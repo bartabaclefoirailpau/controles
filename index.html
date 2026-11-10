@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fr"><head><base target="_top"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&amp;family=Jost:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root{--b:#8A6440;--g:#FCF8F1;--r:#c62828;--v:#2e7d32}
+*{box-sizing:border-box}body{font-family:Calibri,Arial,sans-serif;margin:0;padding:12px;background:#fff;color:#1a1a1a;max-width:720px;margin-inline:auto}
+h1{font-size:20px;margin:0 0 10px;color:var(--b)}h2{font-size:14px;text-transform:uppercase;color:var(--b);margin:18px 0 6px}
+select,input{font:inherit;padding:9px;border:1px solid #bbb;border-radius:6px;width:100%;background:#fff;color:#1a1a1a}
+.row{display:flex;gap:8px;margin-bottom:8px}.row>*{flex:1}
+.res{max-height:240px;overflow:auto;border:1px solid #ddd;border-radius:6px;margin-top:6px}
+.res div{padding:9px;border-bottom:1px solid #eee;cursor:pointer;font-size:14px}.res small{color:#666;display:block}
+.line{border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:8px;background:var(--g)}
+.line b{font-size:14px}.line small{display:block;color:#555}.in{display:flex;gap:8px;margin-top:8px;align-items:end}.in label{flex:1;font-size:12px}
+.neg{color:var(--r);font-weight:700}.pos{color:var(--v);font-weight:700}
+button{font:inherit;font-weight:700;padding:12px;border:0;border-radius:8px;background:var(--b);color:#fff;width:100%}button:disabled{background:#999}
+.x{background:#fff;color:var(--r);border:1px solid var(--r);width:auto;padding:6px 10px}
+table{border-collapse:collapse;width:100%;font-size:13px}th{background:var(--b);color:#fff;text-align:left;padding:6px}td{padding:6px;border-bottom:1px solid #ddd}td+td,th+th{text-align:right}
+.tot{font-size:22px;font-weight:700;text-align:center;padding:10px;border:2px solid var(--b);border-radius:8px;margin:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}.chip{padding:6px 11px;border:1px solid var(--b);border-radius:16px;font-size:13px;color:var(--b);cursor:pointer;user-select:none}.chip.on{background:var(--b);color:#fff}.lab{font-size:12px;color:#555;margin:8px 0 2px}
+.dt{background:var(--g);border:1px solid var(--b);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:14px;text-align:center}
+.msg{padding:10px;border-radius:6px;margin:8px 0;background:#fff3cd}
+body{background:#F6EFE3;font-family:'Jost',Calibri,Arial,sans-serif;color:#1F1B18}
+h1{font-family:'Cinzel',serif;font-size:22px;letter-spacing:.04em;margin:0;color:#8A6440}
+h2{font-family:'Cinzel',serif;letter-spacing:.06em}
+.sub{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:#8A6440}
+.hd{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #D9C7AA}
+select,input{background:#FCF8F1;border-color:#D9C7AA}.res{border-color:#E3D3B8}.line{border-color:#E3D3B8}
+.bd{display:inline-block;margin-left:4px;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:500}
+.bd.g,.st-g{background:#C6EFCE;color:#14532d}.bd.o,.st-o{background:#FFE9A8;color:#5c3d00}.bd.r,.st-r{background:#FFC7CE;color:#7f1020}
+.tot.st-g{border-color:#2e7d32}.tot.st-o{border-color:#b7791f}.tot.st-r{border-color:#c62828}
+.lg{font-size:12px;color:#555;margin:0 0 6px}
+.tile{display:block;width:100%;text-align:left;background:#FCF8F1;color:#1F1B18;border:1px solid #D9C7AA;border-radius:8px;padding:16px;margin-bottom:12px;font-weight:400}
+.tile b{display:block;font-family:'Cinzel',serif;font-size:17px;letter-spacing:.05em;color:#8A6440;margin-bottom:4px}
+.tile span{font-size:14px;line-height:1.45}
+.info{font-size:13px;line-height:1.5;background:#FCF8F1;border:1px solid #E3D3B8;border-radius:8px;padding:10px 12px;margin-bottom:12px;display:none}
+.back{background:transparent;color:#8A6440;border:1px solid #8A6440;margin-bottom:10px;padding:8px;font-weight:500;display:none}
+.hd h1{font-size:19px}
+body{font-size:17px}
+select,input{font-size:17px;padding:12px}
+button{font-size:17px;padding:14px}
+h2{font-size:16px}.sub{font-size:13px}.hd h1{font-size:20px}
+.dt{font-size:16px}.info{font-size:15px}.lg{font-size:14px}.lab{font-size:15px}
+.chip{font-size:16px;padding:8px 14px}
+.res div{font-size:16px;padding:12px}.res small{font-size:14px}
+.line b{font-size:16px}.line small{font-size:14px}.in label{font-size:14px}
+table{font-size:15px}.tot{font-size:24px}.bd{font-size:14px}
+.tile span{font-size:16px}.tile b{font-size:19px}
+[style*="font-size:13px"]{font-size:15px!important}
+[style*="font-size:12px"]{font-size:14px!important}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin:4px 0 10px}.bg2{grid-template-columns:1fr 1fr}
+.bigb{min-height:56px;border:1px solid #8A6440;border-radius:10px;background:#FCF8F1;color:#8A6440;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;user-select:none;padding:6px}
+.bigb b{font-size:19px;font-weight:500;line-height:1.2}.bigb span{font-size:13px;line-height:1.2}
+.bigb.on{background:#8A6440;color:#fff}
+.stp{font-size:14px;color:#8A6440;margin:4px 0 8px}.fl{display:block;margin:10px 0 2px;font-size:15px}.fl small{display:block;color:#666;font-size:13px;font-weight:400}
+.ck{border-top:1px solid #E3D3B8;padding:8px 0;font-size:15px}.ck b{margin-right:6px}.ck.ok b{color:#2e7d32}.ck.ko b{color:#c62828}.ck.ko{color:#7f1020}.ck small{display:block;color:#555;font-size:14px}.ck.na{color:#777}
+.cbx{display:flex;align-items:center;gap:8px;font-size:16px}.cbx input{width:auto}.nvb{background:transparent;color:#8A6440;border:1px solid #8A6440}
+.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.dgrid label{font-size:14px}.sec{font-size:14px;color:#8A6440;margin:12px 0 2px;font-weight:500}
+.negrow{display:flex;align-items:center;gap:8px}.mn{font-size:26px;font-weight:700;color:#c62828;min-width:22px;text-align:center}.negrow input{flex:1}
+.bn{display:flex;align-items:center;gap:10px;border-radius:10px;padding:11px 12px;color:#fff;font-weight:500;font-size:17px;margin:0 0 10px}.bn svg{flex:0 0 auto}
+.tkt{font-size:14px;font-weight:500;margin:12px 0 0}.tk{background:#fff;border:1px dashed #b9a98f;border-radius:4px;padding:6px 8px;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.55;color:#222;margin:4px 0 6px}
+.tk .hl{background:#FFE9A8;display:flex;justify-content:space-between;gap:8px;padding:0 3px;border-radius:2px;font-weight:700}
+.pck{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-top:1px solid #E3D3B8;font-size:16px;line-height:1.35}.pck input{width:24px;height:24px;margin-top:1px;flex:0 0 auto}
+.who{font-size:14px;color:#555;margin:-2px 0 10px;display:none;justify-content:space-between;align-items:center;gap:8px}.who button{width:auto;padding:6px 12px;font-size:14px;background:transparent;color:#8A6440;border:1px solid #8A6440}
+.doc{border:1px solid #D9C7AA;border-radius:10px;padding:12px;margin-bottom:12px;background:#FCF8F1}.dh{display:flex;justify-content:space-between;align-items:center;gap:8px}.dh b{font-size:17px}
+.ds{font-size:13px;padding:3px 10px;border-radius:12px;background:#E9DCC6;color:#5a4528;white-space:nowrap}.ds.ok{background:#C6EFCE;color:#14532d}.ds.ko{background:#FFC7CE;color:#7f1020}
+.rap{font-size:15px;line-height:1.4;margin:8px 0}
+.cam{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;background:#8A6440;color:#fff;border-radius:10px;padding:16px;font-size:18px;font-weight:500;cursor:pointer;margin:6px 0;text-align:center}.cam.sm{padding:11px;font-size:16px}.cam input{position:absolute;width:1px;height:1px;opacity:0}
+.rc{margin:8px 0;border-top:1px solid #E3D3B8}.kv{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid #EFE3CF;font-size:15px}
+details{margin-top:8px}summary{font-size:14px;color:#8A6440;cursor:pointer}
+.brow{display:grid;grid-template-columns:62px 18px 1fr 108px;align-items:center;gap:8px;margin:7px 0}.brow input{padding:10px}.bl{font-weight:500}.bx{color:#8A6440;text-align:center}.bt{text-align:right;font-weight:500;font-size:15px}
+.stk{position:sticky;top:0;z-index:5;background:#8A6440;color:#fff;border-radius:10px;padding:8px 12px;margin:0 0 10px;box-shadow:0 3px 8px rgba(0,0,0,.28)}.sk{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 0;font-size:16px}.sk+.sk{border-top:1px solid rgba(255,255,255,.35)}.sk b{font-weight:600}.sk .ok{color:#C6EFCE}.sk .ko{color:#FFC7CE}
+.ldw{background:#FCF8F1;border:1px solid #E3D3B8;border-radius:12px;padding:18px 16px;margin-top:20px}.ldl{font-family:'Cinzel',serif;letter-spacing:.14em;font-size:20px;color:#8A6440;text-align:center}.lds{font-size:11px;letter-spacing:.3em;color:#8A6440;text-align:center;margin:2px 0 16px}
+.ldb{height:12px;border-radius:8px;background:#E3D3B8;overflow:hidden}.ldb i{display:block;height:100%;width:0;background:#8A6440;border-radius:8px;transition:width .2s linear}.ldr{display:flex;justify-content:space-between;font-size:14px;margin:6px 0 10px}
+.ldu{list-style:none;margin:0;padding:0}.ldu li{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:15px;color:#8a7a62}.ldu li.on{color:#1F1B18;font-weight:500}.ldu li.ok{color:#2e7d32}.ldu li i{width:18px;text-align:center;font-style:normal}
+.pgw{margin:8px 0}.bigb.wide{grid-column:1 / -1}.chipx{font-size:12px;padding:2px 8px;border-radius:10px;background:#E9DCC6;color:#5a4528}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.mk{background:#FCF8F1;border:1px solid #E3D3B8;border-radius:10px;padding:9px 10px}.mk small{display:block;font-size:13px;color:#6a5f4d}.mk b{font-size:20px;font-weight:500}
+.pk{background:#FCF8F1;border:1px solid #D9C7AA;border-radius:10px;padding:10px;margin:0 0 8px}.pk .ph2{display:flex;justify-content:space-between;font-size:16px}.pk small{display:block;font-size:13px;color:#4a4033}.fbar{height:10px;border-radius:6px;background:#E3D3B8;margin:6px 0;overflow:hidden}.fbar i{display:block;height:100%;background:#2e7d32;border-radius:6px}
+.dj{background:#FCF8F1;border:1px solid #E3D3B8;border-radius:10px;padding:10px 12px;margin:0 0 8px}.dj1{display:flex;align-items:center;gap:10px}.dj1 input{width:24px;height:24px;flex:0 0 auto}.dj1 small{display:block;color:#6a5f4d;font-size:13px}.dj2{font-size:21px;font-weight:500}
+.dj3{font-size:15px;margin-top:6px;line-height:1.35}.dj4{font-size:11px;color:#8a7a62;margin-top:3px}.dst{display:inline-block;font-size:12px;padding:2px 9px;border-radius:10px;margin-top:6px;background:#E9DCC6;color:#5a4528}.dst.ok{background:#C6EFCE;color:#14532d}.dst.wa{background:#FFE9A8;color:#5c3d00}
+.dj.o{border-left:6px solid #b7791f}.dj.v{border-left:6px solid #2e7d32}.dj.r{border-left:6px solid #c62828;background:#FFF1F2}.dj5{font-size:14px;color:#7f1020;margin-top:6px;line-height:1.35}.dst.ko{background:#FFC7CE;color:#7f1020}
+.calh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0}.calh b{font-size:18px;font-weight:500;text-transform:capitalize}.calb{width:52px;padding:6px;font-size:22px;line-height:1}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cdw{text-align:center;font-size:13px;color:#8a7a62;padding:2px 0}
+.cd{min-height:50px;border-radius:8px;border:1px solid #E3D3B8;background:#FCF8F1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;line-height:1.1}.cd b{font-weight:500}.cd small{font-size:10px;color:#6a5f4d}
+.cd.e{background:transparent;border:0}.cd.o{background:#FFE9A8;border-color:#b7791f;cursor:pointer}.cd.v{background:#C6EFCE;border-color:#2e7d32;cursor:pointer}.cd.r{background:#FFC7CE;border-color:#c62828;cursor:pointer}.cd.sel{outline:3px solid #8A6440;outline-offset:1px}
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0;font-size:13px;color:#4a4033}.leg span{display:flex;align-items:center;gap:5px}.leg i.cd{display:inline-block;min-height:0;width:16px;height:16px;border-radius:4px}
+.dj.b{border-left:6px solid #2f5fb3}.dst.bl{background:#CFE0FF;color:#1b3a73}.cd.b{background:#CFE0FF;border-color:#2f5fb3;cursor:pointer}
+</style></head><body>
+<div class="hd"><svg viewBox="50 180 300 215" width="70" height="50" role="img" aria-label="Pictogramme Le Foirail" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="color:#8A6440;display:block"><ellipse cx="200" cy="225" rx="78" ry="11"/><path d="M122 225 L200 305 L278 225"/><path d="M141 240 Q200 254 259 240"/><line x1="200" y1="305" x2="200" y2="345"/><ellipse cx="200" cy="350" rx="40" ry="7"/><line x1="244" y1="254" x2="290" y2="190" stroke-width="2.5"/><circle cx="272" cy="205" r="14"/><circle cx="276" cy="201" r="3.5"/><line x1="96.2" y1="258.0" x2="62.8" y2="244.6"/><line x1="88.3" y1="292.2" x2="52.4" y2="289.7"/><line x1="91.3" y1="327.1" x2="56.4" y2="335.8"/><line x1="105.0" y1="359.4" x2="74.5" y2="378.4"/><line x1="303.8" y1="258.0" x2="337.2" y2="244.6"/><line x1="311.7" y1="292.2" x2="347.6" y2="289.7"/><line x1="308.7" y1="327.1" x2="343.6" y2="335.8"/><line x1="295.0" y1="359.4" x2="325.5" y2="378.4"/><line x1="118" y1="382" x2="188" y2="382"/><line x1="212" y1="382" x2="282" y2="382"/><path d="M200 375 L207 382 L200 389 L193 382 Z" fill="currentColor"/></svg><div><h1>Contrôles Bar Tabac du Foirail</h1><div class="sub" id="sub">Choisissez le contrôle à effectuer</div></div></div>
+<div class="dt" id="dt"></div><div class="who" id="who"></div><button class="back" id="back">← Choisir un autre contrôle</button><div class="info" id="info"></div>
+<div id="view">Chargement…</div>
+<script>
+// Quand la page est hébergée hors de Google (GitHub Pages), google.script.run n'existe pas : on le remplace par des appels HTTP vers le script.
+var API_URL = 'https://script.google.com/macros/s/AKfycbyUnovzsxP8vO7MEr9QkhxbM7im1sZOOvXL8aqqUv_FygdqLmqS8NpBtmRzKgydfGaFXg/exec';
+if (!(window.google && window.google.script && window.google.script.run)) {
+  (function () {
+    function appel(fn, args, ok, ko) {
+      var ctl = window.AbortController ? new AbortController() : null, t = ctl ? setTimeout(function () { ctl.abort(); }, 120000) : null;
+      fetch(API_URL, {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify({fn: fn, args: args}), signal: ctl ? ctl.signal : undefined})
+        .then(function (r) { return r.json(); })
+        .then(function (j) { if (t) clearTimeout(t); if (j && j.ok) { if (ok) ok(j.result); } else if (ko) ko(new Error((j && j.error) || 'Erreur du serveur.')); })
+        .catch(function (e) { if (t) clearTimeout(t); if (ko) ko(new Error('Connexion au serveur impossible : vérifiez le réseau et réessayez.')); });
+    }
+    function run(ok, ko) {
+      return new Proxy({}, {get: function (o, nom) {
+        if (nom === 'withSuccessHandler') return function (f) { return run(f, ko); };
+        if (nom === 'withFailureHandler') return function (f) { return run(ok, f); };
+        return function () { appel(String(nom), Array.prototype.slice.call(arguments), ok, ko); };
+      }});
+    }
+    window.google = {script: {run: run(null, null)}};
+  })();
+}
+window.onerror = function (m) { document.getElementById('view').innerHTML = '<div class="msg" style="background:#f8d7da">Erreur de la page : ' + m + '</div>'; };
+var $ = function (id) { return document.getElementById(id); };
+var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+var eur = function (n) { return n.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'}); };
+var cls = function (n) { return n < 0 ? 'neg' : (n > 0 ? 'pos' : ''); };
+
+var B, D, L = [], done = false, chk = function () { return false; };
+var LD = {t: null, p: 0, e: []};
+function ldHtml(titre, etapes) {
+  return '<div class="ldw"><div class="ldl">LE FOIRAIL</div><div class="lds">CONTRÔLES · BAR TABAC</div><div class="ldb"><i id="ld_b"></i></div><div class="ldr"><span id="ld_t">' + esc(titre) + '</span><b id="ld_p" style="font-weight:500">0 %</b></div><ul class="ldu" id="ld_u">' + etapes.map(function (e) { return '<li><i>○</i>' + esc(e) + '</li>'; }).join('') + '</ul></div>';
+}
+function ldSet(p, st, txt) {
+  LD.p = p; var b = $('ld_b'); if (!b) return;
+  b.style.width = p + '%'; $('ld_p').textContent = Math.round(p) + ' %'; if (txt) $('ld_t').textContent = txt;
+  var li = $('ld_u').children; for (var i = 0; i < li.length; i++) { li[i].className = i < st ? 'ok' : (i === st ? 'on' : ''); li[i].firstChild.textContent = i < st ? '✓' : (i === st ? '●' : '○'); }
+}
+function ldRun(titre, etapes) {
+  clearInterval(LD.t); LD.e = etapes; $('view').innerHTML = ldHtml(titre, etapes);
+  ldSet(30, 1, etapes[1] + '…');
+  LD.t = setInterval(function () { ldSet(LD.p + (92 - LD.p) * 0.05, 1); }, 150);
+}
+function ldDone(cb) { clearInterval(LD.t); ldSet(100, LD.e.length, 'Prêt'); setTimeout(cb, 250); }
+var PG_ST = ['Préparation de l’image', 'Envoi au serveur', 'Lecture du ticket par l’IA', 'Contrôles croisés'];
+function pgHtml(id) {
+  var g = CL.pg && CL.pg.id === id ? CL.pg : {p: 4, s: 0};
+  return '<div class="pgw"><div class="ldb"><i id="pg_b" style="width:' + g.p + '%"></i></div><div class="ldr"><span id="pg_t">' + PG_ST[g.s] + '…</span><b id="pg_p" style="font-weight:500">' + Math.round(g.p) + ' %</b></div></div>';
+}
+function pgSet(p, s) { if (!CL.pg) return; CL.pg.p = p; CL.pg.s = s; var b = $('pg_b'); if (b) { b.style.width = p + '%'; $('pg_p').textContent = Math.round(p) + ' %'; $('pg_t').textContent = PG_ST[s] + '…'; } }
+function pgStart(id) {
+  clearInterval(CL.pgt); CL.pg = {id: id, p: 4, s: 0, t0: 0};
+  CL.pgt = setInterval(function () {
+    var g = CL.pg; if (!g) return;
+    if (g.s === 1 && g.t0 && Date.now() - g.t0 > 1500) g.s = 2;
+    if (g.s === 0) pgSet(Math.min(24, g.p + 1.5), 0); else if (g.s === 1) pgSet(Math.min(44, g.p + 1.2), 1); else if (g.s === 2) pgSet(g.p + (90 - g.p) * 0.045, 2);
+  }, 120);
+}
+function pgStop() { clearInterval(CL.pgt); CL.pg = null; }
+var INFO = {
+  stock: ['Stock fin de mois', 'À faire le dernier jour du mois : fûts, CO2, café, sucres et déca. En cours : part restante du fût ou du paquet entamé (0,5 = moitié). Neuves : nombre d’unités neuves. Mettre 0 si rien.'],
+  cloture: ['Contrôle de caisse', 'À faire à chaque changement d’équipe et à la clôture du soir. Suivez les étapes dans l’ordre : chaque étape compare les tickets entre eux. Si une ligne est rouge, relisez le ticket indiqué. Après la préparation, vous photographiez chaque document : l’application lit les chiffres toute seule. Une étape ne se débloque que si tous ses contrôles sont verts. Les rapports FDJ et Nickel cumulent la journée : l’application ajoute les clôtures déjà enregistrées aujourd’hui.'],
+  surprise: ['Contrôle surprise', 'Réservé aux gérants. À faire à tout moment : sur place avec les tickets, ou avec les photos envoyées par un employé. Mêmes tickets que la clôture (ticket X, TPE, FDJ, Nickel), mais le tiroir est compté fond de caisse compris. Le rapport PDF est envoyé par e-mail.'],
+  depots: ['Dépôts à la banque', 'Réservé aux gérants. Chaque clôture alimente cet écran : cochez ce qui part à la banque, l’application prépare les pochettes (8 000 € maximum chacune) et note le dépôt. Les pièces restent en caisse : elles sont échangées contre des billets de la caisse.'],
+  tabac: ['Contrôle tabac · écarts de stock', 'À faire deux fois par semaine et avant chaque livraison. Déclarez seulement les références dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20).']
+};
+function check() { var b = $('save'); if (b) b.disabled = done || !chk(); }
+
+function go(v) {
+  if (!B.user) { loginView(); return; }
+  var gr = (B.gerants || []).indexOf(B.user.nom) >= 0;
+  if (B.user.nom === 'Extra' && v !== 'cloture') v = 'home';
+  if (v === 'depots' && !gr) v = 'home';
+  L = []; done = false; window.okSave = false; chk = function () { return false; };
+  S = {fam: '', sou: '', mar: '', mine: false, cond: '', fmt: '', gam: '', q: ''};
+  var i = INFO[v];
+  $('sub').textContent = i ? i[0] : 'Choisissez le contrôle à effectuer';
+  $('info').style.display = i ? 'block' : 'none'; $('info').textContent = i ? i[1] : '';
+  $('back').style.display = i ? 'block' : 'none';
+  if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else home();
+  window.scrollTo(0, 0);
+}
+
+function home() {
+  var gr = (B.gerants || []).indexOf(B.user.nom) >= 0, x = B.user.nom === 'Extra';
+  var t = '<button class="tile" onclick="go(\'cloture\')"><b>Contrôle de caisse</b><span>Changement d’équipe ou clôture du soir : ticket X, TPE, FDJ, cash back, Nickel puis comptage. Le calcul se fait tout seul.</span></button>';
+  if (!x) t += '<button class="tile" onclick="go(\'stock\')"><b>Stock fin de mois</b><span>Fûts, café, sucres et déca : saisir les quantités du dernier jour du mois.</span></button>' +
+    '<button class="tile" onclick="go(\'tabac\')"><b>Contrôle tabac</b><span>Déclarer les écarts entre le stock Strator et le rayon.</span></button>';
+  if (gr) t += '<button class="tile" onclick="go(\'depots\')"><b>Dépôts</b><span id="dp_sub">Calcul en cours…</span></button>';
+  $('view').innerHTML = t;
+  if (gr) depotsResume();
+}
+function tick() { $('dt').textContent = new Date().toLocaleString('fr-FR', {timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'}); }
+var idleT = null;
+function idleReset() { clearTimeout(idleT); if (B && B.user) idleT = setTimeout(function () { logout('Session verrouillée après 10 minutes sans activité.'); }, 600000); }
+function logout(msg) { B.user = null; clearTimeout(idleT); loginView(msg); }
+
+function loginView(msg) {
+  window.okSave = false; chk = function () { return false; }; L = [];
+  $('who').style.display = 'none'; $('back').style.display = 'none'; $('info').style.display = 'none'; $('sub').textContent = 'Connexion';
+  $('view').innerHTML = '<div class="line"><b>Qui êtes-vous ?</b><label class="fl" for="lg_nom">Prénom</label><select id="lg_nom">' + opts(B.emp, 'Choisir') + '</select>' +
+    '<div id="lg_ex" style="display:none"><label class="fl" for="lg_pre">Prénom de l’extra<small>Obligatoire : il apparaît sur chaque contrôle. Vos données restent séparées de celles de l’équipe.</small></label><input id="lg_pre" maxlength="20" autocomplete="off"></div>' +
+    '<label class="fl" for="lg_pin">Votre code personnel</label><input id="lg_pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••"><div id="lg_msg">' + (msg ? '<div class="msg">' + esc(msg) + '</div>' : '') + '</div>' +
+    '<button id="lg_go" disabled style="margin-top:8px">Se connecter</button></div><p class="lg">Chaque déclaration est enregistrée à votre nom, avec la date et l’heure. La page se verrouille après 10 minutes sans activité.</p>';
+  var upd = function () { var x = $('lg_nom').value === 'Extra'; $('lg_ex').style.display = x ? 'block' : 'none'; $('lg_go').disabled = !($('lg_nom').value && $('lg_pin').value && (!x || $('lg_pre').value.trim().length >= 2)); };
+  $('lg_nom').onchange = upd; $('lg_pin').oninput = upd; $('lg_pre').oninput = upd;
+  $('lg_go').onclick = function () {
+    var nom = $('lg_nom').value, pin = $('lg_pin').value, pre = $('lg_pre').value.trim(); $('lg_go').disabled = true; $('lg_go').textContent = 'Vérification…';
+    google.script.run.withSuccessHandler(function (r) {
+      if (r && r.ok) { B.user = {nom: r.nom, pin: pin, extra: r.extra || '', aff: r.aff || r.nom}; $('who').innerHTML = '<span>Connecté : <b>' + esc(B.user.aff) + '</b>' + (r.nom === 'Extra' ? ' <span class="chipx">Profil extra</span>' : '') + '</span><button onclick="logout()">Se déconnecter</button>'; $('who').style.display = 'flex'; idleReset(); go('home'); }
+      else { $('lg_go').textContent = 'Se connecter'; $('lg_pin').value = ''; $('lg_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc((r && r.message) || 'Connexion impossible.') + '</div>'; }
+    }).withFailureHandler(function (e) { $('lg_go').textContent = 'Se connecter'; $('lg_go').disabled = false; $('lg_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; }).connexion(nom, pin, pre);
+  };
+}
+
+function start(b) {
+  B = b; tick(); setInterval(tick, 20000);
+  $('back').onclick = function () { go('home'); };
+  if (document.addEventListener) ['click', 'keydown', 'touchstart', 'input'].forEach(function (ev) { document.addEventListener(ev, idleReset, true); });
+  ldDone(function () { loginView(); });
+}
+ldRun('Ouverture de l’application…', ['Page chargée', 'Connexion au serveur', 'Préparation de l’écran']);
+google.script.run.withSuccessHandler(start).withFailureHandler(function (e) { $('view').textContent = 'Erreur : ' + e.message; }).getBase();
+setTimeout(function () { if (!B) $('view').innerHTML += '<div class="msg">Le chargement met du temps. Si ce message reste affiché, notez-le et envoyez-le moi.</div>'; }, 20000);
+var S = {fam: '', sou: '', mar: '', mine: false, cond: '', fmt: '', gam: '', q: ''};
+var STOP = 'en unites unite paquet rigide souple pot blague pochette boite de du des la le les et a au aux x by g mg cigares cigare cigarillos pipe tobacco coupe large cigarettes pods pod'.split(' ');
+function opts(a, first) { return (first ? '<option value="">' + first + '</option>' : '') + a.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join(''); }
+function uniq(a) { return a.filter(function (x, i) { return a.indexOf(x) === i; }).sort(); }
+function norm(s) { return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+function cap(w) { return (w.length > 3 && w === w.toUpperCase()) ? w.charAt(0) + w.slice(1).toLowerCase() : w; }
+function condOf(s) {
+  s = String(s);
+  var m = /(\d+)\s*x\s*(\d+(?:[.,]\d+)?)\s*g\b/i.exec(s);
+  if (m) return m[1] + ' x ' + m[2].replace(',', '.') + ' g';
+  m = /(\d+)\s*(unités|unites|unité|unite|cigares|cigare|cigarillos|cigarillo|pièces|pieces)\b/i.exec(s);
+  if (m) { var u = m[2].toLowerCase(); return m[1] + ' ' + (u.indexOf('unit') === 0 ? 'unités' : u.indexOf('cigarillo') === 0 ? 'cigarillos' : u.indexOf('cigare') === 0 ? 'cigares' : 'pièces'); }
+  m = /(\d+(?:[.,]\d+)?)\s*(g|gr|grammes)\b/i.exec(s);
+  if (m) return m[1].replace(',', '.') + ' g';
+  m = /bo[iî]te\s+de\s+(\d+)/i.exec(s) || /,\s*en\s+(\d+)\s*$/i.exec(s);
+  return m ? m[1] + ' pièces' : '';
+}
+function prep(cat) {
+  var fc = {};
+  cat.forEach(function (c) {
+    c.base = String(c[1]).replace(/,?\s*en\s+\d.*$/i, '').replace(/\s+/g, ' ').trim(); c.tk = c.base.split(' ');
+    var k = norm(c.tk[0]), o = fc[k] = fc[k] || {n: 0, s: {}}, s2 = norm(c.tk[1] || ''); o.n++; o.s[s2] = (o.s[s2] || 0) + 1;
+  });
+  cat.forEach(function (c) {
+    var t = c.tk, k = norm(t[0]), o = fc[k], top = '', tn = 0;
+    for (var s in o.s) if (o.s[s] > tn) { tn = o.s[s]; top = s; }
+    var two = t.length > 1 && o.n >= 3 && top && tn / o.n >= 0.85 && norm(t[1]) === top;
+    c.bk = two ? k + ' ' + top : k; c.bd = two ? cap(t[0]) + ' ' + cap(t[1]) : cap(t[0]); c.bn = two ? 2 : 1;
+    c.n = norm(c[1]).replace(/[^a-z0-9& ]/g, ' ');
+    c.cd = condOf(c[5] || c[1]);
+    c.f100 = /(^|[^0-9])100\s?'?s(\W|$)/i.test(c[1]);
+    c.gt = []; var seen = {};
+    t.slice(c.bn).forEach(function (w) {
+      var key = norm(w).replace(/[^a-z0-9&]/g, '');
+      if (key.length < 2 || /^\d/.test(key) || STOP.indexOf(key) >= 0 || seen[key]) return;
+      seen[key] = 1; c.gt.push([key, cap(w.replace(/[()]/g, ''))]);
+    });
+  });
+}
+function ok(c, skip) {
+  skip = skip || '';
+  return (!S.fam || c[2] === S.fam) && (!S.sou || c[3] === S.sou) && (!S.mar || c.bk === S.mar) && (!S.mine || c[7]) &&
+    (skip.indexOf('cond') >= 0 || !S.cond || c.cd === S.cond) &&
+    (skip.indexOf('fmt') >= 0 || !S.fmt || (S.fmt === '100' ? c.f100 : !c.f100)) &&
+    (skip.indexOf('gam') >= 0 || !S.gam || c.gt.some(function (x) { return x[0] === S.gam; }));
+}
+function facets(skip) { return D.cat.filter(function (c) { return ok(c, skip); }); }
+function subseq(t, s) { if (t.length < 4) return false; var j = 0; for (var i = 0; i < s.length && j < t.length; i++) if (s.charAt(i) === t.charAt(j)) j++; return j === t.length; }
+function results() {
+  var q = norm(S.q).replace(/[^a-z0-9& ]/g, ' ').trim(), tk = q ? q.split(/\s+/) : [];
+  if (!tk.length && !(S.fam || S.sou || S.mar || S.cond || S.fmt || S.gam)) return null;
+  var base = facets(''), fuzzy = false;
+  var out = base.filter(function (c) { return tk.every(function (t) { return c.n.indexOf(t) >= 0; }); });
+  if (tk.length && !out.length) {
+    fuzzy = true;
+    out = base.filter(function (c) { return tk.every(function (t) { return c.n.indexOf(t) >= 0 || c.n.split(' ').some(function (w) { return w.length <= t.length + 3 && subseq(t, w); }); }); });
+  }
+  out.sort(function (a, b) { return a.bk < b.bk ? -1 : a.bk > b.bk ? 1 : (a[1] < b[1] ? -1 : 1); });
+  return {list: out.slice(0, 60), total: out.length, fuzzy: fuzzy};
+}
+function chip(k, v, label, n) { return '<span class="chip' + (S[k] === v ? ' on' : '') + '" data-k="' + k + '" data-v="' + esc(v) + '">' + esc(label) + (n ? ' (' + n + ')' : '') + '</span>'; }
+function big(k, v, main, sub) { return '<div class="bigb' + (S[k] === v ? ' on' : '') + '" data-k="' + k + '" data-v="' + esc(v) + '"><b>' + esc(main) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</div>'; }
+function refresh() {
+  var sf = facets('sou mar cond fmt gam'), sous = uniq(sf.map(function (c) { return c[3]; }));
+  if (sous.indexOf(S.sou) < 0) S.sou = '';
+  $('sou').innerHTML = opts(sous, 'Toutes les sous-familles'); $('sou').value = S.sou;
+  var bm = {}; facets('mar cond fmt gam').forEach(function (c) { var o = bm[c.bk] = bm[c.bk] || {d: c.bd, n: 0}; o.n++; });
+  if (S.mar && !bm[S.mar]) S.mar = '';
+  var bk = Object.keys(bm).sort(function (a, b) { return bm[a].d.toLowerCase() < bm[b].d.toLowerCase() ? -1 : 1; });
+  $('mar').innerHTML = '<option value="">Toutes les marques</option>' + bk.map(function (k) { return '<option value="' + esc(k) + '">' + esc(bm[k].d) + ' (' + bm[k].n + ')</option>'; }).join(''); $('mar').value = S.mar;
+  var h = '', cm = {};
+  var ff = facets('fmt'), n100 = ff.filter(function (c) { return c.f100; }).length;
+  if (n100 || S.fmt) h += '<div class="lab">Format</div><div class="bgrid bg2">' + big('fmt', 'norm', 'Normale', (ff.length - n100) + ' réf.') + big('fmt', '100', "100's", n100 + ' réf.') + '</div>';
+  facets('cond').forEach(function (c) { if (c.cd) cm[c.cd] = (cm[c.cd] || 0) + 1; });
+  var ck = Object.keys(cm).sort(function (a, b) { return parseInt(a) - parseInt(b) || (a < b ? -1 : 1); });
+  if (ck.length > 1 || S.cond) h += '<div class="lab">Conditionnement</div><div class="bgrid">' + ck.map(function (k) { return big('cond', k, k, cm[k] + ' réf.'); }).join('') + '</div>';
+  if (S.mar) {
+    var gm = {}; facets('gam').forEach(function (c) { c.gt.forEach(function (x) { var o = gm[x[0]] = gm[x[0]] || {d: x[1], n: 0}; o.n++; }); });
+    var gk = Object.keys(gm).filter(function (k) { return gm[k].n >= 2 || k === S.gam; }).sort(function (a, b) { return gm[b].n - gm[a].n; }).slice(0, 14);
+    if (gk.length) h += '<div class="lab">Sous-gamme</div><div class="chips">' + gk.map(function (k) { return chip('gam', k, gm[k].d, gm[k].n); }).join('') + '</div>';
+  }
+  $('chips').innerHTML = h; showRes();
+}
+function showRes() {
+  var r = results();
+  if (!r) { $('res').innerHTML = '<div style="cursor:default;color:#666">Choisissez une marque ou une famille, ou tapez un nom de produit.</div>'; return; }
+  if (!r.total) { $('res').innerHTML = '<div style="cursor:default">Aucun résultat. Vérifiez les filtres actifs.</div>'; return; }
+  var head = (r.fuzzy ? '<div style="cursor:default;color:#8a6d00">Aucun résultat exact : suggestions proches.</div>' : '') + (r.total > 60 ? '<div style="cursor:default;color:#666">' + r.total + ' résultats, 60 affichés : affinez avec les filtres.</div>' : '');
+  $('res').innerHTML = head + r.list.map(function (c) { return '<div onclick="add(' + c[0] + ')">' + esc(c[1]) + '<small>' + esc(c[3]) + (c.cd ? ' · ' + esc(c.cd) : '') + ' · ' + eur(c[4]) + '</small></div>'; }).join('');
+}
+
+
+function tabacStart() {
+  ldRun('Chargement du catalogue…', ['Demande envoyée', 'Réception du catalogue', 'Préparation de la recherche']);
+  google.script.run.withSuccessHandler(function (r) {
+    D = {cat: r.cat, max: B.max, seuils: B.seuilsTabac, emp: B.emp, types: B.types, creneaux: B.creneaux, effectifs: B.effectifs};
+    prep(D.cat); ldDone(function () { tabacInit(D); });
+  }).withFailureHandler(function (e) { $('view').textContent = 'Erreur : ' + e.message; }).getCatalogue();
+}
+function tabacInit(d) {
+  var h = '<p class="lg">Employé : <b>' + esc(B.user.aff) + '</b></p><div class="row"><select id="typ">' + opts(d.types, 'Type de contrôle') + '</select></div><div class="row"><select id="cre">' + opts(d.creneaux, 'Créneau horaire') + '</select><select id="eff">' + opts(d.effectifs, 'Seul ou à deux ?') + '</select></div>';
+  h += '<h2>1. Ajouter une référence en écart</h2><div class="row"><select id="fam">' + opts(uniq(d.cat.map(function (c) { return c[2]; })), 'Toutes les familles') + '</select><select id="sou"></select></div>';
+  h += '<div class="row"><select id="mar"></select></div><div id="chips"></div>';
+  h += '<label style="font-size:13px"><input type="checkbox" id="mine" style="width:auto"> Seulement les références que nous tenons en stock</label>';
+  h += '<input id="q" placeholder="Rechercher un produit (2 lettres minimum)" style="margin-top:6px"><div class="res" id="res"></div>';
+  h += '<h2>2. Quantités <span id="cnt"></span></h2><div id="lines"></div>';
+  h += '<h2>3. Impact de l\'écart</h2><p class="lg">' + legende() + '</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer la déclaration</button>';
+  $('view').innerHTML = h;
+  if (d.cat.some(function (c) { return c[7]; })) { $('mine').checked = true; S.mine = true; }
+  $('fam').onchange = function () { S.fam = this.value; S.sou = ''; S.mar = ''; S.cond = ''; S.fmt = ''; S.gam = ''; refresh(); };
+  $('sou').onchange = function () { S.sou = this.value; refresh(); };
+  $('mar').onchange = function () { S.mar = this.value; S.gam = ''; refresh(); };
+  $('mine').onchange = function () { S.mine = this.checked; refresh(); };
+  $('q').oninput = function () { S.q = this.value; showRes(); };
+  $('chips').onclick = function (e) { var t = e.target && e.target.closest ? e.target.closest('[data-k]') : e.target; if (t && t.getAttribute && t.getAttribute('data-k')) { var k = t.getAttribute('data-k'), v = t.getAttribute('data-v'); S[k] = S[k] === v ? '' : v; refresh(); } };
+  $('typ').onchange = $('cre').onchange = $('eff').onchange = check;
+  chk = function () { return window.okSave && $('typ').value && $('cre').value && $('eff').value; };
+  $('save').onclick = save; refresh(); render();
+}
+
+function num(v) { v = String(v).replace(',', '.').trim(); if (v === '') return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
+function stockView() {
+  var h = '<p class="lg">Employé : <b>' + esc(B.user.aff) + '</b></p><div class="row"><select id="smois">' + opts(B.mois, 'Mois contrôlé') + '</select></div>';
+  B.produits.forEach(function (p, i) {
+    h += '<div class="line"><b>' + esc(p[0]) + '</b><small>' + esc(p[1]) + ' · ' + p[2] + ' ' + esc(p[3]) + ' par unité</small><div class="in"><label>En cours (part restante)<select id="se' + i + '">' + opts(B.enCours) + '</select></label><label>Neuves<input id="sn' + i + '" type="number" inputmode="numeric" min="0" step="1"></label><div style="flex:1;font-size:13px">Total<br><span id="st' + i + '">–</span></div></div></div>';
+  });
+  h += '<div id="msg"></div><button id="save" disabled>Enregistrer le stock</button>';
+  $('view').innerHTML = h;
+  $('smois').onchange = stockCalc;
+  B.produits.forEach(function (p, i) { $('se' + i).onchange = stockCalc; $('sn' + i).oninput = stockCalc; });
+  chk = function () { return window.okSave; };
+  $('save').onclick = stockSave; stockCalc();
+}
+function stockCalc() {
+  var ok = !!$('smois').value;
+  B.produits.forEach(function (p, i) {
+    var e = num($('se' + i).value), n = num($('sn' + i).value), el = $('st' + i);
+    if (n === null || n < 0 || Math.round(n) !== n) { ok = false; el.textContent = '–'; return; }
+    el.textContent = (Math.round(p[2] * (e + n) * 100) / 100) + ' ' + p[3];
+  });
+  window.okSave = ok; check();
+}
+function stockSave() {
+  var b = $('save'); b.disabled = true; b.textContent = 'Enregistrement…';
+  google.script.run.withSuccessHandler(function (r) {
+    done = true; b.style.display = 'none';
+    $('msg').innerHTML = '<div class="msg" style="background:#d4edda">Stock de ' + esc($('smois').value) + ' enregistré (onglet « ' + esc(r.onglet) + ' »).</div><button onclick="go(\'home\')">Retour au menu</button>';
+  }).withFailureHandler(function (e) { b.textContent = 'Enregistrer le stock'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .enregistrerStock({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', mois: $('smois').value, q: B.produits.map(function (p, i) { return [$('se' + i).value, $('sn' + i).value]; })});
+}
+function find(id) { for (var i = 0; i < D.cat.length; i++) if (D.cat[i][0] === id) return D.cat[i]; }
+function add(id) {
+  if (done) return;
+  if (L.length >= D.max) { $('msg').innerHTML = '<div class="msg">Limite de ' + D.max + ' références atteinte : enregistrez, puis faites une nouvelle déclaration.</div>'; return; }
+  if (L.some(function (l) { return l.c[0] === id; })) return;
+  L.push({c: find(id), theo: '', reel: ''}); render();
+}
+function del(i) { L.splice(i, 1); render(); }
+function upd(i, k, v) { L[i][k] = v; calc(); }
+function val(l) { var t = parseFloat(String(l.theo).replace(',', '.')), r = parseFloat(String(l.reel).replace(',', '.')); return (isNaN(t) || isNaN(r) || t < 0 || r < 0) ? null : {t: t, r: r, e: r - t, i: Math.round((r - t) * l.c[4] * 100) / 100}; }
+function render() {
+  $('lines').innerHTML = L.map(function (l, i) {
+    return '<div class="line"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(l.c[1]) + '</b><button class="x" onclick="del(' + i + ')">Retirer</button></div><small>' + esc(l.c[2]) + ' › ' + esc(l.c[3]) + ' · prix de vente ' + eur(l.c[4]) + '</small>' +
+      '<div class="in"><label>Théorique (Strator)<input type="number" inputmode="numeric" min="0" value="' + esc(l.theo) + '" oninput="upd(' + i + ',\'theo\',this.value)"></label><label>Réel (rayon)<input type="number" inputmode="numeric" min="0" value="' + esc(l.reel) + '" oninput="upd(' + i + ',\'reel\',this.value)"></label><div style="flex:1;font-size:13px">Écart<br><span id="e' + i + '">–</span></div></div></div>';
+  }).join('');
+  calc();
+}
+function st(x, a, b) { x = Math.abs(x); return x <= a ? ['g', 'Vert'] : (x <= b ? ['o', 'Orange'] : ['r', 'Rouge']); }
+function pill(x, a, b) { var s = st(x, a, b); return '<span class="bd ' + s[0] + '">' + s[1] + '</span>'; }
+function legende() { var q = D.seuils; return 'Par référence : vert jusqu’à ' + q.l1 + ' €, orange jusqu’à ' + q.l2 + ' €, rouge au-delà. Pour tout le contrôle : vert jusqu’à ' + q.t1 + ' €, orange jusqu’à ' + q.t2 + ' €, rouge au-delà.'; }
+function calc() {
+  var G = {}, S = {}, tot = 0, ok = L.length > 0, nb = 0;
+  L.forEach(function (l, i) {
+    var v = val(l), el = $('e' + i);
+    if (!v) { ok = false; if (el) el.textContent = '–'; return; }
+    if (v.e === 0) ok = false;
+    if (el) el.innerHTML = '<span class="' + cls(v.e) + '">' + (v.e > 0 ? '+' : '') + v.e + ' · ' + eur(v.i) + '</span>' + pill(v.i, D.seuils.l1, D.seuils.l2);
+    nb++; tot += v.i;
+    [[G, l.c[2]], [S, l.c[3]]].forEach(function (p) { var o = p[0][p[1]] = p[0][p[1]] || {n: 0, e: 0, i: 0}; o.n++; o.e += v.e; o.i += v.i; });
+  });
+  $('cnt').textContent = '(' + L.length + ' / ' + (D ? D.max : 20) + ')';
+  var tb = function (T, t) { return '<table><tr><th>' + t + '</th><th>Réf.</th><th>Écart</th><th>Impact</th></tr>' + Object.keys(T).sort().map(function (k) { return '<tr><td>' + esc(k) + '</td><td>' + T[k].n + '</td><td class="' + cls(T[k].e) + '">' + T[k].e + '</td><td class="' + cls(T[k].i) + '">' + eur(T[k].i) + '</td></tr>'; }).join('') + '</table>'; };
+  $('recap').innerHTML = nb ? '<div class="tot st-' + st(tot, D.seuils.t1, D.seuils.t2)[0] + '">Impact final : ' + eur(tot) + ' · ' + st(tot, D.seuils.t1, D.seuils.t2)[1] + '</div>' + tb(G, 'Famille') + '<br>' + tb(S, 'Sous-famille') : '<p style="color:#666;font-size:13px">Le récapitulatif par famille et sous-famille apparaît dès que les quantités sont saisies.</p>';
+  window.okSave = ok; check();
+}
+
+function save() {
+  var b = $('save'); b.disabled = true; b.textContent = 'Enregistrement…';
+  google.script.run.withSuccessHandler(function (r) {
+    done = true; b.style.display = 'none';
+    $('msg').innerHTML = '<div class="msg" style="background:#d4edda">Déclaration enregistrée : ' + r.nb + ' référence(s), impact ' + eur(r.impact) + '.</div><button onclick="go(\'home\')">Retour au menu</button>';
+  }).withFailureHandler(function (e) { b.textContent = 'Enregistrer la déclaration'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .enregistrer({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
+}
+
+var DP = null, COUP = [500, 200, 100, 50, 20, 10, 5];
+var MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'], JOURS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+function dpEchange(c) { var cc = Math.round(c * 100) / 100, e = Math.floor(cc / 5 + 1e-9) * 5, b = {20: 0, 10: 0, 5: 0}, r = e; [20, 10, 5].forEach(function (d) { b[d] = Math.floor(r / d); r -= b[d] * d; }); return {e: e, reste: Math.round((cc - e) * 100) / 100, b: b}; }
+function dpPlan(counts, max) {
+  var bills = []; COUP.forEach(function (d) { for (var i = 0; i < (counts[d] || 0); i++) bills.push(d); });
+  var T = bills.reduce(function (a, b) { return a + b; }, 0); if (!T) return [];
+  for (var k = Math.max(1, Math.ceil(T / max)); k < 40; k++) {
+    var pk = []; for (var i = 0; i < k; i++) pk.push({t: 0, n: 0, c: {}});
+    var ok = true;
+    for (var j = 0; j < bills.length; j++) {
+      var best = -1; for (var q = 0; q < pk.length; q++) { if (pk[q].t + bills[j] <= max && (best < 0 || pk[q].t < pk[best].t)) best = q; }
+      if (best < 0) { ok = false; break; }
+      pk[best].t += bills[j]; pk[best].n++; pk[best].c[bills[j]] = (pk[best].c[bills[j]] || 0) + 1;
+    }
+    if (ok) return pk;
+  }
+  return [];
+}
+function dpComplet(l) { var s = l.pz; COUP.forEach(function (d) { s += (l.b[d] || 0) * d; }); return Math.abs(s - l.total) <= 0.011; }
+function dpJourLib(iso) { var d = new Date(iso + 'T12:00:00'); return JOURS_FR[d.getDay()] + ' ' + iso.slice(8, 10) + '/' + iso.slice(5, 7); }
+function dpMoisLib(m) { return MOIS_FR[Number(m.slice(5, 7)) - 1] + ' ' + m.slice(0, 4); }
+function dpMoisNow() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1); }
+function dpJours() {
+  var by = {};
+  DP.d.lignes.forEach(function (l) {
+    var j = by[l.iso] = by[l.iso] || {iso: l.iso, lines: [], total: 0, cb: 0, pz: 0, b: {}, pend: [], pr: [], jours: 0, deps: [], an: [], ec: 0};
+    j.lines.push(l); j.total += l.total; j.cb += l.cb; j.pz += l.pz; j.ec += l.ec || 0;
+    COUP.forEach(function (d) { j.b[d] = (j.b[d] || 0) + (l.b[d] || 0); });
+    if (l.st === 'À déposer') { j.pend.push(l); j.jours = Math.max(j.jours, l.jours); } else { if (l.st === 'Prête') { j.pr.push(l); j.jours = Math.max(j.jours, l.jours); } if (l.dep && j.deps.indexOf(l.dep) < 0) j.deps.push(l.dep); }
+    if (l.an) l.an.split(' ; ').forEach(function (a) { if (a && j.an.indexOf(a) < 0) j.an.push(a); });
+  });
+  return Object.keys(by).sort().map(function (k) { return by[k]; });
+}
+function dpEtat(j) { return j.an.length ? 'r' : (j.pend.length ? 'o' : (j.pr.length ? 'b' : 'v')); }
+function dpCalc() {
+  var cnt = {}, coins = 0, old = 0, n = 0, inc = [];
+  DP.d.lignes.forEach(function (l) {
+    if (l.st !== 'À déposer' || !DP.sel[l.iso]) return;
+    n++; coins += l.pz; old = Math.max(old, l.jours); if (!dpComplet(l)) inc.push(l);
+    COUP.forEach(function (d) { cnt[d] = (cnt[d] || 0) + (l.b[d] || 0); });
+  });
+  var ech = dpEchange(coins); [20, 10, 5].forEach(function (d) { cnt[d] = (cnt[d] || 0) + ech.b[d]; });
+  var nb = 0, tot = 0; COUP.forEach(function (d) { nb += cnt[d] || 0; tot += (cnt[d] || 0) * d; });
+  return {n: n, cnt: cnt, coins: Math.round(coins * 100) / 100, ech: ech, nb: nb, tot: tot, old: old, inc: inc, plan: inc.length ? [] : dpPlan(cnt, DP.d.max)};
+}
+function dpPk(x, i, max) {
+  var det = COUP.filter(function (d) { return x.c[d]; }).map(function (d) { return x.c[d] + ' × ' + d + ' €'; }).join(' · ');
+  return '<div class="pk"><div class="ph2"><b style="font-weight:500">Pochette ' + (i + 1) + '</b><b style="font-weight:500">' + eur(x.t) + '</b></div><div class="fbar"><i style="width:' + Math.round(x.t / max * 100) + '%"></i></div><small>' + x.n + ' billets · ' + det + '</small><small>Marge avant la limite : ' + eur(max - x.t) + '</small></div>';
+}
+function dpBloc(j, sel) {
+  var det = COUP.filter(function (d) { return j.b[d]; }).map(function (d) { return j.b[d] + ' × ' + d + ' €'; }).join(' · ');
+  var inc = j.lines.filter(function (l) { return !dpComplet(l); }), jr = function (x) { return x + (x > 1 ? ' jours' : ' jour'); }, et = dpEtat(j);
+  var st = j.pend.length ? (j.pend.length === j.lines.length ? ['wa', 'À préparer · ' + (j.jours > 0 ? jr(j.jours) + ' en attente' : 'du jour')] : ['wa', 'En partie préparé']) : (j.pr.length ? ['bl', 'Poche prête · ' + j.deps.join(', ') + (j.jours > 0 ? ' · ' + jr(j.jours) : '')] : ['ok', 'Déposé' + (j.deps.length ? ' · ' + j.deps.join(', ') : '')]);
+  var h = '<div class="dj ' + et + '"><div class="dj1">' + (sel ? '<input type="checkbox"' + (DP.sel[j.iso] ? ' checked' : '') + ' onchange="dpToggle(\'' + j.iso + '\',this.checked)" aria-label="Inclure ce jour">' : '') + '<div style="flex:1"><b>' + esc(dpJourLib(j.iso)) + '</b><small>' + j.lines.map(function (l) { return esc(l.c.replace('Caisse ', 'C') + ' ' + l.e); }).join(' · ') + '</small></div><b class="dj2">' + eur(j.total) + '</b></div>';
+  h += '<div class="dj3">' + (inc.length ? 'Détail des billets non saisi (' + inc.map(function (l) { return esc(l.c); }).join(', ') + ')' : (det || 'Aucun billet') + (j.pz ? ' · pièces ' + eur(j.pz) : '')) + '</div><div class="dj4">Carte : ' + eur(j.cb) + (j.ec ? ' · Écart de caisse : ' + (j.ec > 0 ? '+' : '') + eur(j.ec) : '') + '</div>';
+  h += '<span class="dst ' + st[0] + '">' + esc(st[1]) + '</span>' + (j.an.length ? ' <span class="dst ko">Anomalie</span>' : '');
+  if (j.an.length) h += '<div class="dj5">' + j.an.map(function (a) { return '⚠ ' + esc(a); }).join('<br>') + '</div>';
+  if (sel) {
+    h += '<div>' + j.pend.filter(function (l) { return !dpComplet(l); }).map(function (l) { return '<button class="nvb" style="width:auto;padding:6px 10px;font-size:14px;margin:8px 6px 0 0" onclick="dpEdit(' + l.id + ')">Saisir les billets · ' + esc(l.c) + '</button>'; }).join('') +
+      '<button id="dj_' + j.iso + '" class="nvb" style="width:auto;padding:6px 10px;font-size:14px;margin:8px 0 0" onclick="dpDeja(\'' + j.iso + '\')">Déjà déposé</button></div>';
+  }
+  return h + '</div>';
+}
+function depotsResume() {
+  google.script.run.withSuccessHandler(function (r) {
+    var e = $('dp_sub'); if (!e) return;
+    var parts = []; if (r.n) parts.push(eur(r.total) + ' à préparer (' + r.nj + (r.nj > 1 ? ' jours' : ' jour') + ')'); if (r.np) parts.push(r.np + (r.np > 1 ? ' poches prêtes' : ' poche prête') + ' à déposer en banque'); if (r.anom) parts.push(r.anom + ' anomalie(s)');
+    e.innerHTML = parts.length ? (r.ancien >= r.alerte || r.anom ? '<span style="color:#c62828">●</span> ' : '') + parts.join(' · ') + ' · le plus ancien : ' + r.ancien + (r.ancien > 1 ? ' jours' : ' jour') : 'Tout est déposé.';
+  }).withFailureHandler(function () { var e = $('dp_sub'); if (e) e.textContent = 'Dépôts à la banque.'; }).getDepotsResume({employe: B.user.nom, pin: B.user.pin, extraNom: ''});
+}
+function dpInit(r, old) {
+  DP = {d: r, sel: {}, conf: false, cd: null, ed: null, mois: DP ? DP.mois : '', jour: DP ? DP.jour : ''};
+  var inc = {}; r.lignes.forEach(function (l) { if (l.st === 'À déposer' && !dpComplet(l)) inc[l.iso] = 1; });
+  r.lignes.forEach(function (l) { if (l.st === 'À déposer') DP.sel[l.iso] = old && old[l.iso] !== undefined ? old[l.iso] : !inc[l.iso]; });
+}
+function depotsStart() {
+  ldRun('Chargement des dépôts…', ['Demande envoyée', 'Lecture des clôtures', 'Préparation des poches']);
+  DP = null;
+  google.script.run.withSuccessHandler(function (r) { ldDone(function () { dpInit(r, null); dpView(); }); })
+    .withFailureHandler(function (e) { $('view').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; }).getDepots({employe: B.user.nom, pin: B.user.pin, extraNom: ''});
+}
+function dpReload() {
+  google.script.run.withSuccessHandler(function (r) { dpInit(r, DP.sel); dpView(); })
+    .withFailureHandler(function (e) { $('view').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; }).getDepots({employe: B.user.nom, pin: B.user.pin, extraNom: ''});
+}
+function dpView() {
+  var d = DP.d, jours = dpJours(), pend = jours.filter(function (j) { return j.pend.length; });
+  if (!DP.mois) DP.mois = dpMoisNow();
+  var h = '<div class="bn" style="background:#8A6440">' + IC.coins + '<span>Dépôts à la banque</span></div><div id="dp_k"></div><div id="dp_al"></div>';
+  h += dpPretes();
+  if (pend.length) {
+    h += '<div class="sec">À préparer · la poche est prête ci-dessous : mettre l’argent, fermer, valider</div><div id="dp_ed"></div>' + pend.map(function (j) { return dpBloc(j, true); }).join('') +
+      '<div id="dp_pl"></div><details><summary>Signaler une anomalie (manque, excédent…)</summary><input id="dp_an" maxlength="200" placeholder="Ex : il manque 20 € dans la poche" style="margin-top:6px"></details><label class="fl" for="dp_bd">N° de bordereau (facultatif)</label><input id="dp_bd" maxlength="100" autocomplete="off"><button id="dp_go" style="margin-top:8px" onclick="dpValider()">Poche prête</button><div id="dp_msg"></div>';
+  } else h += '<p class="lg" style="margin-top:12px">Rien à préparer : les prochaines clôtures apparaîtront ici, poche déjà préparée.</p>';
+  h += '<div class="sec">Calendrier du mois</div><div id="dp_cal"></div><div id="dp_day"></div><details><summary>Voir tous les jours du mois</summary><div id="dp_list"></div></details>';
+  h += '<div class="sec">Derniers dépôts</div>' + (d.hist.length ? d.hist.map(function (x) { return '<div class="kv"><span>' + esc(x.d) + ' · ' + esc(x.g) + ' · ' + (x.p ? x.p + (x.p > 1 ? ' pochettes' : ' pochette') : 'déjà déposé') + (x.s === 'Poche prête' ? ' · <b style="color:#1b3a73;font-weight:500">poche prête</b>' : '') + '</span><b style="font-weight:500">' + eur(x.t) + '</b></div>'; }).join('') : '<p class="lg">Aucun dépôt enregistré pour l’instant.</p>');
+  $('view').innerHTML = h; dpRefresh(); dpCal();
+}
+function dpNav(s) {
+  var tous = dpJours().map(function (j) { return j.iso.slice(0, 7); }).concat([dpMoisNow()]).sort(), mn = tous[0], mx = tous[tous.length - 1];
+  var y = Number(DP.mois.slice(0, 4)), m = Number(DP.mois.slice(5, 7)) + s; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; }
+  var k = y + '-' + (m < 10 ? '0' : '') + m; if (k < mn || k > mx) return;
+  DP.mois = k; DP.jour = ''; dpCal();
+}
+function dpJour(iso) { DP.jour = iso; dpCal(); }
+function dpCal() {
+  var e = $('dp_cal'); if (!e || !DP) return;
+  var m = DP.mois, y = Number(m.slice(0, 4)), mo = Number(m.slice(5, 7)), nbj = new Date(y, mo, 0).getDate(), off = (new Date(y, mo - 1, 1).getDay() + 6) % 7, by = {}, mj = [];
+  dpJours().forEach(function (j) { by[j.iso] = j; if (j.iso.slice(0, 7) === m) mj.push(j); });
+  if (!DP.jour || DP.jour.slice(0, 7) !== m) DP.jour = mj.length ? mj[mj.length - 1].iso : '';
+  var h = '<div class="calh"><button class="nvb calb" onclick="dpNav(-1)" aria-label="Mois précédent">‹</button><b>' + esc(dpMoisLib(m)) + '</b><button class="nvb calb" onclick="dpNav(1)" aria-label="Mois suivant">›</button></div><div class="cal">' + ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(function (x) { return '<span class="cdw">' + x + '</span>'; }).join('');
+  for (var i = 0; i < off; i++) h += '<span class="cd e"></span>';
+  for (var d = 1; d <= nbj; d++) {
+    var iso = m + '-' + (d < 10 ? '0' : '') + d, j = by[iso];
+    h += '<div class="cd ' + (j ? dpEtat(j) : '') + (DP.jour === iso ? ' sel' : '') + '"' + (j ? ' onclick="dpJour(\'' + iso + '\')"' : '') + '><b>' + d + '</b>' + (j ? '<small>' + Math.round(j.total).toLocaleString('fr-FR') + '</small>' : '') + '</div>';
+  }
+  var nA = 0, nV = 0, nR = 0, nB = 0, tot = 0, cb = 0; mj.forEach(function (j) { var t = dpEtat(j); if (t === 'o') nA++; else if (t === 'v') nV++; else if (t === 'b') nB++; else nR++; tot += j.total; cb += j.cb; });
+  h += '</div><div class="leg"><span><i class="cd o"></i>À préparer</span><span><i class="cd b"></i>Poche prête</span><span><i class="cd v"></i>Déposé</span><span><i class="cd r"></i>Anomalie</span><span><i class="cd"></i>Pas de clôture</span></div>' +
+    '<div class="mg"><div class="mk"><small>Recettes · ' + esc(dpMoisLib(m)) + '</small><b>' + eur(tot) + '</b></div><div class="mk"><small>Jours : déposés · prêts · à préparer · anomalies</small><b>' + nV + ' · ' + nB + ' · ' + nA + ' · ' + nR + '</b></div></div><div class="dj4" style="margin:-2px 0 6px">Carte du mois : ' + eur(cb) + '</div>';
+  e.innerHTML = h;
+  $('dp_day').innerHTML = DP.jour && by[DP.jour] ? dpBloc(by[DP.jour], false) : (mj.length ? '' : '<p class="lg">Aucune clôture ce mois-ci.</p>');
+  $('dp_list').innerHTML = mj.slice().reverse().map(function (j) { return dpBloc(j, false); }).join('');
+}
+function dpToggle(iso, on) { DP.sel[iso] = on; DP.conf = false; dpRefresh(); }
+function dpRefresh() {
+  var d = DP.d, c = dpCalc(), jr = function (x) { return x + (x > 1 ? ' jours' : ' jour'); };
+  $('dp_k').innerHTML = '<div class="mg"><div class="mk"><small>À déposer (billets)</small><b>' + eur(c.tot) + '</b></div><div class="mk"><small>Nombre de billets</small><b>' + c.nb + '</b></div><div class="mk"><small>Pièces gardées</small><b>' + eur(c.coins) + '</b></div><div class="mk"><small>Attend depuis</small><b>' + (c.n ? jr(c.old) : '–') + '</b></div></div>';
+  $('dp_al').innerHTML = c.old >= d.alerte && c.n ? '<div class="msg" style="background:#FFC7CE;color:#7f1020">Une clôture attend depuis ' + jr(c.old) + ' : pensez à déposer.</div>' : '';
+  if (!$('dp_pl')) return;
+  var e = c.ech, det = [20, 10, 5].filter(function (x) { return e.b[x]; }).map(function (x) { return e.b[x] + ' × ' + x + ' €'; }).join(' · ');
+  var ech = e.e > 0 ? '<p class="lg">Les pièces (' + eur(c.coins) + ') restent en caisse : prenez <b>' + eur(e.e) + '</b> de billets dans la caisse en échange (' + det + ').' + (e.reste > 0 ? ' Il reste ' + eur(e.reste) + ' de pièces.' : '') + '</p>' : (c.coins > 0 ? '<p class="lg">Pièces : ' + eur(c.coins) + '. C’est trop peu pour un échange, elles restent en caisse.</p>' : '');
+  $('dp_pl').innerHTML = !c.n ? '<p class="lg">Cochez au moins un jour.</p>' : (c.inc.length ? '<div class="msg">Détail des billets non saisi : ' + c.inc.map(function (l) { return esc(l.d + ' ' + l.c); }).join(', ') + '. Saisissez-le avec le bouton sous le jour, ou décochez ce jour.</div>' : '<div class="sec">Poches prêtes · ' + eur(d.max) + ' maximum chacune</div>' + ech + (c.plan.length ? c.plan.map(function (x, i) { return dpPk(x, i, d.max); }).join('') : '<p class="lg">Aucun billet à déposer sur ces jours.</p>'));
+  var b = $('dp_go'); b.disabled = !c.n || !c.plan.length;
+  b.textContent = !c.n || !c.plan.length ? 'Poche prête' : (DP.conf ? 'Confirmer : l’argent est dans la poche, fermée ?' : 'Poche prête : l’argent est dedans, fermée · ' + eur(c.tot));
+}
+function dpEdVals() {
+  var q = {}, s = 0; COUP.forEach(function (d) { var v = Math.round(Number($('de' + d).value) || 0); q[d] = v > 0 ? v : 0; s += q[d] * d; });
+  var pz = Math.round((num($('depz').value) || 0) * 100) / 100; if (pz < 0) pz = 0;
+  return {q: q, pz: pz, s: Math.round((s + pz) * 100) / 100};
+}
+function dpEdLigne() { return DP.d.lignes.filter(function (x) { return x.id === DP.ed; })[0]; }
+function dpEdCalc() {
+  var l = dpEdLigne(); if (!l) return;
+  var v = dpEdVals(), reste = Math.round((l.total - v.s) * 100) / 100;
+  COUP.forEach(function (d) { $('det' + d).textContent = v.q[d] ? eur(v.q[d] * d) : ''; });
+  $('de_r').innerHTML = reste === 0 ? '<b style="color:#2e7d32">✓ Le détail correspond au total.</b>' : (reste > 0 ? 'Reste à saisir : <b>' + eur(reste) + '</b>' : '<b style="color:#c62828">En trop : ' + eur(-reste) + '</b>');
+  $('de_go').disabled = reste !== 0;
+}
+function dpEdit(id) {
+  DP.ed = id; var l = dpEdLigne(); if (!l) return;
+  $('dp_ed').innerHTML = '<div class="line"><b>Détail des billets · ' + esc(l.c) + ' du ' + esc(l.d) + '</b><p class="lg">Total de la clôture : <b>' + eur(l.total) + '</b>. Saisissez les billets de la recette et le total des pièces.</p>' +
+    COUP.map(function (d) { return '<div class="brow"><span class="bl">' + d + ' €</span><span class="bx">×</span><input id="de' + d + '" type="number" inputmode="numeric" step="1" min="0" oninput="dpEdCalc()"><span class="bt" id="det' + d + '"></span></div>'; }).join('') +
+    '<div class="brow"><span class="bl">Pièces</span><span class="bx"></span><input id="depz" type="number" inputmode="decimal" step="0.01" min="0" placeholder="total en €" oninput="dpEdCalc()"><span class="bt"></span></div><div id="de_r" class="lg"></div><div class="row"><button class="nvb" onclick="dpEdClose()">Annuler</button><button id="de_go" onclick="dpEdSave()" disabled>Enregistrer le détail</button></div><div id="de_msg"></div></div>';
+  dpEdCalc(); var z = $('dp_ed'); if (z && z.scrollIntoView) z.scrollIntoView();
+}
+function dpEdClose() { DP.ed = null; $('dp_ed').innerHTML = ''; }
+function dpEdSave() {
+  var v = dpEdVals(), b = $('de_go'); b.disabled = true; b.textContent = 'Enregistrement…';
+  google.script.run.withSuccessHandler(function () { dpReload(); })
+    .withFailureHandler(function (e) { b.textContent = 'Enregistrer le détail'; b.disabled = false; $('de_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+    .completerPoche({employe: B.user.nom, pin: B.user.pin, extraNom: '', id: DP.ed, billets: v.q, pieces: v.pz});
+}
+function dpDeja(iso) {
+  var b = $('dj_' + iso); if (!b) return;
+  if (DP.cd !== iso) { DP.cd = iso; b.textContent = 'Confirmer : déjà déposé à la banque ?'; return; }
+  b.disabled = true; b.textContent = 'Enregistrement…';
+  var ids = DP.d.lignes.filter(function (l) { return l.iso === iso && l.st === 'À déposer'; }).map(function (l) { return l.id; });
+  google.script.run.withSuccessHandler(function () { DP.cd = null; dpReload(); })
+    .withFailureHandler(function (e) { DP.cd = null; b.disabled = false; b.textContent = 'Déjà déposé'; if ($('dp_msg')) $('dp_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+    .marquerDeja({employe: B.user.nom, pin: B.user.pin, extraNom: '', ids: ids});
+}
+function dpValider() {
+  var c = dpCalc(); if (!c.n || !c.plan.length) return;
+  if (!DP.conf) { DP.conf = true; dpRefresh(); return; }
+  var b = $('dp_go'); b.disabled = true; b.textContent = 'Enregistrement…';
+  var ids = DP.d.lignes.filter(function (l) { return l.st === 'À déposer' && DP.sel[l.iso]; }).map(function (l) { return l.id; });
+  google.script.run.withSuccessHandler(function (r) {
+    var det = [20, 10, 5].filter(function (x) { return r.billetsEchange[x]; }).map(function (x) { return r.billetsEchange[x] + ' × ' + x + ' €'; }).join(' · ');
+    $('view').innerHTML = '<div class="msg" style="background:#d4edda">Poche prête (' + esc(r.numero) + ') : ' + r.pochettes.length + (r.pochettes.length > 1 ? ' pochettes' : ' pochette') + ', ' + eur(r.total) + ' en ' + r.nb + ' billets.</div>' + r.pochettes.map(function (x, i) { return dpPk(x, i, DP.d.max); }).join('') +
+      (r.echange > 0 ? '<p class="lg">Pièces échangées contre des billets de la caisse : ' + eur(r.echange) + ' (' + det + ')' + (r.reste > 0 ? '. ' + eur(r.reste) + ' de pièces restent en caisse.' : '.') + '</p>' : '') + '<p class="lg">Quand la poche est partie à la banque, revenez ici et appuyez sur « Déposée en banque ».</p><button onclick="go(\'home\')">Retour au menu</button>';
+  }).withFailureHandler(function (e) { DP.conf = false; $('dp_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; dpRefresh(); })
+    .validerDepot({employe: B.user.nom, pin: B.user.pin, extraNom: '', ids: ids, bordereau: $('dp_bd').value, anomalie: $('dp_an') ? $('dp_an').value : ''});
+}
+
+function dpPretes() {
+  var P = DP.d.pretes || []; if (!P.length) return '';
+  return '<div class="sec">Poche prête · à déposer en banque</div>' + P.map(function (x) {
+    return '<div class="dj b"><div class="dj1"><div style="flex:1"><b>' + esc(x.n) + '</b><small>préparée le ' + esc(x.d) + ' par ' + esc(x.g) + '</small></div><b class="dj2">' + eur(x.t) + '</b></div>' + x.poches.map(function (k, i) { return dpPk(k, i, DP.d.max); }).join('') +
+      (x.bord ? '<div class="dj4">Bordereau : ' + esc(x.bord) + '</div>' : '') + (x.jours >= DP.d.alerte ? '<div class="dj5">⚠ En attente depuis ' + x.jours + ' jours : pensez à la déposer.</div>' : (x.jours > 0 ? '<div class="dj4">En attente depuis ' + x.jours + (x.jours > 1 ? ' jours' : ' jour') + '</div>' : '')) +
+      '<details><summary>Signaler une anomalie (refus, écart à la banque…)</summary><input id="dc_an_' + x.n + '" maxlength="200" placeholder="Ex : un billet refusé" style="margin-top:6px"></details>' +
+      '<button id="dc_' + x.n + '" style="margin-top:8px" onclick="dpConf(\'' + x.n + '\')">Déposée en banque · ' + eur(x.t) + '</button><div id="dcm_' + x.n + '"></div></div>';
+  }).join('');
+}
+function dpConf(n) {
+  var b = $('dc_' + n); if (!b) return;
+  if (DP.cc !== n) { DP.cc = n; b.textContent = 'Confirmer : la poche est bien partie à la banque ?'; return; }
+  b.disabled = true; b.textContent = 'Enregistrement…';
+  google.script.run.withSuccessHandler(function () { DP.cc = null; dpReload(); })
+    .withFailureHandler(function (e) { DP.cc = null; b.disabled = false; b.textContent = 'Déposée en banque'; $('dcm_' + n).innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+    .confirmerDepot({employe: B.user.nom, pin: B.user.pin, extraNom: '', numero: n, anomalie: $('dc_an_' + n) ? $('dc_an_' + n).value : ''});
+}
+var CL = null;
+var DEN_B = [500, 200, 100, 50, 20, 10, 5];
+var CL_STEPS = ['Préparation', 'Carte bancaire', 'FDJ', 'Cash back', 'Nickel', 'Comptage', 'Bilan'];
+
+function clotureStart() {
+  ldRun('Ouverture du contrôle de caisse…', ['Demande envoyée', 'Lecture des clôtures du jour', 'Préparation du contrôle']);
+  google.script.run.withSuccessHandler(function (r) { ldDone(function () { CL = {info: r, step: 0, c: [1, 2], v: {}, photos: [], doc: {}, man: {}, err: {}, fails: {}, reads: {}, ov: {}, ovpin: {}, pics: {}, picn: {}, busy: '', ovKey: '', rep: null, rd: {}, sm: false, src: ''}; CL.v.cl_mode = 'direct'; clStep(); }); })
+    .withFailureHandler(function (e) { $('view').textContent = 'Erreur : ' + e.message; }).getCloture();
+}
+function cv(id) { var n = num(CL.v[id] === undefined ? '' : CL.v[id]); return (n !== null && /^x\d(jeux|loto|rcb|rnk)$/.test(id)) ? Math.abs(n) : n; }
+function cz(id) { var n = cv(id); return n === null ? 0 : n; }
+function r2(x) { return Math.round(x * 100) / 100; }
+function fld(id, label, hint, int, neg) {
+  var v = CL.v[id] === undefined ? '' : CL.v[id];
+  var inp = '<input id="' + id + '" type="number" inputmode="' + (int ? 'numeric' : 'decimal') + '" step="' + (int ? '1' : '0.01') + '" min="0" value="' + esc(v) + '" oninput="clIn(this,' + (neg ? 1 : 0) + ')">';
+  return '<label class="fl" for="' + id + '">' + label + (hint ? '<small>' + hint + '</small>' : '') + '</label>' + (neg ? '<div class="negrow"><span class="mn">−</span>' + inp + '</div>' : inp);
+}
+function clIn(el, neg) { if (neg) { var s = el.value.replace(/-/g, ''); if (s !== el.value) el.value = s; } CL.v[el.id] = el.value; clCheck(); }
+var BAND = [['#8A6440', 'clip', 'Avant de commencer'], ['#1F3A5F', 'card', 'Carte bancaire · TPE'], ['#1B3A8C', 'clover', 'FDJ · jeux et loto'], ['#2E7D32', 'cash', 'Cash back'], ['#2E2E2E', 'wallet', 'Nickel · dépôts et retraits'], ['#8A6440', 'coins', 'Comptage des espèces'], ['#8A6440', 'check', 'Bilan et enregistrement']];
+var SV = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+var IC = {
+  clip: SV + '<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 14l2 2 4-4"/></svg>',
+  card: SV + '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>',
+  clover: '<svg width="26" height="26" viewBox="0 0 16 16" fill="#fff" aria-hidden="true"><circle cx="8" cy="4.5" r="3"/><circle cx="11.5" cy="8" r="3"/><circle cx="8" cy="11.5" r="3"/><circle cx="4.5" cy="8" r="3"/></svg>',
+  cash: SV + '<rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>',
+  wallet: SV + '<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z"/><path d="M4 7l12-3v3"/><circle cx="16" cy="13.5" r="1"/></svg>',
+  coins: SV + '<ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7"/><path d="M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/></svg>',
+  check: SV + '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>'
+};
+function band(s) { var b = BAND[s]; return '<div class="bn" style="background:' + b[0] + '">' + IC[b[1]] + '<span>' + b[2] + '</span></div>'; }
+function tk(title, rows) {
+  return '<div class="tkt">' + title + '</div><div class="tk">' + rows.map(function (r) {
+    return typeof r === 'string' ? '<div>' + esc(r) + '</div>' : '<div class="hl"><span>' + esc(r[0]) + '</span><span>' + esc(r[1]) + ' ←</span></div>';
+  }).join('') + '</div>';
+}
+function clPrepItems() {
+  var docs = [], cash = [];
+  CL.c.forEach(function (n) { docs.push(['p_x' + n, '<b>Ticket X</b> de la caisse ' + n]); });
+  CL.c.forEach(function (n) { docs.push(['p_t' + n, '<b>TPE</b> de la caisse ' + n + ' : 2 tickets (contact et sans contact)']); });
+  docs.push(['p_f', '<b>FDJ</b> : rapport journalier et rapport temps réel']);
+  docs.push(['p_n', '<b>Nickel</b> : rapport d’activité']);
+  CL.c.forEach(function (n) { cash.push(['p_c' + n, CL.sm ? (CL.src === 'photos' ? '<b>Caisse ' + n + '</b> : l’employé m’a annoncé le montant compté dans le tiroir (fond de caisse compris)' : '<b>Caisse ' + n + '</b> : le tiroir est ouvert devant moi, je compte tout (fond de caisse compris)') : CL.v.cl_mode === 'reprise' ? '<b>Caisse ' + n + '</b> : j’ai sous les yeux le détail du comptage noté ce jour-là (la recette, sans le fond de caisse)' : '<b>Caisse ' + n + '</b> : la recette est sortie du tiroir (tout sauf le fond de caisse de ' + CL.info.fonds[n] + ' €) et posée devant moi']); });
+  return {docs: docs, cash: cash};
+}
+function clPrepOk() { var it = clPrepItems(); return it.docs.concat(it.cash).every(function (x) { return CL.v[x[0]]; }); }
+function clPrep() {
+  var it = clPrepItems(), row = function (x) { return '<label class="pck"><input type="checkbox" id="' + x[0] + '"' + (CL.v[x[0]] ? ' checked' : '') + ' onchange="CL.v[this.id]=this.checked?1:0;clCheck()"><span>' + x[1] + '</span></label>'; };
+  return '<div class="line"><b>1. Sortez ces documents</b>' + it.docs.map(row).join('') + '</div><div class="line"><b>' + (CL.sm ? '2. Comptage du tiroir' : (CL.v.cl_mode === 'reprise' ? '2. Retrouvez le comptage de ce jour-là' : '2. Sortez la recette des tiroirs')) + '</b>' + it.cash.map(row).join('') + '</div>';
+}
+
+function clSrcInner() {
+  var s = CL.src;
+  return '<div class="bgrid bg2" style="margin-top:8px"><div class="bigb' + (s === 'place' ? ' on' : '') + '" onclick="clSrc(\'place\')"><b>Sur place</b><span>je photographie les tickets</span></div><div class="bigb' + (s === 'photos' ? ' on' : '') + '" onclick="clSrc(\'photos\')"><b>Photos reçues</b><span>envoyées par un employé</span></div></div>' +
+    (s === 'photos' ? '<label class="fl" for="sm_from">Photos envoyées par</label><select id="sm_from" onchange="CL.v.sm_from=this.value;clCheck()">' + opts(B.emp.filter(function (n) { return n !== B.user.nom; }), 'Choisir') + '</select><p class="lg">Choisissez les photos dans la galerie du téléphone. Le comptage du tiroir sera noté « déclaré par l’employé, non vérifié sur place ».</p>' : '');
+}
+function clSrc(s) { CL.src = s; clModeDraw(); if ($('sm_from') && CL.v.sm_from) $('sm_from').value = CL.v.sm_from; }
+
+
+function clS0() {
+  function sel(id, label, list) { return '<label class="fl" for="' + id + '">' + label + '</label><select id="' + id + '" onchange="CL.v[this.id]=this.value;clCheck()">' + opts(list, 'Choisir') + '</select>'; }
+  var cais = '<div class="fl">Caisses concernées</div><div class="row"><label class="cbx"><input type="checkbox" id="cl_c1" onchange="clCaisses()"> Caisse 1</label><label class="cbx"><input type="checkbox" id="cl_c2" onchange="clCaisses()"> Caisse 2</label></div>';
+  if (CL.sm) return '<div id="modewrap">' + clModeHtml() + '</div><div class="line">' + cais + '<p class="lg">Contrôle en cours de service : le fond de caisse (caisse 1 : ' + CL.info.fonds[1] + ' €, caisse 2 : ' + CL.info.fonds[2] + ' €) fait partie du tiroir et sera compté avec le reste. Les tickets doivent avoir été imprimés il y a moins de ' + CL.info.ageMax + ' minutes.' + (CL.info.cumul.n ? ' Déjà enregistré aujourd’hui : ' + CL.info.cumul.n + ' caisse(s) : les rapports FDJ et Nickel en tiennent compte.' : '') + '</p></div><div id="prep">' + clPrep() + '</div><p class="lg">Ensuite, ' + (CL.src === 'photos' ? 'choisissez' : 'photographiez') + ' chaque document, un par un : l’application lit les chiffres toute seule.</p><p class="lg" id="prepmsg" style="color:#7f1020"></p>';
+  return '<div id="modewrap">' + clModeHtml() + '</div><div class="line"><b>Qui, quand ?</b><p class="lg" style="margin-top:6px">Employé qui fait le contrôle : <b>' + esc(B.user.aff) + '</b></p>' + '<label class="fl" for="cl_type">Type de contrôle</label><select id="cl_type" onchange="clType(this.value)">' + opts(B.caisseTypes, 'Choisir') + '</select>' + sel('cl_cre', 'Créneau terminé', B.creneaux) + '<div id="entwrap"></div>' + cais +
+    '<p class="lg">Le fond de caisse (caisse 1 : ' + CL.info.fonds[1] + ' €, caisse 2 : ' + CL.info.fonds[2] + ' €) reste dans le tiroir : il n’est pas compté.' + (CL.info.cumul.n ? ' Déjà enregistré aujourd’hui : ' + CL.info.cumul.n + ' caisse(s).' : '') + '</p></div>' +
+    '<div id="prep">' + clPrep() + '</div><p class="lg">Ensuite, l’application vous demandera de photographier chaque document, un par un, et lira les chiffres toute seule.</p><p class="lg" id="prepmsg" style="color:#7f1020"></p>';
+}
+function fr(d) { return d ? d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) : ''; }
+
+function clModeHtml() {
+  if (B.user.nom === 'Extra') return '';
+  var m = CL.v.cl_mode, I = CL.info, possible = I.hier >= I.debut, g = (B.gerants || []).indexOf(B.user.nom) >= 0;
+  var h = '<div class="line"><b>Cette clôture concerne</b><div class="bgrid bg2" style="margin-top:8px">' +
+    '<div class="bigb' + (m === 'direct' ? ' on' : '') + '" onclick="clMode(\'direct\')"><b>Aujourd’hui</b><span>en temps réel</span></div>' +
+    '<div class="bigb' + (m === 'reprise' ? ' on' : '') + '" onclick="clMode(\'reprise\')"' + (possible ? '' : ' style="opacity:.4"') + '><b>Reprise</b><span>d’une journée passée</span></div>' +
+    (g ? '<div class="bigb wide' + (m === 'surprise' ? ' on' : '') + '" onclick="clMode(\'surprise\')"><b>Contrôle surprise</b><span>gérants · sur place ou photos reçues</span></div>' : '') + '</div>';
+  if (m === 'reprise') {
+    h += '<label class="fl" for="cl_date">Date de la journée à reprendre<small>Seul l’exercice en cours est accepté : du ' + fr(I.debut) + ' à hier (' + fr(I.hier) + ').</small></label><input id="cl_date" type="date" min="' + I.debut + '" max="' + I.hier + '" value="' + esc(CL.v.cl_date || '') + '" onchange="clDate(this.value)"><div id="dt_msg"></div>';
+    h += CL.rep ? '<div class="msg" style="background:#d4edda">Reprise validée par ' + esc(CL.rep.nom) + '.</div>' : '<p class="lg" style="margin-top:10px">Une reprise doit être validée par un gérant.</p><select id="rp_nom">' + opts(B.gerants || [], 'Gérant') + '</select><input id="rp_pin" type="password" inputmode="numeric" autocomplete="off" placeholder="Code du gérant" style="margin-top:6px"><button id="rp_go" style="margin-top:8px" onclick="clRep()">Valider la reprise</button><div id="rp_msg"></div>';
+  } else if (m === 'surprise') h += clSrcInner();
+  else if (!possible) h += '<p class="lg">Aucune journée à reprendre pour l’instant : l’exercice vient de commencer.</p>';
+  return h + '</div>';
+}
+function clModeDraw() { var w = $('modewrap'); if (w) w.innerHTML = clModeHtml(); if ($('prep')) $('prep').innerHTML = clPrep(); clCheck(); }
+function clCumul(date) {
+  google.script.run.withSuccessHandler(function (r) { CL.info.cumul = r.cumul; clCheck(); }).withFailureHandler(function () {}).getCloture(date || '');
+}
+
+function clMode(m) {
+  if (m === CL.v.cl_mode) return;
+  if (m === 'reprise' && CL.info.hier < CL.info.debut) return;
+  if (m === 'surprise' && (B.gerants || []).indexOf(B.user.nom) < 0) return;
+  CL.v.cl_mode = m; CL.sm = (m === 'surprise');
+  if (m !== 'reprise') { CL.v.cl_date = ''; CL.rep = null; clCumul(''); }
+  clStep();
+}
+function clDate(v) {
+  if (!v || v < CL.info.debut || v > CL.info.hier) { CL.v.cl_date = ''; if ($('dt_msg')) $('dt_msg').innerHTML = '<div class="msg" style="background:#f8d7da">Date refusée : elle doit être comprise entre le ' + fr(CL.info.debut) + ' et hier (' + fr(CL.info.hier) + ').</div>'; clCheck(); return; }
+  CL.v.cl_date = v; if ($('dt_msg')) $('dt_msg').innerHTML = ''; clCumul(v); clCheck();
+}
+function clRep() {
+  var nom = $('rp_nom').value, pin = $('rp_pin').value; if (!nom || !pin) return;
+  $('rp_go').disabled = true;
+  google.script.run.withSuccessHandler(function (r) {
+    if (r && r.ok) { CL.rep = {nom: nom, pin: pin}; clModeDraw(); }
+    else { $('rp_go').disabled = false; $('rp_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc((r && r.message) || 'Refusé.') + '</div>'; }
+  }).withFailureHandler(function (e) { $('rp_go').disabled = false; $('rp_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .verifierGerant({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', gerant: nom, gpin: pin});
+}
+function clEnt() {
+  var w = $('entwrap'); if (!w) return;
+  if (CL.v.cl_type === "Changement d'équipe") {
+    if (CL.v.cl_ent === 'Aucun (clôture)') CL.v.cl_ent = '';
+    w.innerHTML = '<label class="fl" for="cl_ent">Employé entrant</label><select id="cl_ent" onchange="CL.v[this.id]=this.value;clCheck()">' + opts(B.emp.filter(function (n) { return n !== B.user.nom; }), 'Choisir') + '</select>';
+    if (CL.v.cl_ent) $('cl_ent').value = CL.v.cl_ent;
+  } else {
+    CL.v.cl_ent = CL.v.cl_type ? 'Aucun (clôture)' : '';
+    w.innerHTML = CL.v.cl_type ? '<p class="lg">Clôture du soir : il n’y a pas d’employé entrant.</p>' : '';
+  }
+}
+function clType(v) { CL.v.cl_type = v; if (v === "Changement d'équipe") CL.v.cl_ent = ''; clEnt(); clCheck(); }
+function clCaisses() { CL.c = [1, 2].filter(function (n) { return $('cl_c' + n).checked; }); if ($('prep')) $('prep').innerHTML = clPrep(); clCheck(); }
+var CAMSVG = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+var DOCLAB = {fj: 'FDJ journalier', fr: 'FDJ temps réel', nk: 'Nickel'};
+function docLabel(id) { return DOCLAB[id] || ((id.charAt(0) === 'x' ? 'ticket X' : 'TPE') + ' caisse ' + id.slice(1)); }
+function docType(id) { var c = id.charAt(0); return c === 'x' ? 'x' : (c === 't' ? 'tpe' : id); }
+function kv(l, id, neg) { var v = cv(id); return '<div class="kv"><span>' + l + '</span><b>' + (v === null ? '–' : (neg && v ? '−' : '') + eur(v)) + '</b></div>'; }
+function kvn(l, id) { var v = cv(id); return '<div class="kv"><span>' + l + '</span><b>' + (v === null ? '–' : v) + '</b></div>'; }
+function recapX(n) { var p = 'x' + n; return '<div class="rc">' + kv('Espèces', p + 'esp') + kv('Carte bancaire', p + 'cb') + kvn('Paiements carte', p + 'cbn') + kv('Total du tiroir', p + 'tot') + kv('Remboursement jeux', p + 'jeux', 1) + kv('Remboursement loto', p + 'loto', 1) + kv('Retrait cash back', p + 'rcb', 1) + kv('Dépôt cash back', p + 'dcb') + kv('Commission cash back', p + 'ccb') + kv('Dépôt Nickel', p + 'dnk') + kv('Retrait Nickel', p + 'rnk', 1) + '</div>'; }
+function recapT(n) { var p = 't' + n; return '<div class="rc">' + kv('Contact : achats', p + 'a') + kvn('Contact : nombre', p + 'an') + kv('Sans contact : achats', p + 'b') + kvn('Sans contact : nombre', p + 'bn') + '</div>'; }
+function recapFj() { return '<div class="rc">' + kv('Total des lots payés', 'f_lots') + '</div>'; }
+function recapFr() { return '<div class="rc">' + kv('Paiements', 'f_paie') + kv('Annulations paiements', 'f_ann') + '</div>'; }
+function recapNk() { return '<div class="rc">' + kv('Dépôts cash', 'n_dep') + kv('Retraits cash', 'n_ret') + kv('Commissions', 'n_com') + '</div>'; }
+function rowsX() { return tk('Ticket X de la caisse', ['Solde tiroir', ['ESPÈCES', 'xxx,xx'], ['CARTE BANCAIRE   nb', 'xxx,xx'], ['Total', 'xxx,xx'], 'Sorties', ['Remboursement jeux', '-xxx,xx'], ['Retrait Cash Back', '-xxx,xx']]); }
+function rowsT() { return tk('Ticket TPE', ['TOTAUX TRANSACTIONS', 'APPLICATION BANCAIRE (ou CB SANS CONTACT)', ['NBR TRANSACTIONS : Achats', 'nb'], ['MONTANTS EN EUR : Achats', 'xxx,xx']]); }
+function rowsFj() { return tk('Rapport FDJ « journalier »', ['RAPPORT JOURNALIER', 'LOTS PAYES LE jj/mm/aaaa', ['Total des lots payés', 'xxx,x €']]); }
+function rowsFr() { return tk('Rapport FDJ « temps réel »', ['RAPPORT JOURNALIER TEMPS REEL', '-----PAIEMENTS-----', ['TOTAL', 'xxx,xx €'], '-----ANNULATIONS PAIEMENTS-----', ['TOTAL', 'x,xx €']]); }
+function rowsNk() { return tk('Rapport d’activité Nickel', ['DEPOTS CASH', ['Total:', 'xxx,xx EUR'], 'RETRAITS CASH', ['Total:', 'xxx,xx EUR']]); }
+function manX(n) { var p = 'x' + n; return fld(p + 'cb', 'Carte bancaire : montant (€)', '') + fld(p + 'cbn', 'Carte bancaire : nombre de paiements', '', true) + fld(p + 'esp', 'ESPÈCES du Solde tiroir (€)', '') + fld(p + 'tot', 'Total du Solde tiroir (€)', '') +
+  fld(p + 'jeux', 'Remboursement jeux (€)', 'Sans le signe : le moins est déjà mis.', false, true) + fld(p + 'loto', 'Remboursement loto (€)', '', false, true) + fld(p + 'rcb', 'Retrait cash back (€)', '0 si aucun', false, true) + fld(p + 'dcb', 'Dépôt cash back (€)', '0 si aucun') + fld(p + 'ccb', 'Commission cash back (€)', '0 si aucune') +
+  fld(p + 'dnk', 'Dépôt Nickel (€)', '0 si aucun') + fld(p + 'rnk', 'Retrait Nickel (€)', '0 si aucune ligne', false, true); }
+function manT(n) { var p = 't' + n; return fld(p + 'a', 'Contact : Achats, montant (€)', '') + fld(p + 'an', 'Contact : nombre d’achats', '', true) + fld(p + 'b', 'Sans contact : Achats, montant (€)', '') + fld(p + 'bn', 'Sans contact : nombre d’achats', '', true) + fld(p + 'r', 'Remboursements du TPE : montant (€)', '0 si aucun'); }
+function manFj() { return fld('f_lots', 'Total des lots payés (€)', ''); }
+function manFr() { return fld('f_paie', 'Paiements : TOTAL (€)', '') + fld('f_ann', 'Annulations paiements : TOTAL (€)', '0 si aucune'); }
+function manNk() { return fld('n_dep', 'Dépôts cash : Total (€)', '0 si aucun') + fld('n_ret', 'Retraits cash : Total (€)', '0 si aucun') + fld('n_com', 'Commissions : total des lignes Com. (€)', '0 si aucune'); }
+function docCard(id, titre, rappel, rows, manual, recap) {
+  var st = CL.doc[id], busy = CL.busy === id, man = CL.man[id];
+  var h = '<div class="doc"><div class="dh"><b>' + titre + '</b><span class="ds ' + (st === 'lu' ? 'ok' : (st === 'echec' ? 'ko' : '')) + '">' + (st === 'lu' ? 'Lu ✓' : (st === 'echec' ? 'À reprendre' : 'À photographier')) + '</span></div><p class="rap">' + rappel + '</p>';
+  if (busy) h += pgHtml(id);
+  else if (!man) h += '<label class="cam">' + CAMSVG + (CL.sm && CL.src === 'photos' ? (st ? 'Choisir une autre photo' : 'Choisir la photo') : (st ? 'Reprendre la photo' : 'Prendre la photo')) + '<input type="file" accept="image/*"' + capAttr() + ' onchange="clPhoto(this,\'' + id + '\')"></label>';
+  if (CL.err[id]) h += '<div class="msg" style="background:#f8d7da">' + esc(CL.err[id]) + '</div>';
+  if (st === 'lu' && recap) h += recap;
+  if (man) h += '<p class="lg">Saisie manuelle de secours : elle sera signalée au gérant.</p>' + manual + '<button class="nvb" style="margin-top:8px" onclick="clMan(\'' + id + '\',0)">Revenir à la photo</button>';
+  else if ((CL.fails[id] || 0) >= 1 || (CL.reads[CL.step] || 0) >= 2) h += '<button class="nvb" style="margin-top:8px" onclick="clMan(\'' + id + '\',1)">La photo ne marche pas : saisie manuelle</button>';
+  return h + '<details><summary>À quoi ressemble ce ticket ?</summary>' + rows + '</details></div>';
+}
+function capAttr() { return CL.sm && CL.src === 'photos' ? '' : ' capture="environment"'; }
+function docMini(id, label) {
+  return '<div>' + (CL.busy === id ? pgHtml(id) : '<label class="cam sm">' + CAMSVG + label + '<input type="file" accept="image/*"' + capAttr() + ' onchange="clPhoto(this,\'' + id + '\')"></label>') + (CL.err[id] ? '<div class="msg" style="background:#f8d7da">' + esc(CL.err[id]) + '</div>' : '') + '</div>';
+}
+function packImage(file, cb) {
+  var r = new FileReader();
+  r.onload = function () {
+    var img = new Image();
+    img.onload = function () {
+      var s = Math.min(1, 1800 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      cb(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = function () { cb(null); };
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+function clRedraw() { var y = window.pageYOffset || 0; clStep(); window.scrollTo(0, y); }
+
+function clPhoto(inp, id) {
+  var f = inp.files && inp.files[0]; if (!f) return;
+  CL.busy = id; CL.err[id] = ''; pgStart(id); clRedraw();
+  packImage(f, function (data) {
+    if (!data) { pgStop(); CL.busy = ''; CL.err[id] = 'Photo illisible : recommencez.'; clRedraw(); return; }
+    pgSet(26, 1); if (CL.pg) CL.pg.t0 = Date.now();
+    google.script.run.withSuccessHandler(function (r) { pgSet(100, 3); setTimeout(function () { pgStop(); clApply(id, r, data); }, 250); })
+      .withFailureHandler(function (e) { pgStop(); CL.busy = ''; CL.err[id] = e.message; CL.fails[id] = (CL.fails[id] || 0) + 1; clRedraw(); })
+      .lireTicket({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: docType(id), image: data});
+  });
+}
+function clApply(id, r, data) {
+  CL.busy = ''; CL.reads[CL.step] = (CL.reads[CL.step] || 0) + 1;
+  if (!r || !r.ok) {
+    CL.doc[id] = 'echec'; CL.fails[id] = (CL.fails[id] || 0) + 1;
+    CL.err[id] = (r && r.message ? r.message + ' ' : '') + 'Reprenez la photo : ticket entier, bien à plat, bien éclairé, sans reflet.';
+  } else {
+    var c = r.champs || {}, k = id.charAt(0), n = id.slice(1), S0 = function (x) { return String(x === undefined || x === null ? 0 : x); };
+    if (k === 'x') { ['cb', 'cbn', 'esp', 'tot', 'jeux', 'loto', 'rcb', 'dcb', 'dnk', 'rnk'].forEach(function (f) { CL.v['x' + n + f] = S0(c[f]); }); CL.v['x' + n + 'dates'] = (c.dates || []).join(','); CL.v['x' + n + 'edition'] = c.edition || ''; CL.rd[n] = Number(c.ccb) || 0; CL.v['x' + n + 'ccb'] = CL.rd[n] > 0 ? String(CL.rd[n]) : ''; }
+    else if (k === 't') {
+      if (c.contact) { CL.v['t' + n + 'a'] = S0(c.contact.m); CL.v['t' + n + 'an'] = S0(c.contact.n); CL.v['t' + n + 'rc'] = S0(c.contact.r); }
+      if (c.sans) { CL.v['t' + n + 'b'] = S0(c.sans.m); CL.v['t' + n + 'bn'] = S0(c.sans.n); CL.v['t' + n + 'rs'] = S0(c.sans.r); }
+      CL.v['t' + n + 'r'] = String(r2(cz('t' + n + 'rc') + cz('t' + n + 'rs')));
+    }
+    else if (id === 'fj') CL.v.f_lots = S0(c.lots);
+    else if (id === 'fr') { CL.v.f_paie = S0(c.paie); CL.v.f_ann = S0(c.ann); }
+    else if (id === 'nk') { CL.v.n_dep = S0(c.dep); CL.v.n_ret = S0(c.ret); CL.v.n_com = S0(c.com); }
+    CL.doc[id] = 'lu'; CL.err[id] = ''; CL.picn[id] = (CL.picn[id] || 0) + 1; if (data) CL.pics[id + '#' + CL.picn[id]] = data;
+  }
+  clRedraw();
+}
+function clMan(id, on) { CL.man[id] = !!on; clRedraw(); }
+function clS1() {
+  var h = '';
+  CL.c.forEach(function (n) {
+    h += docCard('x' + n, 'Ticket X de la caisse ' + n, 'Photographiez le <b>ticket X</b> de la caisse ' + n + ' : il doit montrer « Solde tiroir » et « Sorties ».', rowsX(), manX(n), recapX(n));
+    h += docCard('t' + n, 'TPE de la caisse ' + n, 'Photographiez les <b>2 tickets du TPE</b> de la caisse ' + n + ' : « Application bancaire » et « CB sans contact » (ensemble ou l’un après l’autre).', rowsT(), manT(n), recapT(n));
+  });
+  return h + '<div id="ck"></div>';
+}
+function clS2() {
+  var h = '', cu = CL.info.cumul;
+  h += docCard('fj', 'FDJ : rapport journalier', 'Photographiez le <b>rapport FDJ « journalier »</b> (la fin du ticket : « Total des lots payés »).', rowsFj(), manFj(), recapFj());
+  h += docCard('fr', 'FDJ : rapport temps réel', 'Photographiez le <b>rapport FDJ « temps réel »</b> (rubriques PAIEMENTS et ANNULATIONS PAIEMENTS).', rowsFr(), manFr(), recapFr());
+  h += '<div class="line"><b>Remboursements lus sur les tickets X</b>' + CL.c.map(function (n) { return '<div class="kv"><span>Caisse ' + n + ' : jeux / loto</span><b>' + (cv('x' + n + 'jeux') === null ? '–' : eur(cv('x' + n + 'jeux'))) + ' / ' + (cv('x' + n + 'loto') === null ? '–' : eur(cv('x' + n + 'loto'))) + '</b></div>'; }).join('') +
+    '<p class="lg">Si une ligne reste rouge, la lecture d’un ticket X peut être fausse : reprenez sa photo.</p>' + CL.c.map(function (n) { return docMini('x' + n, 'Reprendre la photo du ticket X caisse ' + n); }).join('') + '</div>';
+  if (cu.n) h += '<p class="lg">Déjà enregistré aujourd’hui : jeux ' + eur(cu.jeux) + ', loto ' + eur(cu.loto) + '. Les rapports FDJ cumulent la journée.</p>';
+  return h + '<div id="ck"></div><div id="ovw"></div>';
+}
+function ccbDecl(n) {
+  var v = cv('x' + n + 'ccb'), rc = cv('x' + n + 'rcb') || 0, rd = CL.rd[n] || 0;
+  if (v === null) return false;
+  if (rd > 0 && Math.abs(v - rd) < 0.005) return false;
+  if (rd === 0 && v === 0 && rc === 0) return false;
+  return true;
+}
+function ccbField(n) {
+  var id = 'x' + n + 'ccb', rd = CL.rd[n] || 0, rc = cv('x' + n + 'rcb') || 0, v = CL.v[id] === undefined ? '' : CL.v[id];
+  return '<label class="fl" for="' + id + '">Commission cash back (€)<small>' + (rd > 0 ? 'Lue sur le ticket : ' + eur(rd) + '. Si c’est faux, corrigez : ce sera noté « déclaratif ».' : (rc > 0 ? 'Non lue sur la photo : saisissez-la d’après la ligne « Commission Cash Back » du ticket X. Elle sera notée « déclaratif ».' : 'Aucune commission lue. S’il y en a une quand même sur le ticket X, saisissez-la : elle sera notée « déclaratif ».')) + '</small></label><input id="' + id + '" type="number" inputmode="decimal" step="0.01" min="0" value="' + esc(v) + '" oninput="clIn(this,0)">';
+}
+function clS3() {
+  var h = '<div class="line"><b>Cash back</b><p class="lg">Les montants viennent des tickets X déjà photographiés. La commission est variable : si la photo ne l’a pas lue, ou l’a mal lue, saisissez-la d’après le ticket X.</p></div>';
+  CL.c.forEach(function (n) {
+    h += '<div class="line"><b>Caisse ' + n + '</b><div class="rc">' + kv('Retrait cash back', 'x' + n + 'rcb', 1) + kv('Dépôt cash back', 'x' + n + 'dcb') + '</div>' + ccbField(n) + docMini('x' + n, 'Reprendre la photo du ticket X caisse ' + n) + '</div>';
+  });
+  return h + '<div id="ck"></div><div id="ovw"></div>';
+}
+function clS4() {
+  var h = docCard('nk', 'Nickel : rapport d’activité', 'Photographiez le <b>rapport d’activité Nickel</b> (rubriques DEPOTS CASH et RETRAITS CASH).', rowsNk(), manNk(), recapNk());
+  h += '<div class="line"><b>Nickel lu sur les tickets X</b>' + CL.c.map(function (n) { return '<div class="rc"><div class="kv"><span>Caisse ' + n + ' : dépôt / retrait</span><b>' + (cv('x' + n + 'dnk') === null ? '–' : eur(cv('x' + n + 'dnk'))) + ' / ' + (cv('x' + n + 'rnk') === null ? '–' : eur(cv('x' + n + 'rnk'))) + '</b></div></div>' + docMini('x' + n, 'Reprendre la photo du ticket X caisse ' + n); }).join('') + '</div>';
+  return h + '<div id="ck"></div><div id="ovw"></div>';
+}
+function dk(n, d) { return 'k' + n + '_' + String(d).replace('.', 'p'); }
+function cnt(n) {
+  var s = 0, any = false, pz = cv('k' + n + '_pieces');
+  DEN_B.forEach(function (d) { var q = cv(dk(n, d)); if (q !== null) { any = true; s += q * d; } });
+  if (pz === null) return null;
+  return r2(s + pz);
+}
+function brow(n, d) {
+  var id = dk(n, d), v = CL.v[id] === undefined ? '' : CL.v[id], q = num(v);
+  return '<div class="brow"><span class="bl">' + d + ' €</span><span class="bx">×</span><input id="' + id + '" type="number" inputmode="numeric" step="1" min="0" value="' + esc(v) + '" oninput="clIn(this,0)"><span class="bt" id="bt' + id + '">' + (q ? eur(q * d) : '') + '</span></div>';
+}
+function misSoFar(n) {
+  var s = 0; DEN_B.forEach(function (d) { var q = cv(dk(n, d)); if (q !== null) s += q * d; });
+  var pz = cv('k' + n + '_pieces'); return r2(s + (pz === null ? 0 : pz));
+}
+function clS5() {
+  var h = '<div class="stk" id="stk"></div><div class="line"><b>' + (CL.sm ? 'Comptez tout le tiroir' : 'Comptez uniquement la recette') + '</b><p class="lg">' + (CL.sm ? 'Le fond de caisse fait partie du tiroir : comptez-le avec le reste.' + (CL.src === 'photos' ? ' Comptage annoncé par l’employé : il sera noté « non vérifié sur place ».' : '') : 'Le fond de caisse reste dans le tiroir : ne le comptez pas.') + ' Le bandeau en haut reste affiché : il montre ce qui est mis et ce qui reste.</p></div>';
+  CL.c.forEach(function (n) {
+    var pv = CL.v['k' + n + '_pieces'] === undefined ? '' : CL.v['k' + n + '_pieces'];
+    h += '<div class="line"><b>Caisse ' + n + '</b><div class="rc">' + (CL.sm ? '<div class="kv"><span>Fond de caisse</span><b>' + eur(CL.info.fonds[n]) + '</b></div>' + kv('Espèces du ticket X', 'x' + n + 'esp') + '<div class="kv"><span><b>À trouver dans le tiroir</b></span><b>' + (clRes(n).att === null ? '–' : eur(clRes(n).att)) + '</b></div>' : kv('Espèces du ticket X (à trouver)', 'x' + n + 'esp')) + '</div><div class="sec">Billets : nombre de chaque sorte</div>' + DEN_B.map(function (d) { return brow(n, d); }).join('') +
+      '<div class="brow"><span class="bl">Pièces</span><span class="bx"></span><input id="k' + n + '_pieces" type="number" inputmode="decimal" step="0.01" min="0" value="' + esc(pv) + '" placeholder="total en €" oninput="clIn(this,0)"><span class="bt">0 si aucune</span></div>' +
+      '<div id="kr' + n + '" style="margin-top:10px"></div></div>';
+  });
+  return h + '<div id="ck"></div>';
+}
+function clRes(n) {
+  var esp = cv('x' + n + 'esp'), fond = CL.info.fonds[n], c = cnt(n), att = esp === null ? null : r2(esp + (CL.sm ? fond : 0));
+  return {fond: fond, esp: esp, att: att, compte: c, ecart: (att === null || c === null) ? null : r2(c - att), recette: c};
+}
+function clBilan() {
+  var tot = {recette: 0, ecart: 0, ok: true}, s = CL.info.seuils;
+  CL.c.forEach(function (n) { var r = clRes(n); if (r.compte === null || r.att === null) tot.ok = false; else { tot.recette += r.recette; tot.ecart += r.ecart; } });
+  tot.recette = r2(tot.recette); tot.ecart = r2(tot.ecart);
+  return tot;
+}
+function clS6() {
+  var h = '<div id="bil"></div>';
+  if (!CL.sm) CL.c.forEach(function (n) {
+    h += '<div class="line"><b>Caisse ' + n + '</b>' + fld('k' + n + 'comp', 'Complément versé par l’équipe (€), facultatif', 'À remplir si de l’argent a été ajouté pour couvrir un manque') + fld('k' + n + 'ret', 'Excédent retiré (€), facultatif', 'À remplir si de l’argent en trop a été sorti') + '</div>';
+  });
+  h += '<label class="fl" for="cl_com">Commentaire (facultatif)</label><input id="cl_com" maxlength="300" value="' + esc(CL.v.cl_com || '') + '" oninput="CL.v.cl_com=this.value">' +
+    '<label class="fl" for="cl_ph">Photos supplémentaires (facultatif). Les photos des tickets sont déjà gardées comme preuve.</label><input id="cl_ph" type="file" accept="image/*" multiple onchange="clPhotos(this.files)"><p class="lg" id="cl_phn">' + CL.photos.length + ' photo(s) jointe(s)</p>' +
+    '<div id="ck"></div><div id="msg"></div><button id="save" disabled>' + (CL.sm ? 'Enregistrer le contrôle' : 'Enregistrer la clôture') + '</button>';
+  return h;
+}
+function clPhotos(files) {
+  CL.photos = [];
+  Array.prototype.slice.call(files, 0, 10).forEach(function (f) {
+    var r = new FileReader();
+    r.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var s = Math.min(1, 1400 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        CL.photos.push(c.toDataURL('image/jpeg', 0.72)); $('cl_phn').textContent = CL.photos.length + ' photo(s) jointe(s)';
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(f);
+  });
+}
+function clSum(key) { var s = 0, miss = false; CL.c.forEach(function (n) { var x = cv('x' + n + key); if (x === null) miss = true; else s += x; }); return miss ? null : s; }
+function clChecks() {
+  var out = [], I = CL.info;
+  function add(step, label, a, b, hint, unit, note) { out.push({step: step, label: label, a: a, b: b, hint: hint, unit: unit || '€', note: note || '', ok: (a === null || b === null) ? null : Math.abs(a - b) <= 0.005}); }
+  CL.c.forEach(function (n) {
+    var cb = cv('x' + n + 'cb'), tA = cv('t' + n + 'a'), tB = cv('t' + n + 'b'), nA = cv('t' + n + 'an'), nB = cv('t' + n + 'bn'), nX = cv('x' + n + 'cbn'), esp = cv('x' + n + 'esp'), tot = cv('x' + n + 'tot');
+    add(1, 'Caisse ' + n + ' : carte du ticket X = tickets du TPE (contact + sans contact)', cb, (tA === null || tB === null) ? null : r2(tA + tB), 'relisez la ligne carte du ticket X et les deux tickets du TPE');
+    add(1, 'Caisse ' + n + ' : nombre de paiements carte', nX, (nA === null || nB === null) ? null : nA + nB, 'relisez les nombres de transactions', 'n');
+    add(3, 'Caisse ' + n + ' : retrait cash back = dépôt cash back', cv('x' + n + 'rcb'), cv('x' + n + 'dcb'), 'relisez les lignes cash back du ticket X');
+    var rcn = cv('x' + n + 'rcb');
+    if (rcn !== null && rcn > 0) { var cc = cv('x' + n + 'ccb'); out.push({step: 3, label: 'Caisse ' + n + ' : commission cash back renseignée', a: cc === null ? '–' : eur(cc), b: '', unit: 't', hint: 'saisissez la commission de la ligne « Commission Cash Back » du ticket X', note: '', ok: cc !== null}); }
+    var dd = CL.v['x' + n + 'dates'], att = CL.v.cl_mode === 'reprise' ? CL.v.cl_date : I.aujourdhui;
+    if (dd) { var lst = dd.split(','); out.push({step: 1, label: 'Caisse ' + n + ' : le ticket X est bien de la journée du ' + fr(att), a: fr(lst[0]), b: fr(att), unit: 't', hint: CL.v.cl_mode === 'reprise' ? 'ce ticket n’est pas de la journée choisie : prenez le bon ticket ou corrigez la date à l’étape 1' : 'ce ticket n’est pas d’aujourd’hui : s’il s’agit d’une journée passée, revenez à l’étape 1 et choisissez « Reprise »', note: '', ok: lst.indexOf(att) >= 0}); }
+    var ed = CL.v['x' + n + 'edition'];
+    if (CL.sm && ed) { var age = Math.round((Date.now() - new Date(ed.replace(' ', 'T') + ':00').getTime()) / 60000); out.push({step: 1, soft: true, label: 'Caisse ' + n + ' : ticket X imprimé il y a moins de ' + I.ageMax + ' minutes', a: 'imprimé à ' + ed.slice(11) + ' (il y a ' + age + ' min)', b: '', unit: 't', hint: 'ticket trop ancien : demandez un nouveau ticket X', note: '', ok: age <= I.ageMax && age >= -5}); }
+    add(1, 'Caisse ' + n + ' : espèces + carte = total du tiroir', (esp === null || cb === null) ? null : r2(esp + cb), tot, 'relisez les lignes espèces et total du solde tiroir');
+  });
+  var jeux = clSum('jeux'), loto = clSum('loto'), dnk = clSum('dnk'), rnk = clSum('rnk'), paie = cv('f_paie'), ann = cv('f_ann'), cu = I.cumul;
+  add(2, 'Jeux : lots payés FDJ = remboursements jeux (cumul du jour)', cv('f_lots'), jeux === null ? null : r2(jeux + cu.jeux), 'relisez le rapport FDJ et la ligne Remboursement jeux', '€', cu.jeux ? 'Dont ' + eur(cu.jeux) + ' déjà enregistrés aujourd’hui' : '');
+  add(2, 'Loto : paiements FDJ moins annulations = remboursements loto (cumul du jour)', (paie === null || ann === null) ? null : r2(paie - ann), loto === null ? null : r2(loto + cu.loto), 'relisez le rapport temps réel et la ligne Remboursement loto', '€', cu.loto ? 'Dont ' + eur(cu.loto) + ' déjà enregistrés aujourd’hui' : '');
+  add(4, 'Nickel : dépôts cash du rapport = Dépôt Nickel des tickets X (cumul du jour)', cv('n_dep'), dnk === null ? null : r2(dnk + cu.dnk), 'relisez le rapport Nickel et la famille Dépôt Nickel');
+  add(4, 'Nickel : retraits cash du rapport = retraits Nickel des tickets X (cumul du jour)', cv('n_ret'), rnk === null ? null : r2(rnk + cu.rnk), 'relisez le rapport Nickel et les sorties du ticket X');
+  return out;
+}
+function ckHtml(c) {
+  if (c.ok === null) return '<div class="ck na">• ' + esc(c.label) + ' : à compléter</div>';
+  var f = c.unit === 'n' ? function (x) { return String(x); } : (c.unit === 't' ? function (x) { return x; } : eur);
+  return '<div class="ck ' + (c.ok ? 'ok' : 'ko') + '"><b>' + (c.ok ? '✓' : '✗') + '</b>' + esc(c.label) + '<small>' + f(c.a) + (c.b !== '' && c.b !== undefined ? ' contre ' + f(c.b) : '') + (c.ok ? '' : ' · ' + (c.unit === 't' ? '' : 'écart ' + f(Math.abs(c.a - c.b)) + ' : ') + esc(c.hint)) + '</small>' + (c.note ? '<small>' + esc(c.note) + '</small>' : '') + (c.soft && !c.ok ? '<small>Alerte : elle n’empêche pas d’enregistrer.</small>' : '') + '</div>';
+}
+function clStepOk(s) {
+  if (s >= 1 && s <= 4 && CL.ov[s]) return true;
+  if (s === 0) return clIdOk();
+  if (s === 6) return true;
+  var cs = clChecks().filter(function (c) { return c.step === s && !c.soft; });
+  if (!cs.every(function (c) { return c.ok === true; })) return false;
+  if (s === 5) return CL.c.every(function (n) { return clRes(n).compte !== null; });
+  return true;
+}
+function ovHtml(s) {
+  return '<div class="line"><b>Toujours en écart après plusieurs photos ?</b><p class="lg">Si l’écart est réel, un gérant peut le valider avec son code. Il sera noté dans l’enregistrement.</p><select id="ov_nom">' + opts(B.gerants || [], 'Gérant') + '</select><input id="ov_pin" type="password" inputmode="numeric" autocomplete="off" placeholder="Code du gérant" style="margin-top:6px"><button id="ov_go" style="margin-top:8px" onclick="clOv(' + s + ')">Valider l’écart</button><div id="ov_msg"></div></div>';
+}
+function ovUpdate(s, cs) {
+  var w = $('ovw'); if (!w) return;
+  var ko = cs.some(function (c) { return c.step === s && c.ok === false; });
+  var want = ko && (CL.reads[s] || 0) >= 2 && !CL.ov[s], key = CL.ov[s] ? 'ov' : (want ? 'want' : '');
+  if (key === CL.ovKey) return;
+  CL.ovKey = key;
+  w.innerHTML = CL.ov[s] ? '<div class="msg" style="background:#d4edda">Écart validé par ' + esc(CL.ov[s]) + '.</div>' : (want ? ovHtml(s) : '');
+}
+function clOv(s) {
+  var nom = $('ov_nom').value, pin = $('ov_pin').value; if (!nom || !pin) return;
+  $('ov_go').disabled = true;
+  google.script.run.withSuccessHandler(function (r) {
+    if (r && r.ok) { CL.ov[s] = nom; CL.ovpin[s] = pin; CL.ovKey = ''; clCheck(); }
+    else { $('ov_go').disabled = false; $('ov_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc((r && r.message) || 'Refusé.') + '</div>'; }
+  }).withFailureHandler(function (e) { $('ov_go').disabled = false; $('ov_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .verifierGerant({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', gerant: nom, gpin: pin});
+}
+function clIdOk() { var v = CL.v; if (CL.sm) return !!(CL.src && (CL.src === 'place' || v.sm_from) && CL.c.length && clPrepOk()); return !!(v.cl_type && v.cl_cre && v.cl_ent && v.cl_ent !== B.user.nom && CL.c.length && clPrepOk() && (v.cl_mode !== 'reprise' || (v.cl_date && CL.rep))); }
+function clCheck() {
+  var s = CL.step, cs = clChecks();
+  if ($('ck')) $('ck').innerHTML = cs.filter(function (c) { return c.step === s || s === 6; }).map(ckHtml).join('');
+  if (s === 5 && $('stk')) $('stk').innerHTML = CL.c.map(function (n) {
+    var esp = clRes(n).att, mis = misSoFar(n), reste = esp === null ? null : r2(esp - mis);
+    return '<div class="sk"><b>Caisse ' + n + '</b><span>Mis <b>' + eur(mis) + '</b></span><span>' + (reste === null ? 'Reste –' : (reste === 0 ? '<b class="ok">✓ Compte juste</b>' : (reste < 0 ? '<b class="ko">En trop ' + eur(-reste) + '</b>' : 'Reste <b>' + eur(reste) + '</b>'))) + '</span></div>';
+  }).join('');
+  if (s === 5) CL.c.forEach(function (n) {
+    var r = clRes(n), q = CL.info.seuils, el = $('kr' + n); if (!el) return;
+    DEN_B.forEach(function (d) { var b = $('bt' + dk(n, d)), x = cv(dk(n, d)); if (b) b.textContent = x ? eur(x * d) : ''; });
+    var mis = misSoFar(n), esp = r.att, reste = esp === null ? null : r2(esp - mis);
+    var h = '<div class="rc"><div class="kv"><span>Mis (billets + pièces)</span><b>' + eur(mis) + '</b></div><div class="kv"><span>' + (CL.sm ? 'À trouver (fond + espèces du ticket X)' : 'À trouver (espèces du ticket X)') + '</span><b>' + (esp === null ? '–' : eur(esp)) + '</b></div><div class="kv"><span>' + (reste !== null && reste < 0 ? 'En trop' : 'Reste à compter') + '</span><b style="color:' + (reste === null ? '#555' : (reste === 0 ? '#2e7d32' : (reste < 0 ? '#c62828' : '#8A6440'))) + '">' + (reste === null ? '–' : eur(Math.abs(reste))) + '</b></div></div>';
+    if (r.compte === null) h += '<p class="lg">Saisissez aussi le total des pièces (0 s’il n’y en a pas) pour terminer.</p>';
+    else if (r.att !== null) h += '<div class="tot st-' + st(r.ecart, q.s1, q.s2)[0] + '" style="font-size:20px">Écart : ' + (r.ecart > 0 ? '+' : '') + eur(r.ecart) + ' · ' + st(r.ecart, q.s1, q.s2)[1] + '</div>' + (CL.sm ? '<div>Total du tiroir compté : <b>' + eur(r.compte) + '</b> (fond de caisse ' + eur(r.fond) + ' compris).</div>' : '<div>Recette à sortir : <b>' + eur(r.recette) + '</b>. Le fond de caisse (' + eur(r.fond) + ') reste dans le tiroir.</div>');
+    el.innerHTML = h;
+  });
+  if (s === 6) {
+    var b = clBilan(), q = CL.info.seuils, ko = cs.filter(function (c) { return c.ok === false; }).length, na = cs.filter(function (c) { return c.ok === null; }).length;
+    var rows = CL.c.map(function (n) { var r = clRes(n); return '<tr><td>Caisse ' + n + '</td><td>' + (r.att === null ? '–' : eur(r.att)) + '</td><td>' + (r.compte === null ? '–' : eur(r.compte)) + '</td><td>' + (r.ecart === null ? '–' : (r.ecart > 0 ? '+' : '') + eur(r.ecart) + pill(r.ecart, q.s1, q.s2)) + '</td></tr>'; }).join('');
+    $('bil').innerHTML = '<table><tr><th>Caisse</th><th>À trouver</th><th>Compté</th><th>Écart</th></tr>' + rows + '</table><div class="tot st-' + (b.ok ? st(b.ecart, q.s1, q.s2)[0] : 'o') + '">' + (CL.sm ? 'Total compté (fonds de caisse compris) : ' : 'Recette totale à sortir : ') + eur(b.recette) + '<br><span style="font-size:16px">Écart total : ' + (b.ecart > 0 ? '+' : '') + eur(b.ecart) + '</span></div>' +
+      (ko ? '<div class="msg" style="background:#f8d7da">' + ko + ' contrôle(s) croisé(s) en alerte : relisez les tickets concernés. L’alerte sera notée dans l’enregistrement.</div>' : '') + (na ? '<div class="msg">' + na + ' contrôle(s) incomplet(s) : revenez aux étapes précédentes.</div>' : '');
+    window.okSave = clIdOk() && b.ok && na === 0 && [1, 2, 3, 4, 5].every(clStepOk); check();
+  }
+  if (s === 0 && $('prepmsg')) $('prepmsg').textContent = clIdOk() ? '' : CL.sm ? 'Pour continuer : choisissez d’où viennent les tickets (et qui les a envoyés), les caisses, puis cochez toutes les cases.' : 'Pour continuer : choisissez le type et le créneau (et l’employé entrant pour un changement d’équipe), puis cochez toutes les cases. Pour une reprise : date valide et validation du gérant.';
+  if (s >= 1 && s <= 4) ovUpdate(s, cs);
+  if (s >= 1 && s <= 5 && $('blk')) $('blk').textContent = clStepOk(s) ? '' : 'Étape bloquée : tant qu’une ligne est rouge ou à compléter, vous ne pouvez pas continuer. Reprenez les photos, ou utilisez la saisie manuelle de secours.';
+  var nx = $('clnext'); if (nx) nx.disabled = !clStepOk(s);
+}
+function clNav(d) { CL.step = Math.max(0, Math.min(6, CL.step + d)); clStep(); window.scrollTo(0, 0); }
+function clStep() {
+  var s = CL.step;
+  var h = '<div class="stp">Étape ' + (s + 1) + ' sur ' + CL_STEPS.length + ' · <b>' + CL_STEPS[s] + '</b></div>' + band(s) + (s > 0 && CL.v.cl_mode === 'reprise' ? '<div class="msg">Reprise de la journée du ' + fr(CL.v.cl_date) + (CL.rep ? ' · validée par ' + esc(CL.rep.nom) : '') + '</div>' : '') + [clS0, clS1, clS2, clS3, clS4, clS5, clS6][s]() +
+    '<div class="row" style="margin-top:12px">' + (s > 0 ? '<button class="nvb" onclick="clNav(-1)">← Précédent</button>' : '') + (s < 6 ? '<button id="clnext" onclick="clNav(1)">Suivant →</button>' : '') + '</div>' + (s >= 1 && s <= 5 ? '<p class="lg" id="blk" style="color:#7f1020"></p>' : '') + (s < 6 ? '<div id="msg"></div>' : '');
+  $('view').innerHTML = h; CL.ovKey = '';
+  if (s === 0) { ['cl_type', 'cl_cre'].forEach(function (id) { if (CL.v[id] && $(id)) $(id).value = CL.v[id]; }); clEnt(); [1, 2].forEach(function (n) { $('cl_c' + n).checked = CL.c.indexOf(n) >= 0; }); if (CL.sm && $('sm_from') && CL.v.sm_from) $('sm_from').value = CL.v.sm_from; }
+  chk = function () { return window.okSave; };
+  if (s === 6) $('save').onclick = clSave;
+  clCheck();
+}
+function mailMsg(r) { return r.mail === true ? '<div class="msg" style="background:#d4edda">Rapport PDF envoyé par e-mail.</div>' : (r.mail === false ? '<div class="msg">Le rapport PDF n’a pas pu être envoyé par e-mail (voir l’onglet Connexions).</div>' : ''); }
+function clSave() {
+  var b = $('save'); b.disabled = true; b.textContent = 'Enregistrement…';
+  var g = function (id) { var n = cv(id); return CL.v[id] === undefined ? '' : (n !== null && /^x\d(jeux|loto|rcb|rnk)$/.test(id) ? String(n) : CL.v[id]); };
+  var caisses = CL.c.map(function (n) {
+    return {n: n, compte: clRes(n).compte, complement: g('k' + n + 'comp'), retire: g('k' + n + 'ret'), billets: (function () { var o = {}; DEN_B.forEach(function (d) { o[d] = Math.round(cz(dk(n, d))); }); return o; })(), pieces: cz('k' + n + '_pieces'),
+      x: {edition: g('x' + n + 'edition'), esp: g('x' + n + 'esp'), cb: g('x' + n + 'cb'), cbn: g('x' + n + 'cbn'), tot: g('x' + n + 'tot'), jeux: g('x' + n + 'jeux'), loto: g('x' + n + 'loto'), rcb: g('x' + n + 'rcb'), dcb: g('x' + n + 'dcb'), ccb: g('x' + n + 'ccb'), dnk: g('x' + n + 'dnk'), rnk: g('x' + n + 'rnk')},
+      tpe: {a: g('t' + n + 'a'), an: g('t' + n + 'an'), b: g('t' + n + 'b'), bn: g('t' + n + 'bn'), r: g('t' + n + 'r')}};
+  });
+  if (CL.sm) {
+    google.script.run.withSuccessHandler(function (r) {
+      done = true; b.style.display = 'none';
+      $('msg').innerHTML = '<div class="msg" style="background:#d4edda">Contrôle surprise enregistré : ' + r.nb + ' caisse(s), total compté ' + eur(r.total) + ', écart total ' + eur(r.ecart) + ' · ' + r.statut + (r.photos ? ', ' + r.photos + ' photo(s) rangée(s).' : '.') + '</div>' + mailMsg(r) +
+        (r.alertes.length ? '<div class="msg" style="background:#f8d7da">Alertes notées : ' + esc(r.alertes.join(' ; ')) + '</div>' : '') + '<button onclick="go(\'home\')">Retour au menu</button>';
+    }).withFailureHandler(function (e) { b.textContent = 'Enregistrer le contrôle'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+    .enregistrerControle({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', source: CL.src, envoyePar: CL.v.sm_from || '', commentaire: g('cl_com'), caisses: caisses,
+      fdj: {lots: g('f_lots'), paie: g('f_paie'), ann: g('f_ann')}, nickel: {dep: g('n_dep'), ret: g('n_ret'), com: g('n_com')},
+      photos: Object.keys(CL.pics).map(function (k) { return CL.pics[k]; }).concat(CL.photos).slice(-10),
+      validations: Object.keys(CL.ov).filter(function (k) { return CL.ov[k]; }).map(function (k) { return {etape: CL_STEPS[k], gerant: CL.ov[k], gpin: CL.ovpin[k]}; }),
+      manuel: Object.keys(CL.man).filter(function (k) { return CL.man[k]; }).map(docLabel),
+      declaratif: CL.c.filter(ccbDecl).map(function (n) { return 'commission cash back caisse ' + n; })});
+    return;
+  }
+  google.script.run.withSuccessHandler(function (r) {
+    done = true; b.style.display = 'none';
+    $('msg').innerHTML = '<div class="msg" style="background:#d4edda">Clôture enregistrée : ' + r.nb + ' caisse(s), recette totale ' + eur(r.recette) + ', écart total ' + eur(r.ecart) + ' · ' + r.statut + (r.photos ? ', ' + r.photos + ' photo(s) rangée(s).' : '.') + '</div>' +
+      mailMsg(r) + (r.alertes.length ? '<div class="msg" style="background:#f8d7da">Alertes notées : ' + esc(r.alertes.join(' ; ')) + '</div>' : '') + '<button onclick="go(\'home\')">Retour au menu</button>';
+  }).withFailureHandler(function (e) { b.textContent = 'Enregistrer la clôture'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .enregistrerCloture({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', mode: CL.v.cl_mode || 'direct', date: CL.v.cl_date || '', repGerant: CL.rep ? {nom: CL.rep.nom, pin: CL.rep.pin} : null, entrant: g('cl_ent'), type: g('cl_type'), creneau: g('cl_cre'), commentaire: g('cl_com'), caisses: caisses,
+    fdj: {lots: g('f_lots'), paie: g('f_paie'), ann: g('f_ann')}, nickel: {dep: g('n_dep'), ret: g('n_ret'), com: g('n_com')},
+    photos: Object.keys(CL.pics).map(function (k) { return CL.pics[k]; }).concat(CL.photos).slice(-10),
+    validations: Object.keys(CL.ov).filter(function (k) { return CL.ov[k]; }).map(function (k) { return {etape: CL_STEPS[k], gerant: CL.ov[k], gpin: CL.ovpin[k]}; }),
+    manuel: Object.keys(CL.man).filter(function (k) { return CL.man[k]; }).map(docLabel),
+    declaratif: CL.c.filter(ccbDecl).map(function (n) { return 'commission cash back caisse ' + n; })});
+}
+</script></body></html>
