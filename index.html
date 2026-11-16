@@ -125,7 +125,7 @@ var $ = function (id) { return document.getElementById(id); };
 var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
 var eur = function (n) { return n.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'}); };
 var cls = function (n) { return n < 0 ? 'neg' : (n > 0 ? 'pos' : ''); };
-
+ 
 var B, D, L = [], done = false, chk = function () { return false; };
 var LD = {t: null, p: 0, e: []};
 function ldHtml(titre, etapes) {
@@ -165,7 +165,7 @@ var INFO = {
   tabac: ['Contrôle tabac · écarts de stock', 'À faire deux fois par semaine et avant chaque livraison. Déclarez seulement les références dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20).']
 };
 function check() { var b = $('save'); if (b) b.disabled = done || !chk(); }
-
+ 
 function go(v) {
   if (!B.user) { loginView(); return; }
   var gr = (B.gerants || []).indexOf(B.user.nom) >= 0;
@@ -180,7 +180,7 @@ function go(v) {
   if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else home();
   window.scrollTo(0, 0);
 }
-
+ 
 function home() {
   var gr = (B.gerants || []).indexOf(B.user.nom) >= 0, x = B.user.nom === 'Extra';
   var t = '<button class="tile" onclick="go(\'cloture\')"><b>Contrôle de caisse</b><span>Changement d’équipe ou clôture du soir : ticket X, TPE, FDJ, cash back, Nickel puis comptage. Le calcul se fait tout seul.</span></button>';
@@ -194,7 +194,7 @@ function tick() { $('dt').textContent = new Date().toLocaleString('fr-FR', {time
 var idleT = null;
 function idleReset() { clearTimeout(idleT); if (B && B.user) idleT = setTimeout(function () { logout('Session verrouillée après 10 minutes sans activité.'); }, 600000); }
 function logout(msg) { B.user = null; clearTimeout(idleT); loginView(msg); }
-
+ 
 function loginView(msg) {
   window.okSave = false; chk = function () { return false; }; L = [];
   $('who').style.display = 'none'; $('back').style.display = 'none'; $('info').style.display = 'none'; $('sub').textContent = 'Connexion';
@@ -212,7 +212,7 @@ function loginView(msg) {
     }).withFailureHandler(function (e) { $('lg_go').textContent = 'Se connecter'; $('lg_go').disabled = false; $('lg_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; }).connexion(nom, pin, pre);
   };
 }
-
+ 
 function start(b) {
   B = b; tick(); setInterval(tick, 20000);
   $('back').onclick = function () { go('home'); };
@@ -312,8 +312,8 @@ function showRes() {
   var head = (r.fuzzy ? '<div style="cursor:default;color:#8a6d00">Aucun résultat exact : suggestions proches.</div>' : '') + (r.total > 60 ? '<div style="cursor:default;color:#666">' + r.total + ' résultats, 60 affichés : affinez avec les filtres.</div>' : '');
   $('res').innerHTML = head + r.list.map(function (c) { return '<div onclick="add(' + c[0] + ')">' + esc(c[1]) + '<small>' + esc(c[3]) + (c.cd ? ' · ' + esc(c.cd) : '') + ' · ' + eur(c[4]) + '</small></div>'; }).join('');
 }
-
-
+ 
+ 
 function tabacStart() {
   ldRun('Chargement du catalogue…', ['Demande envoyée', 'Réception du catalogue', 'Préparation de la recherche']);
   google.script.run.withSuccessHandler(function (r) {
@@ -341,7 +341,7 @@ function tabacInit(d) {
   chk = function () { return window.okSave && $('typ').value && $('cre').value && $('eff').value; };
   $('save').onclick = save; refresh(); render();
 }
-
+ 
 function num(v) { v = String(v).replace(',', '.').trim(); if (v === '') return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
 function stockView() {
   var h = '<p class="lg">Employé : <b>' + esc(B.user.aff) + '</b></p><div class="row"><select id="smois">' + opts(B.mois, 'Mois contrôlé') + '</select></div>';
@@ -407,7 +407,7 @@ function calc() {
   $('recap').innerHTML = nb ? '<div class="tot st-' + st(tot, D.seuils.t1, D.seuils.t2)[0] + '">Impact final : ' + eur(tot) + ' · ' + st(tot, D.seuils.t1, D.seuils.t2)[1] + '</div>' + tb(G, 'Famille') + '<br>' + tb(S, 'Sous-famille') : '<p style="color:#666;font-size:13px">Le récapitulatif par famille et sous-famille apparaît dès que les quantités sont saisies.</p>';
   window.okSave = ok; check();
 }
-
+ 
 function save() {
   var b = $('save'); b.disabled = true; b.textContent = 'Enregistrement…';
   google.script.run.withSuccessHandler(function (r) {
@@ -416,7 +416,7 @@ function save() {
   }).withFailureHandler(function (e) { b.textContent = 'Enregistrer la déclaration'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
   .enregistrer({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
 }
-
+ 
 var DP = null, COUP = [500, 200, 100, 50, 20, 10, 5];
 var MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'], JOURS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 function dpEchange(c) { var cc = Math.round(c * 100) / 100, e = Math.floor(cc / 5 + 1e-9) * 5, b = {20: 0, 10: 0, 5: 0}, r = e; [20, 10, 5].forEach(function (d) { b[d] = Math.floor(r / d); r -= b[d] * d; }); return {e: e, reste: Math.round((cc - e) * 100) / 100, b: b}; }
@@ -600,7 +600,7 @@ function dpValider() {
   }).withFailureHandler(function (e) { DP.conf = false; $('dp_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; dpRefresh(); })
     .validerDepot({employe: B.user.nom, pin: B.user.pin, extraNom: '', ids: ids, bordereau: $('dp_bd').value, anomalie: $('dp_an') ? $('dp_an').value : ''});
 }
-
+ 
 function dpPretes() {
   var P = DP.d.pretes || []; if (!P.length) return '';
   return '<div class="sec">Poche prête · à déposer en banque</div>' + P.map(function (x) {
@@ -621,7 +621,7 @@ function dpConf(n) {
 var CL = null;
 var DEN_B = [500, 200, 100, 50, 20, 10, 5];
 var CL_STEPS = ['Préparation', 'Carte bancaire', 'FDJ', 'Cash back', 'Nickel', 'Comptage', 'Bilan'];
-
+ 
 function clotureStart() {
   ldRun('Ouverture du contrôle de caisse…', ['Demande envoyée', 'Lecture des clôtures du jour', 'Préparation du contrôle']);
   google.script.run.withSuccessHandler(function (r) { ldDone(function () { CL = {info: r, step: 0, c: [1, 2], v: {}, photos: [], doc: {}, man: {}, err: {}, fails: {}, reads: {}, ov: {}, ovpin: {}, pics: {}, picn: {}, busy: '', ovKey: '', rep: null, rd: {}, sm: false, src: ''}; CL.v.cl_mode = 'direct'; clStep(); }); })
@@ -667,15 +667,15 @@ function clPrep() {
   var it = clPrepItems(), row = function (x) { return '<label class="pck"><input type="checkbox" id="' + x[0] + '"' + (CL.v[x[0]] ? ' checked' : '') + ' onchange="CL.v[this.id]=this.checked?1:0;clCheck()"><span>' + x[1] + '</span></label>'; };
   return '<div class="line"><b>1. Sortez ces documents</b>' + it.docs.map(row).join('') + '</div><div class="line"><b>' + (CL.sm ? '2. Comptage du tiroir' : (CL.v.cl_mode === 'reprise' ? '2. Retrouvez le comptage de ce jour-là' : '2. Sortez la recette des tiroirs')) + '</b>' + it.cash.map(row).join('') + '</div>';
 }
-
+ 
 function clSrcInner() {
   var s = CL.src;
   return '<div class="bgrid bg2" style="margin-top:8px"><div class="bigb' + (s === 'place' ? ' on' : '') + '" onclick="clSrc(\'place\')"><b>Sur place</b><span>je photographie les tickets</span></div><div class="bigb' + (s === 'photos' ? ' on' : '') + '" onclick="clSrc(\'photos\')"><b>Photos reçues</b><span>envoyées par un employé</span></div></div>' +
     (s === 'photos' ? '<label class="fl" for="sm_from">Photos envoyées par</label><select id="sm_from" onchange="CL.v.sm_from=this.value;clCheck()">' + opts(B.emp.filter(function (n) { return n !== B.user.nom; }), 'Choisir') + '</select><p class="lg">Choisissez les photos dans la galerie du téléphone. Le comptage du tiroir sera noté « déclaré par l’employé, non vérifié sur place ».</p>' : '');
 }
 function clSrc(s) { CL.src = s; clModeDraw(); if ($('sm_from') && CL.v.sm_from) $('sm_from').value = CL.v.sm_from; }
-
-
+ 
+ 
 function clS0() {
   function sel(id, label, list) { return '<label class="fl" for="' + id + '">' + label + '</label><select id="' + id + '" onchange="CL.v[this.id]=this.value;clCheck()">' + opts(list, 'Choisir') + '</select>'; }
   var cais = '<div class="fl">Caisses concernées</div><div class="row"><label class="cbx"><input type="checkbox" id="cl_c1" onchange="clCaisses()"> Caisse 1</label><label class="cbx"><input type="checkbox" id="cl_c2" onchange="clCaisses()"> Caisse 2</label></div>';
@@ -685,7 +685,7 @@ function clS0() {
     '<div id="prep">' + clPrep() + '</div><p class="lg">Ensuite, l’application vous demandera de photographier chaque document, un par un, et lira les chiffres toute seule.</p><p class="lg" id="prepmsg" style="color:#7f1020"></p>';
 }
 function fr(d) { return d ? d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) : ''; }
-
+ 
 function clModeHtml() {
   if (B.user.nom === 'Extra') return '';
   var m = CL.v.cl_mode, I = CL.info, possible = I.hier >= I.debut, g = (B.gerants || []).indexOf(B.user.nom) >= 0;
@@ -704,7 +704,7 @@ function clModeDraw() { var w = $('modewrap'); if (w) w.innerHTML = clModeHtml()
 function clCumul(date) {
   google.script.run.withSuccessHandler(function (r) { CL.info.cumul = r.cumul; clCheck(); }).withFailureHandler(function () {}).getCloture(date || '');
 }
-
+ 
 function clMode(m) {
   if (m === CL.v.cl_mode) return;
   if (m === 'reprise' && CL.info.hier < CL.info.debut) return;
@@ -792,7 +792,7 @@ function packImage(file, cb) {
   r.readAsDataURL(file);
 }
 function clRedraw() { var y = window.pageYOffset || 0; clStep(); window.scrollTo(0, y); }
-
+ 
 function clPhoto(inp, id) {
   var f = inp.files && inp.files[0]; if (!f) return;
   CL.busy = id; CL.err[id] = ''; pgStart(id); clRedraw();
@@ -943,11 +943,14 @@ function clChecks() {
     if (CL.sm && ed) { var age = Math.round((Date.now() - new Date(ed.replace(' ', 'T') + ':00').getTime()) / 60000); out.push({step: 1, soft: true, label: 'Caisse ' + n + ' : ticket X imprimé il y a moins de ' + I.ageMax + ' minutes', a: 'imprimé à ' + ed.slice(11) + ' (il y a ' + age + ' min)', b: '', unit: 't', hint: 'ticket trop ancien : demandez un nouveau ticket X', note: '', ok: age <= I.ageMax && age >= -5}); }
     add(1, 'Caisse ' + n + ' : espèces + carte = total du tiroir', (esp === null || cb === null) ? null : r2(esp + cb), tot, 'relisez les lignes espèces et total du solde tiroir');
   });
-  var jeux = clSum('jeux'), loto = clSum('loto'), dnk = clSum('dnk'), rnk = clSum('rnk'), paie = cv('f_paie'), ann = cv('f_ann'), cu = I.cumul;
-  add(2, 'Jeux : lots payés FDJ = remboursements jeux (cumul du jour)', cv('f_lots'), jeux === null ? null : r2(jeux + cu.jeux), 'relisez le rapport FDJ et la ligne Remboursement jeux', '€', cu.jeux ? 'Dont ' + eur(cu.jeux) + ' déjà enregistrés aujourd’hui' : '');
-  add(2, 'Loto : paiements FDJ moins annulations = remboursements loto (cumul du jour)', (paie === null || ann === null) ? null : r2(paie - ann), loto === null ? null : r2(loto + cu.loto), 'relisez le rapport temps réel et la ligne Remboursement loto', '€', cu.loto ? 'Dont ' + eur(cu.loto) + ' déjà enregistrés aujourd’hui' : '');
-  add(4, 'Nickel : dépôts cash du rapport = Dépôt Nickel des tickets X (cumul du jour)', cv('n_dep'), dnk === null ? null : r2(dnk + cu.dnk), 'relisez le rapport Nickel et la famille Dépôt Nickel');
-  add(4, 'Nickel : retraits cash du rapport = retraits Nickel des tickets X (cumul du jour)', cv('n_ret'), rnk === null ? null : r2(rnk + cu.rnk), 'relisez le rapport Nickel et les sorties du ticket X');
+  var jeux = clSum('jeux'), loto = clSum('loto'), dnk = clSum('dnk'), rnk = clSum('rnk'), paie = cv('f_paie'), ann = cv('f_ann'), cu = I.cumul, net = (paie === null || ann === null) ? null : r2(paie - ann);
+  // Le ticket X couvre soit toute la journée (non remis à zéro), soit seulement la période : on accepte les deux cas
+  function cum(a, s, c) { if (s === null) return null; return (a !== null && Math.abs(a - s) > 0.005 && Math.abs(a - s - c) <= 0.005) ? r2(s + c) : s; }
+  function nt(a, s, c) { if (s === null || !c) return ''; if (a !== null && Math.abs(a - s) <= 0.005) return 'Le ticket X couvre déjà toute la journée : les clôtures précédentes (' + eur(c) + ') ne sont pas ajoutées'; if (a !== null && Math.abs(a - s - c) <= 0.005) return 'Dont ' + eur(c) + ' déjà enregistrés aujourd’hui'; return 'Ni le ticket X seul (' + eur(s) + '), ni le ticket X avec les clôtures précédentes (' + eur(r2(s + c)) + ') ne correspondent au rapport'; }
+  add(2, 'Jeux : lots payés FDJ = remboursements jeux (cumul du jour)', cv('f_lots'), cum(cv('f_lots'), jeux, cu.jeux), 'relisez le rapport FDJ et la ligne Remboursement jeux', '€', nt(cv('f_lots'), jeux, cu.jeux));
+  add(2, 'Loto : paiements FDJ moins annulations = remboursements loto (cumul du jour)', net, cum(net, loto, cu.loto), 'relisez le rapport temps réel et la ligne Remboursement loto', '€', nt(net, loto, cu.loto));
+  add(4, 'Nickel : dépôts cash du rapport = Dépôt Nickel des tickets X (cumul du jour)', cv('n_dep'), cum(cv('n_dep'), dnk, cu.dnk), 'relisez le rapport Nickel et la famille Dépôt Nickel', '€', nt(cv('n_dep'), dnk, cu.dnk));
+  add(4, 'Nickel : retraits cash du rapport = retraits Nickel des tickets X (cumul du jour)', cv('n_ret'), cum(cv('n_ret'), rnk, cu.rnk), 'relisez le rapport Nickel et les sorties du ticket X', '€', nt(cv('n_ret'), rnk, cu.rnk));
   return out;
 }
 function ckHtml(c) {
@@ -1060,3 +1063,4 @@ function clSave() {
     declaratif: CL.c.filter(ccbDecl).map(function (n) { return 'commission cash back caisse ' + n; })});
 }
 </script></body></html>
+ 
