@@ -96,6 +96,14 @@ details{margin-top:8px}summary{font-size:14px;color:#8A6440;cursor:pointer}
 .dj.b{border-left:6px solid #2f5fb3}.dst.bl{background:#CFE0FF;color:#1b3a73}.cd.b{background:#CFE0FF;border-color:#2f5fb3;cursor:pointer}
 .ver{margin:22px 0 10px;text-align:center;font-size:13px;color:#8a7a62}.ver button{width:auto;display:inline;background:transparent;border:0;color:#8A6440;text-decoration:underline;padding:4px 8px;font-size:13px}
 .nv{position:fixed;inset:0;background:rgba(43,31,22,.55);z-index:99;display:none;align-items:flex-end;justify-content:center}.nv.on{display:flex}.nvb{background:#FCF8F1;border-radius:16px 16px 0 0;max-width:620px;width:100%;max-height:85vh;overflow:auto;padding:16px 18px 22px;box-sizing:border-box}.nvb h2{margin:0 0 4px;font-size:20px;color:#5a4528}.nvb h3{margin:14px 0 4px;font-size:16px;color:#8A6440}.nvb ul{margin:4px 0 0;padding-left:20px;font-size:15px;line-height:1.4}.nvb .cur{display:inline-block;font-size:12px;background:#C6EFCE;color:#1d5d2a;border-radius:10px;padding:2px 8px;margin-left:6px}.nvb button{margin-top:16px}
+.ic{background:#FCF8F1;border:1px solid #E3D3B8;border-left:6px solid #bbb;border-radius:10px;padding:10px 12px;margin:8px 0}.ic.g{border-left-color:#2e7d32}.ic.o{border-left-color:#b7791f}.ic.r{border-left-color:#c62828}
+.ic small{display:block;color:#7a6a5c;font-size:13px}.ic .n{display:block;font-size:30px;font-weight:800;letter-spacing:-.5px;line-height:1.15}.ic.g .n{color:#2e7d32}.ic.o .n{color:#b7791f}.ic.r .n{color:#c62828}
+.gj{height:7px;border-radius:4px;position:relative;margin:12px 0 4px}.gj i{position:absolute;top:-4px;width:4px;height:15px;background:#3d2b1c;border-radius:2px}.gl{display:flex;justify-content:space-between;font-size:11px;color:#7a6a5c}.mu{color:#7a6a5c}
+.fm{display:flex;gap:10px;align-items:flex-start;border:1px solid #D9C7AA;border-radius:10px;padding:11px;margin-bottom:8px;background:#FCF8F1;cursor:pointer}.fm.sel{border-color:#3d2b1c;box-shadow:0 0 0 1px #3d2b1c}.fm input{width:22px;height:22px;margin-top:1px;flex:none}.fm small{display:block;margin-top:3px;font-size:13px}
+.sb{font-size:11px;font-weight:700;border-radius:9px;padding:2px 8px;white-space:nowrap;margin-left:auto}.sb.fait{background:#e1f2e5;color:#1e6b36}.sb.cours{background:#fbefd5;color:#8a5a00}.sb.todo{background:#eee;color:#666}.sb.late{background:#fbe3df;color:#a52f20}
+.cvg{color:#2e7d32}.cvo{color:#b7791f}.cvr{color:#c62828}.sx{position:sticky;top:0;z-index:5}.li2 input[type=checkbox]{width:auto;margin-right:6px}.br{height:6px;background:#eee;border-radius:3px;margin:3px 0 8px}.br i{display:block;height:6px;border-radius:3px}
+.li2{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #E3D3B8;padding:7px 0;font-size:14px}.li2 small{display:block;font-size:12px}
+button.bs2{background:#FCF8F1;color:#3d2b1c;border:1.5px solid #8A6440;margin-top:8px}button.bs2:disabled{background:#eee;color:#999}
 </style></head><body>
 <div class="hd"><svg viewBox="50 180 300 215" width="70" height="50" role="img" aria-label="Pictogramme Le Foirail" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="color:#8A6440;display:block"><ellipse cx="200" cy="225" rx="78" ry="11"/><path d="M122 225 L200 305 L278 225"/><path d="M141 240 Q200 254 259 240"/><line x1="200" y1="305" x2="200" y2="345"/><ellipse cx="200" cy="350" rx="40" ry="7"/><line x1="244" y1="254" x2="290" y2="190" stroke-width="2.5"/><circle cx="272" cy="205" r="14"/><circle cx="276" cy="201" r="3.5"/><line x1="96.2" y1="258.0" x2="62.8" y2="244.6"/><line x1="88.3" y1="292.2" x2="52.4" y2="289.7"/><line x1="91.3" y1="327.1" x2="56.4" y2="335.8"/><line x1="105.0" y1="359.4" x2="74.5" y2="378.4"/><line x1="303.8" y1="258.0" x2="337.2" y2="244.6"/><line x1="311.7" y1="292.2" x2="347.6" y2="289.7"/><line x1="308.7" y1="327.1" x2="343.6" y2="335.8"/><line x1="295.0" y1="359.4" x2="325.5" y2="378.4"/><line x1="118" y1="382" x2="188" y2="382"/><line x1="212" y1="382" x2="282" y2="382"/><path d="M200 375 L207 382 L200 389 L193 382 Z" fill="currentColor"/></svg><div><h1>Contrôles Bar Tabac du Foirail</h1><div class="sub" id="sub">Choisissez le contrôle à effectuer</div></div></div>
 <div class="dt" id="dt"></div><div class="who" id="who"></div><button class="back" id="back">← Choisir un autre contrôle</button><div class="info" id="info"></div>
@@ -165,8 +173,7 @@ var INFO = {
   cloture: ['Contrôle de caisse', 'À faire à chaque changement d’équipe et à la clôture du soir. Suivez les étapes dans l’ordre : chaque étape compare les tickets entre eux. Si une ligne est rouge, relisez le ticket indiqué. Après la préparation, vous photographiez chaque document : l’application lit les chiffres toute seule. Une étape ne se débloque que si tous ses contrôles sont verts. Les rapports FDJ et Nickel cumulent la journée : l’application ajoute les clôtures déjà enregistrées aujourd’hui.'],
   surprise: ['Contrôle surprise', 'Réservé aux gérants. À faire à tout moment : sur place avec les tickets, ou avec les photos envoyées par un employé. Mêmes tickets que la clôture (ticket X, TPE, FDJ, Nickel), mais le tiroir est compté fond de caisse compris. Le rapport PDF est envoyé par e-mail.'],
   depots: ['Dépôts à la banque', 'Réservé aux gérants. Chaque clôture alimente cet écran : cochez ce qui part à la banque, l’application prépare les pochettes (8 000 € maximum chacune) et note le dépôt. Les pièces restent en caisse : elles sont échangées contre des billets de la caisse.'],
-  boissons: ['Contrôle boissons · écarts de stock', 'À faire avant chaque livraison et en fin de semaine. Déclarez seulement les boissons dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20). Les fûts se comptent en fûts, les autres produits à l’unité.'],
-  produits: ['Contrôle vape, CBD et confiserie · écarts de stock', 'À faire régulièrement et avant chaque livraison. Déclarez seulement les produits (vape, CBD, confiserie, papier, articles fumeurs) dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20).'],
+  ctrl: ['Contrôle de stock', 'Choisissez les familles à contrôler (boissons, vape, CBD, articles fumeurs, confiserie) : vous pouvez en enchaîner plusieurs. Déclarez seulement les produits dont le stock réel ne correspond pas au stock théorique de Strator. À la fin, envoyez le rapport : les gérants le valident, puis Strator est mis à jour.'],
   tabac: ['Contrôle tabac · écarts de stock', 'À faire deux fois par semaine et avant chaque livraison. Déclarez seulement les références dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20).']
 };
 function check() { var b = $('save'); if (b) b.disabled = done || !chk(); }
@@ -182,7 +189,7 @@ function go(v) {
   $('sub').textContent = i ? i[0] : 'Choisissez le contrôle à effectuer';
   $('info').style.display = i ? 'block' : 'none'; $('info').textContent = i ? i[1] : '';
   $('back').style.display = i ? 'block' : 'none';
-  if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'boissons') boissonsStart('boissons'); else if (v === 'produits') boissonsStart('produits'); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else home();
+  if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'ctrl') ctrlStart(); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else home();
   window.scrollTo(0, 0);
 }
  
@@ -191,10 +198,10 @@ function home() {
   var t = '<button class="tile" onclick="go(\'cloture\')"><b>Contrôle de caisse</b><span>Changement d’équipe ou clôture du soir : ticket X, TPE, FDJ, cash back, Nickel puis comptage. Le calcul se fait tout seul.</span></button>';
   if (!x) t += '<button class="tile" onclick="go(\'stock\')"><b>Stock fin de mois</b><span>Fûts, café, sucres et déca : saisir les quantités du dernier jour du mois.</span></button>' +
     '<button class="tile" onclick="go(\'tabac\')"><b>Contrôle tabac</b><span>Déclarer les écarts entre le stock Strator et le rayon.</span></button>' +
-    '<button class="tile" onclick="go(\'boissons\')"><b>Contrôle boissons</b><span>Déclarer les écarts entre le stock Strator et le comptage des boissons.</span></button>' +
-    '<button class="tile" onclick="go(\'produits\')"><b>Contrôle vape, CBD et confiserie</b><span>Vape, CBD, confiseries, papier et articles fumeurs : écarts entre Strator et le comptage.</span></button>';
+    '<button class="tile" onclick="go(\'ctrl\')"><b>Contrôle de stock</b><span id="ct_sub">Boissons, vape, CBD, articles fumeurs, confiserie : écarts entre Strator et le comptage, rapport et validation.</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'depots\')"><b>Dépôts</b><span id="dp_sub">Calcul en cours…</span></button>';
-  $('view').innerHTML = t;
+  $('view').innerHTML = (x ? '' : '<div id="hm_imp"></div>') + t;
+  if (!x) homeStock();
   if (gr) depotsResume();
 }
 function tick() { $('dt').textContent = new Date().toLocaleString('fr-FR', {timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'}); }
@@ -424,24 +431,81 @@ function save() {
   .enregistrer({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
 }
  
-// ---------- Contrôle boissons : théorique Strator contre réel, par référence
+// ---------- Contrôle de stock : plusieurs familles enchaînées, rapport, validation des gérants
 var BS = [], BSF = '', BSQ = '', BSSRC = 'boissons';
+var STK = {emp: '', hub: null, sel: {}, done: [], queue: [], cur: null, cat: {}, meta: null};
 function bsNorm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function boissonsStart(src) {
-  BSSRC = src || 'boissons';
-  ldRun(BSSRC === 'produits' ? 'Chargement du catalogue…' : 'Chargement du catalogue boissons…', ['Demande envoyée', 'Réception du catalogue', 'Préparation de la recherche']);
-  google.script.run.withSuccessHandler(function (r) {
-    BS = (r.cat || []).filter(function (c) { return c[6]; }); BSF = ''; BSQ = '';
-    D = {max: B.max, seuils: B.seuilsTabac}; ldDone(boissonsInit);
-  }).withFailureHandler(function (e) { $('view').textContent = 'Erreur : ' + e.message; }).getCatalogueBoissons(BSSRC);
+function stkP(x) { var o = x || {}; o.employe = B.user.nom; o.pin = B.user.pin; return o; }
+function stkErr(e) { $('view').innerHTML = '<div class="msg" style="background:#f8d7da">Erreur : ' + esc(e.message) + '</div><button onclick="go(\'home\')">Retour au menu</button>'; }
+function stkEur(x) { var v = Math.round(x * 100) / 100, a = Math.abs(v); return (v < 0 ? '−' : (v > 0 ? '+' : '')) + a.toLocaleString('fr-FR', {maximumFractionDigits: 2}) + ' €'; }
+function stkIc(titre, imp, a, b, sous, extra) { var s = st(imp, a, b); return '<div class="ic ' + s[0] + '"' + (extra || '') + '><small>' + titre + '</small><b class="n">' + stkEur(imp) + '</b>' + (sous ? '<small>' + sous + '</small>' : '') + '</div>'; }
+function stkJauge(imp, o, r) {
+  var max = r * 1.5, a = Math.round(o / max * 100), b = Math.round(r / max * 100), pos = Math.min(98, Math.round(Math.abs(imp) / max * 100));
+  var rest = Math.round(r - Math.abs(imp));
+  return '<div class="gj" style="background:linear-gradient(90deg,#cfe8d6 0 ' + a + '%,#f6dfa8 ' + a + '% ' + b + '%,#f0b8af ' + b + '%)"><i style="left:' + pos + '%"></i></div>' +
+    '<div class="gl"><span>0 €</span><span>orange ' + o + ' €</span><span>rouge ' + r + ' €</span></div>' +
+    '<small class="mu">' + (rest > 0 ? 'Encore ' + rest + ' € avant le seuil rouge' : 'Seuil rouge dépassé') + '</small>';
+}
+// Bandeau d'accueil : impact des 30 derniers jours
+function homeStock() {
+  google.script.run.withSuccessHandler(function (h) {
+    var e = $('hm_imp'); if (!e) return;
+    e.innerHTML = '<div class="ic ' + st(h.impact30, h.orange, h.rouge)[0] + '"><small>Impact des contrôles de stock · 30 derniers jours</small><b class="n">' + stkEur(h.impact30) + '</b>' + stkJauge(h.impact30, h.orange, h.rouge) + '</div>';
+    var s = $('ct_sub'); if (s && h.aValider) s.textContent = h.aValider + (h.aValider > 1 ? ' rapports à valider' : ' rapport à valider') + ' · Boissons, vape, CBD, articles fumeurs, confiserie.';
+  }).withFailureHandler(function () {}).getStockHub(stkP());
+}
+function ctrlStart() {
+  if (STK.emp !== B.user.nom) STK = {emp: B.user.nom, hub: null, sel: {}, done: [], queue: [], cur: null, cat: {}, meta: null};
+  ldRun('Chargement du contrôle de stock…', ['Demande envoyée', 'Lecture des derniers contrôles', 'Préparation de l’écran']);
+  google.script.run.withSuccessHandler(function (h) { STK.hub = h; ldDone(ctrlHub); }).withFailureHandler(stkErr).getStockHub(stkP());
+}
+function ctrlHub() {
+  var h = STK.hub, gr = (B.gerants || []).indexOf(B.user.nom) >= 0, ok = 0;
+  L = []; done = false; window.okSave = false; chk = function () { return false; };
+  var t = stkIc('Impact · 30 derniers jours', h.impact30, h.orange, h.rouge, '', '') .replace('</div>', stkJauge(h.impact30, h.orange, h.rouge) + '</div>');
+  if (gr) t += '<button class="tile" onclick="ctrlValider()"><b>À valider' + (h.aValider ? ' (' + h.aValider + ')' : '') + '</b><span>Rapports envoyés par l’équipe, tableau de bord et suivi Strator.</span></button>';
+  t += '<h2>Quelles familles contrôlez-vous ?</h2><p class="lg">Cochez une ou plusieurs familles : vous les enchaînez l’une après l’autre.</p>';
+  h.groupes.forEach(function (g) {
+    var d = STK.done.filter(function (x) { return x.groupe === g.id; })[0], p, last;
+    if (d) p = '<span class="sb cours">À envoyer · ' + stkEur(d.impact) + '</span>';
+    else if (g.faitAuj) p = '<span class="sb fait">Fait aujourd’hui</span>';
+    else if (!g.dernier) p = '<span class="sb todo">Jamais contrôlé</span>';
+    else if (g.dernier.jours > 14) p = '<span class="sb late">En retard · ' + g.dernier.jours + ' j</span>';
+    else p = '<span class="sb todo">À faire</span>';
+    last = g.dernier ? 'Dernier contrôle : ' + esc(g.dernier.aff) + ' · ' + esc(g.dernier.emp) + ' · <b class="cv' + st(g.dernier.impact, h.seuils.t1, h.seuils.t2)[0] + '">' + stkEur(g.dernier.impact) + '</b>' : 'Aucun contrôle enregistré';
+    t += '<label class="fm' + (STK.sel[g.id] && !d ? ' sel' : '') + '"><input type="checkbox" ' + (d ? 'disabled' : (STK.sel[g.id] ? 'checked' : '')) + ' onchange="ctrlSel(\'' + g.id + '\',this.checked)"><div style="flex:1"><div style="display:flex;gap:8px;align-items:center"><b>' + esc(g.nom) + '</b>' + p + '</div><small class="mu">' + last + '</small></div></label>';
+    if (STK.sel[g.id] && !d) ok++;
+  });
+  t += '<button id="ct_go" ' + (ok ? '' : 'disabled') + ' onclick="ctrlGo()">' + (ok ? 'Commencer · ' + ok + (ok > 1 ? ' familles' : ' famille') : 'Cochez au moins une famille') + '</button>';
+  if (STK.done.length) t += '<button class="bs2" onclick="ctrlTerminer()">Terminer et envoyer le rapport · ' + STK.done.length + (STK.done.length > 1 ? ' familles' : ' famille') + '</button>';
+  $('view').innerHTML = t;
+}
+function ctrlSel(id, v) { STK.sel[id] = v; ctrlHub(); }
+function ctrlGo() {
+  STK.queue = STK.hub.groupes.filter(function (g) { return STK.sel[g.id] && !STK.done.some(function (d) { return d.groupe === g.id; }); });
+  if (STK.queue.length) { STK.total = STK.queue.length; ctrlNext(); }
+}
+function ctrlNext() {
+  var g = STK.queue.shift(); if (!g) { ctrlHub(); return; }
+  STK.cur = g; BSSRC = g.src;
+  var go2 = function () {
+    BS = STK.cat[g.src].filter(function (c) { return c[6] && c[7] === g.id; }); BSF = ''; BSQ = ''; L = []; done = false;
+    D = {max: B.max, seuils: B.seuilsTabac}; boissonsInit();
+  };
+  if (STK.cat[g.src]) { go2(); return; }
+  ldRun('Chargement du catalogue…', ['Demande envoyée', 'Réception du catalogue', 'Préparation de la recherche']);
+  google.script.run.withSuccessHandler(function (r) { STK.cat[g.src] = r.cat || []; ldDone(go2); }).withFailureHandler(stkErr).getCatalogueBoissons(g.src);
 }
 function boissonsInit() {
-  var h = '<p class="lg">Employé : <b>' + esc(B.user.aff) + '</b></p><div class="row"><select id="typ">' + opts(B.types, 'Type de contrôle') + '</select></div><div class="row"><select id="cre">' + opts(B.creneaux, 'Créneau horaire') + '</select><select id="eff">' + opts(B.effectifs, 'Seul ou à deux ?') + '</select></div>';
-  h += '<h2>1. Ajouter une référence en écart</h2><div class="row"><select id="fam">' + opts(uniq(BS.map(function (c) { return c[2]; })), 'Toutes les familles') + '</select></div>';
+  var g = STK.cur, m = STK.meta || {}, pos = STK.done.length + 1, tot = STK.done.length + STK.queue.length + 1;
+  var h = '<div class="sx" id="lv"></div><p class="lg">Employé : <b>' + esc(B.user.aff) + '</b> · Famille <b>' + esc(g.nom) + '</b> (' + pos + ' sur ' + tot + ')</p>';
+  h += '<div class="row"><select id="typ">' + opts(B.types, 'Type de contrôle') + '</select></div><div class="row"><select id="cre">' + opts(B.creneaux, 'Créneau horaire') + '</select><select id="eff">' + opts(B.effectifs, 'Seul ou à deux ?') + '</select></div>';
+  h += '<h2>1. Ajouter une référence en écart</h2><div class="row"><select id="fam">' + opts(uniq(BS.map(function (c) { return c[2]; })), 'Toutes les sous-familles') + '</select></div>';
   h += '<input id="q" placeholder="Rechercher un produit (2 lettres minimum)" style="margin-top:6px"><div class="res" id="res"></div>';
   h += '<h2>2. Quantités <span id="cnt"></span></h2><div id="lines"></div>';
-  h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix d’achat HT.</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer la déclaration</button>';
+  h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix d’achat HT.</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer cette famille</button>';
   $('view').innerHTML = h;
+  if (m.typ) { $('typ').value = m.typ; $('cre').value = m.cre; $('eff').value = m.eff; }
   $('fam').onchange = function () { BSF = this.value; bsRes(); };
   $('q').oninput = function () { BSQ = this.value; bsRes(); };
   $('typ').onchange = $('cre').onchange = $('eff').onchange = check;
@@ -450,14 +514,14 @@ function boissonsInit() {
 }
 function bsRes() {
   var q = bsNorm(BSQ).trim(), r;
-  if (!BSF && q.length < 2) { $('res').innerHTML = '<div style="cursor:default;color:#666">Choisissez une famille ou tapez le nom d’un produit.</div>'; return; }
+  if (!BSF && q.length < 2) { $('res').innerHTML = '<div style="cursor:default;color:#666">Choisissez une sous-famille ou tapez le nom d’un produit.</div>'; return; }
   r = BS.filter(function (c) { return (!BSF || c[2] === BSF) && (q.length < 2 || q.split(/\s+/).every(function (w) { return bsNorm(c[1]).indexOf(w) >= 0; })) && !L.some(function (l) { return l.c[0] === c[0]; }); });
   if (!r.length) { $('res').innerHTML = '<div style="cursor:default">Aucun résultat.</div>'; return; }
   $('res').innerHTML = (r.length > 60 ? '<div style="cursor:default;color:#666">' + r.length + ' résultats, 60 affichés : affinez la recherche.</div>' : '') + r.slice(0, 60).map(function (c) { return '<div onclick="bsAdd(' + c[0] + ')">' + esc(c[1]) + '<small>' + esc(c[2]) + ' · ' + esc(c[3]) + ' · ' + eur(c[4]) + '</small></div>'; }).join('');
 }
 function bsAdd(id) {
   if (done) return;
-  if (L.length >= D.max) { $('msg').innerHTML = '<div class="msg">Limite de ' + D.max + ' références atteinte : enregistrez, puis faites une nouvelle déclaration.</div>'; return; }
+  if (L.length >= D.max) { $('msg').innerHTML = '<div class="msg">Limite de ' + D.max + ' références atteinte : enregistrez cette famille, puis recommencez.</div>'; return; }
   var c = BS.filter(function (x) { return x[0] === id; })[0];
   if (!c || L.some(function (l) { return l.c[0] === id; })) return;
   L.push({c: c, theo: '', reel: ''}); bsRender(); bsRes();
@@ -473,26 +537,87 @@ function bsRender() {
   bsCalc();
 }
 function bsCalc() {
-  var G = {}, tot = 0, ok = L.length > 0, nb = 0;
+  var G = {}, tot = 0, ok = L.length > 0, nb = 0, q = D.seuils;
   L.forEach(function (l, i) {
     var v = bsVal(l), el = $('e' + i);
     if (!v) { ok = false; if (el) el.textContent = '–'; return; }
     if (v.e === 0) ok = false;
-    if (el) el.innerHTML = '<span class="' + cls(v.e) + '">' + (v.e > 0 ? '+' : '') + v.e + ' · ' + eur(v.i) + '</span>' + pill(v.i, D.seuils.l1, D.seuils.l2);
+    if (el) el.innerHTML = '<span class="' + cls(v.e) + '">' + (v.e > 0 ? '+' : '') + v.e + ' · ' + eur(v.i) + '</span>' + pill(v.i, q.l1, q.l2);
     nb++; tot += v.i;
     var o = G[l.c[2]] = G[l.c[2]] || {n: 0, e: 0, i: 0}; o.n++; o.e += v.e; o.i += v.i;
   });
+  tot = Math.round(tot * 100) / 100;
+  if ($('lv')) $('lv').innerHTML = stkIc((STK.cur ? esc(STK.cur.nom) : '') + ' · impact en direct', tot, q.t1, q.t2, nb + (nb > 1 ? ' références chiffrées' : ' référence chiffrée') + ' · orange à partir de ' + q.t1 + ' €');
   $('cnt').textContent = '(' + L.length + ' / ' + D.max + ')';
-  $('recap').innerHTML = nb ? '<div class="tot st-' + st(tot, D.seuils.t1, D.seuils.t2)[0] + '">Impact final : ' + eur(tot) + ' · ' + st(tot, D.seuils.t1, D.seuils.t2)[1] + '</div><table><tr><th>Famille</th><th>Réf.</th><th>Écart</th><th>Impact</th></tr>' + Object.keys(G).sort().map(function (k) { return '<tr><td>' + esc(k) + '</td><td>' + G[k].n + '</td><td class="' + cls(G[k].e) + '">' + Math.round(G[k].e * 100) / 100 + '</td><td class="' + cls(G[k].i) + '">' + eur(G[k].i) + '</td></tr>'; }).join('') + '</table>' : '<p style="color:#666;font-size:13px">Le récapitulatif par famille apparaît dès que les quantités sont saisies.</p>';
+  $('recap').innerHTML = nb ? '<div class="tot st-' + st(tot, q.t1, q.t2)[0] + '">Impact final : ' + eur(tot) + ' · ' + st(tot, q.t1, q.t2)[1] + '</div><table><tr><th>Sous-famille</th><th>Réf.</th><th>Écart</th><th>Impact</th></tr>' + Object.keys(G).sort().map(function (k) { return '<tr><td>' + esc(k) + '</td><td>' + G[k].n + '</td><td class="' + cls(G[k].e) + '">' + Math.round(G[k].e * 100) / 100 + '</td><td class="' + cls(G[k].i) + '">' + eur(G[k].i) + '</td></tr>'; }).join('') + '</table>' : '<p style="color:#666;font-size:13px">Le récapitulatif apparaît dès que les quantités sont saisies.</p>';
   window.okSave = ok; check();
 }
 function bsSave() {
-  var b = $('save'); b.disabled = true; b.textContent = 'Enregistrement…';
+  var b = $('save'), g = STK.cur; b.disabled = true; b.textContent = 'Enregistrement…';
   google.script.run.withSuccessHandler(function (r) {
-    done = true; b.style.display = 'none';
-    $('msg').innerHTML = '<div class="msg" style="background:#d4edda">Déclaration enregistrée : ' + r.nb + ' référence(s), impact ' + eur(r.impact) + '.</div><button onclick="go(\'home\')">Retour au menu</button>';
-  }).withFailureHandler(function (e) { b.textContent = 'Enregistrer la déclaration'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
-  .enregistrerBoissons({catalogue: BSSRC, employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
+    done = true; STK.meta = {typ: $('typ').value, cre: $('cre').value, eff: $('eff').value};
+    STK.done.push({groupe: g.id, nom: g.nom, session: r.session, nb: r.nb, impact: r.impact}); STK.sel[g.id] = false;
+    ctrlApres(r);
+  }).withFailureHandler(function (e) { b.textContent = 'Enregistrer cette famille'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .enregistrerBoissons({catalogue: BSSRC, employe: B.user.nom, pin: B.user.pin, type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
+}
+function ctrlTotal() { return Math.round(STK.done.reduce(function (s, d) { return s + d.impact; }, 0) * 100) / 100; }
+function ctrlApres(r) {
+  var q = STK.hub.seuils, nx = STK.queue[0], t = '<div class="msg" style="background:#d4edda">' + esc(STK.cur.nom) + ' enregistré : ' + r.nb + ' référence(s).</div>';
+  t += stkIc(esc(STK.cur.nom) + ' · cette famille', r.impact, q.t1, q.t2, '');
+  t += stkIc('Session en cours · ' + STK.done.length + (STK.done.length > 1 ? ' familles' : ' famille'), ctrlTotal(), q.t1, q.t2, 'Rien n’est envoyé aux gérants avant « Terminer ».');
+  if (nx) t += '<button onclick="ctrlNext()">Continuer : ' + esc(nx.nom) + '</button>';
+  t += '<button class="bs2" onclick="ctrlHub()">➕ Contrôler une autre famille</button><button ' + (nx ? 'class="bs2" ' : '') + 'onclick="ctrlTerminer()">Terminer et envoyer le rapport</button>';
+  $('view').innerHTML = t; window.scrollTo(0, 0);
+}
+function ctrlTerminer() {
+  if (!STK.done.length) return;
+  $('view').innerHTML = '<div class="msg">Envoi du rapport aux gérants…</div>';
+  google.script.run.withSuccessHandler(function (r) { STK.done = []; STK.sel = {}; STK.queue = []; STK.hub = null; ctrlRapport(r); }).withFailureHandler(function (e) { stkErr(e); })
+    .cloreRapportStock(stkP({items: STK.done.map(function (d) { return {groupe: d.groupe, session: d.session}; })}));
+}
+function ctrlBarres(fam) {
+  var mx = Math.max.apply(null, fam.map(function (f) { return Math.abs(f.impact); }).concat([1]));
+  return fam.map(function (f) { var c = f.impact < 0 ? '#d97b6e' : '#7fbf91'; return '<div style="display:flex;justify-content:space-between;font-size:14px"><span>' + esc(f.nom) + '</span><b>' + stkEur(f.impact) + '</b></div><div class="br"><i style="width:' + Math.max(3, Math.round(Math.abs(f.impact) / mx * 100)) + '%;background:' + c + '"></i></div>'; }).join('');
+}
+function ctrlRapport(r) {
+  var q = {t1: 50, t2: 200}; try { q = B.seuilsTabac; } catch (e) {}
+  var t = stkIc('Rapport · ' + esc(r.aff) + ' · ' + esc(r.emp), r.impact, q.t1, q.t2, esc(r.statut) + ' · ' + r.nb + ' référence(s) · prix d’achat HT');
+  t += '<div class="mg"><div class="mk"><small>Pertes</small><b class="cvr">' + stkEur(r.pertes) + '</b></div><div class="mk"><small>Gains</small><b class="cvg">' + stkEur(r.gains) + '</b></div>' + (r.prec !== null ? '<div class="mk"><small>Rapport précédent</small><b>' + stkEur(r.prec) + '</b></div>' : '') + '</div>';
+  t += '<h2>Par famille</h2>' + ctrlBarres(r.fam);
+  if (r.top.length) t += '<h2>Plus gros écarts</h2>' + r.top.map(function (x) { return '<div class="li2"><span>' + esc(x.nom) + '</span><b>' + stkEur(x.impact) + '</b></div>'; }).join('');
+  t += r.mail ? '<div class="msg" style="background:#d4edda">Rapport envoyé : les gérants sont prévenus par e-mail et valideront dans l’application.</div>' : '<div class="msg">Rapport enregistré, mais l’e-mail n’est pas parti : prévenez un gérant pour qu’il ouvre « À valider ».</div>';
+  t += '<button onclick="go(\'home\')">Retour au menu</button>';
+  $('view').innerHTML = t; window.scrollTo(0, 0);
+}
+// Gérants : valider les rapports, tableau de bord, suivi de la saisie dans Strator
+function ctrlValider() {
+  ldRun('Chargement des rapports…', ['Demande envoyée', 'Lecture des rapports', 'Préparation de l’écran']);
+  google.script.run.withSuccessHandler(function (r) { STK.rap = r; ldDone(ctrlValiderVue); }).withFailureHandler(stkErr).getRapportsStock(stkP());
+}
+function ctrlLignes(f) { return f.lignes.map(function (l) { return '<div class="li2"><span>' + esc(l[0]) + '<small class="mu">Strator ' + l[1] + ' → compté ' + l[2] + '</small></span><b class="' + (l[4] < 0 ? 'cvr' : 'cvg') + '">' + stkEur(l[4]) + '</b></div>'; }).join(''); }
+function ctrlValiderVue() {
+  var R = STK.rap, q = B.seuilsTabac, t = '<button class="bs2" onclick="ctrlStart()">← Retour au contrôle de stock</button>';
+  t += stkIc('Impact du mois · toutes familles', R.impactMois, q.t2, q.t2 * 3, '');
+  if (R.parFamille.length) t += '<h2>Où part l’argent ?</h2>' + ctrlBarres(R.parFamille.map(function (x) { return {nom: x[0], impact: x[1]}; }));
+  var att = R.rapports.filter(function (r) { return r.etat === 'À valider'; }), str = R.rapports.filter(function (r) { return r.etat === 'À saisir dans Strator'; }), aut = R.rapports.filter(function (r) { return r.etat !== 'À valider' && r.etat !== 'À saisir dans Strator'; });
+  t += '<h2>À valider (' + att.length + ')</h2>' + (att.length ? '' : '<p class="lg">Rien à valider.</p>');
+  att.forEach(function (r) {
+    t += '<div class="line">' + stkIc(esc(r.emp) + ' · ' + esc(r.aff) + ' · ' + esc(r.fams), r.impact, q.t1, q.t2, esc(r.statut)) + r.fam.map(function (f) { return '<b>' + esc(f.nom) + ' · ' + stkEur(f.impact) + '</b>' + ctrlLignes(f); }).join('') +
+      '<button onclick="ctrlDecide(\'' + r.id + '\',\'approuver\')">Approuver : mettre Strator à jour</button><button class="bs2" onclick="ctrlDecide(\'' + r.id + '\',\'recompter\')">Demander un recomptage</button></div>';
+  });
+  t += '<h2>À saisir dans Strator (' + str.length + ')</h2>' + (str.length ? '' : '<p class="lg">Rien en attente.</p>');
+  str.forEach(function (r) {
+    t += '<div class="line"><b>' + esc(r.emp) + ' · ' + esc(r.aff) + ' · approuvé par ' + esc(r.par) + '</b><p class="lg">Mettre ces quantités dans Strator (stock = quantité comptée) :</p>' +
+      r.fam.map(function (f) { return '<b>' + esc(f.nom) + '</b>' + f.lignes.map(function (l) { return '<label class="li2"><span><input type="checkbox"> ' + esc(l[0]) + '</span><b>→ ' + l[2] + '</b></label>'; }).join(''); }).join('') +
+      '<button onclick="ctrlDecide(\'' + r.id + '\',\'saisi\')">Tout est saisi dans Strator</button></div>';
+  });
+  if (aut.length) t += '<h2>Historique</h2>' + aut.slice(0, 15).map(function (r) { return '<div class="li2"><span>' + esc(r.aff) + ' · ' + esc(r.emp) + ' · ' + esc(r.fams) + '<small class="mu">' + esc(r.etat) + (r.par ? ' · ' + esc(r.par) : '') + '</small></span><b>' + stkEur(r.impact) + '</b></div>'; }).join('');
+  $('view').innerHTML = t; window.scrollTo(0, 0);
+}
+function ctrlDecide(id, action) {
+  $('view').innerHTML = '<div class="msg">Enregistrement…</div>';
+  google.script.run.withSuccessHandler(function () { ctrlValider(); }).withFailureHandler(stkErr).decideRapportStock(stkP({id: id, action: action}));
 }
 
 var DP = null, COUP = [500, 200, 100, 50, 20, 10, 5];
@@ -1142,9 +1267,10 @@ function clSave() {
 }
 
 // ---------- Suivi des versions (à modifier à chaque mise à jour : numéro, date et nouveautés)
-var APP_VERSION = '1.4';
+var APP_VERSION = '1.5';
 var APP_DATE = '17 novembre 2026';
 var APP_NOTES = [
+  {v: '1.5', d: '17 novembre 2026', t: ['Contrôle de stock : un seul bloc, vous cochez les familles (boissons, vape, CBD, articles fumeurs, confiserie) et vous les enchaînez.', 'L’impact en euros est visible partout : accueil, pendant la saisie, fin de famille et rapport.', 'Chaque contrôle donne un rapport envoyé aux gérants par e-mail ; ils l’approuvent, puis la mise à jour de Strator est suivie dans l’application.', 'Chaque famille affiche la date et l’auteur du dernier contrôle.']},
   {v: '1.4', d: '17 novembre 2026', t: ['Nouveau : Contrôle boissons. Comme au tabac, on déclare les écarts entre le stock théorique de Strator et le comptage réel, par référence.', 'Catalogue de 75 boissons (Pyrénées Boissons) avec la valeur d’achat pour chiffrer chaque écart.', 'Nouveau : Contrôle vape, CBD et confiserie, sur le même principe (350 produits : e-liquides, puffs, résistances, CBD, confiseries, papier, articles fumeurs).']},
   {v: '1.3', d: '16 novembre 2026', t: ['Clôture de caisse : les rapports FDJ et Nickel qui cumulent la journée ne bloquent plus à tort (ticket X seul, ou ticket X + clôtures déjà faites).', 'Dépôts : seules les clôtures du soir créent un dépôt. Le changement d’équipe n’a plus de dépôt à enregistrer.', 'Numéro de version et liste des nouveautés visibles dans l’application.']},
   {v: '1.2', d: 'novembre 2026', t: ['Application installable sur l’écran d’accueil, avec le logo Le Foirail.', 'Ouverture du lien possible depuis n’importe quel compte Google.']},
