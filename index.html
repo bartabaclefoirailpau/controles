@@ -503,7 +503,7 @@ function boissonsInit() {
   h += '<h2>1. Ajouter une référence en écart</h2><div class="row"><select id="fam">' + opts(uniq(BS.map(function (c) { return c[2]; })), 'Toutes les sous-familles') + '</select></div>';
   h += '<input id="q" placeholder="Rechercher un produit (2 lettres minimum)" style="margin-top:6px"><div class="res" id="res"></div>';
   h += '<h2>2. Quantités <span id="cnt"></span></h2><div id="lines"></div>';
-  h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix d’achat HT.</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer cette famille</button>';
+  h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix de vente TTC (l’argent perdu ou gagné).</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer cette famille</button>';
   $('view').innerHTML = h;
   if (m.typ) { $('typ').value = m.typ; $('cre').value = m.cre; $('eff').value = m.eff; }
   $('fam').onchange = function () { BSF = this.value; bsRes(); };
@@ -517,7 +517,7 @@ function bsRes() {
   if (!BSF && q.length < 2) { $('res').innerHTML = '<div style="cursor:default;color:#666">Choisissez une sous-famille ou tapez le nom d’un produit.</div>'; return; }
   r = BS.filter(function (c) { return (!BSF || c[2] === BSF) && (q.length < 2 || q.split(/\s+/).every(function (w) { return bsNorm(c[1]).indexOf(w) >= 0; })) && !L.some(function (l) { return l.c[0] === c[0]; }); });
   if (!r.length) { $('res').innerHTML = '<div style="cursor:default">Aucun résultat.</div>'; return; }
-  $('res').innerHTML = (r.length > 60 ? '<div style="cursor:default;color:#666">' + r.length + ' résultats, 60 affichés : affinez la recherche.</div>' : '') + r.slice(0, 60).map(function (c) { return '<div onclick="bsAdd(' + c[0] + ')">' + esc(c[1]) + '<small>' + esc(c[2]) + ' · ' + esc(c[3]) + ' · ' + eur(c[4]) + '</small></div>'; }).join('');
+  $('res').innerHTML = (r.length > 60 ? '<div style="cursor:default;color:#666">' + r.length + ' résultats, 60 affichés : affinez la recherche.</div>' : '') + r.slice(0, 60).map(function (c) { return '<div onclick="bsAdd(' + c[0] + ')">' + esc(c[1]) + '<small>' + esc(c[2]) + ' · ' + esc(c[3]) + ' · ' + eur(c[4]) + (c[8] ? '' : ' (prix d’achat)') + '</small></div>'; }).join('');
 }
 function bsAdd(id) {
   if (done) return;
@@ -531,7 +531,7 @@ function bsUpd(i, k, v) { L[i][k] = v; bsCalc(); }
 function bsVal(l) { var t = parseFloat(String(l.theo).replace(',', '.')), r = parseFloat(String(l.reel).replace(',', '.')); if (isNaN(t) || isNaN(r) || t < 0 || r < 0) return null; var e = Math.round((r - t) * 100) / 100; return {t: t, r: r, e: e, i: Math.round(e * l.c[4] * 100) / 100}; }
 function bsRender() {
   $('lines').innerHTML = L.map(function (l, i) {
-    return '<div class="line"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(l.c[1]) + '</b><button class="x" onclick="bsDel(' + i + ')">Retirer</button></div><small>' + esc(l.c[2]) + ' · en ' + esc(l.c[3]) + ' · valeur ' + eur(l.c[4]) + '</small>' +
+    return '<div class="line"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(l.c[1]) + '</b><button class="x" onclick="bsDel(' + i + ')">Retirer</button></div><small>' + esc(l.c[2]) + ' · en ' + esc(l.c[3]) + ' · valeur ' + eur(l.c[4]) + (l.c[8] ? '' : ' (prix d’achat, prix de vente à compléter)') + '</small>' +
       '<div class="in"><label>Théorique (Strator)<input type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.theo) + '" oninput="bsUpd(' + i + ',\'theo\',this.value)"></label><label>Réel (comptage)<input type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.reel) + '" oninput="bsUpd(' + i + ',\'reel\',this.value)"></label><div style="flex:1;font-size:13px">Écart<br><span id="e' + i + '">–</span></div></div></div>';
   }).join('');
   bsCalc();
@@ -582,7 +582,7 @@ function ctrlBarres(fam) {
 }
 function ctrlRapport(r) {
   var q = {t1: 50, t2: 200}; try { q = B.seuilsTabac; } catch (e) {}
-  var t = stkIc('Rapport · ' + esc(r.aff) + ' · ' + esc(r.emp), r.impact, q.t1, q.t2, esc(r.statut) + ' · ' + r.nb + ' référence(s) · prix d’achat HT');
+  var t = stkIc('Rapport · ' + esc(r.aff) + ' · ' + esc(r.emp), r.impact, q.t1, q.t2, esc(r.statut) + ' · ' + r.nb + ' référence(s) · prix de vente TTC');
   t += '<div class="mg"><div class="mk"><small>Pertes</small><b class="cvr">' + stkEur(r.pertes) + '</b></div><div class="mk"><small>Gains</small><b class="cvg">' + stkEur(r.gains) + '</b></div>' + (r.prec !== null ? '<div class="mk"><small>Rapport précédent</small><b>' + stkEur(r.prec) + '</b></div>' : '') + '</div>';
   t += '<h2>Par famille</h2>' + ctrlBarres(r.fam);
   if (r.top.length) t += '<h2>Plus gros écarts</h2>' + r.top.map(function (x) { return '<div class="li2"><span>' + esc(x.nom) + '</span><b>' + stkEur(x.impact) + '</b></div>'; }).join('');
