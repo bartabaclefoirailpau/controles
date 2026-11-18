@@ -173,6 +173,7 @@ var INFO = {
   stock: ['Stock fin de mois', 'À faire le dernier jour du mois : fûts, CO2, café, sucres et déca. En cours : part restante du fût ou du paquet entamé (0,5 = moitié). Neuves : nombre d’unités neuves. Mettre 0 si rien.'],
   cloture: ['Contrôle de caisse', 'À faire à chaque changement d’équipe et à la clôture du soir. Suivez les étapes dans l’ordre : chaque étape compare les tickets entre eux. Si une ligne est rouge, relisez le ticket indiqué. Après la préparation, vous photographiez chaque document : l’application lit les chiffres toute seule. Une étape ne se débloque que si tous ses contrôles sont verts. Les rapports FDJ et Nickel cumulent la journée : l’application ajoute les clôtures déjà enregistrées aujourd’hui.'],
   surprise: ['Contrôle surprise', 'Réservé aux gérants. À faire à tout moment : sur place avec les tickets, ou avec les photos envoyées par un employé. Mêmes tickets que la clôture (ticket X, TPE, FDJ, Nickel), mais le tiroir est compté fond de caisse compris. Le rapport PDF est envoyé par e-mail.'],
+  prix: ['Prix & offres', 'Réservé aux gérants. Choisissez un article, saisissez le prix proposé par un fournisseur et votre volume : l’outil compare à votre prix actuel et dit si l’offre vaut le coup.'],
   depots: ['Dépôts à la banque', 'Réservé aux gérants. Chaque clôture alimente cet écran : cochez ce qui part à la banque, l’application prépare les pochettes (8 000 € maximum chacune) et note le dépôt. Les pièces restent en caisse : elles sont échangées contre des billets de la caisse.'],
   ctrl: ['Contrôle de stock', 'Choisissez les familles à contrôler (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) : vous pouvez en enchaîner plusieurs. Déclarez seulement les produits dont le stock réel ne correspond pas au stock théorique de Strator. À la fin, envoyez le rapport : les gérants le valident, puis Strator est mis à jour.'],
   tabac: ['Contrôle tabac · écarts de stock', 'À faire deux fois par semaine et avant chaque livraison. Déclarez seulement les références dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20).']
@@ -183,14 +184,14 @@ function go(v) {
   if (!B.user) { loginView(); return; }
   var gr = (B.gerants || []).indexOf(B.user.nom) >= 0;
   if (B.user.nom === 'Extra' && v !== 'cloture') v = 'home';
-  if (v === 'depots' && !gr) v = 'home';
+  if ((v === 'depots' || v === 'prix') && !gr) v = 'home';
   L = []; done = false; window.okSave = false; chk = function () { return false; };
   S = {fam: '', sou: '', mar: '', mine: false, cond: '', fmt: '', gam: '', q: ''};
   var i = INFO[v];
   $('sub').textContent = i ? i[0] : 'Choisissez le contrôle à effectuer';
   $('info').style.display = i ? 'block' : 'none'; $('info').textContent = i ? i[1] : '';
   $('back').style.display = i ? 'block' : 'none';
-  if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'ctrl') ctrlStart(); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else home();
+  if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'ctrl') ctrlStart(); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else if (v === 'prix') prixStart(); else home();
   window.scrollTo(0, 0);
 }
 
@@ -200,6 +201,7 @@ function home() {
   if (!x) t += '<button class="tile" onclick="go(\'stock\')"><b>Stock fin de mois</b><span>Fûts, café, sucres et déca : saisir les quantités du dernier jour du mois.</span></button>' +
     '<button class="tile" onclick="go(\'tabac\')"><b>Contrôle tabac</b><span>Déclarer les écarts entre le stock Strator et le rayon.</span></button>' +
     '<button class="tile" onclick="go(\'ctrl\')"><b>Contrôle de stock</b><span id="ct_sub">Boissons, vape, CBD, articles fumeurs, FDJ, confiserie : écarts entre Strator et le comptage, rapport et validation.</span></button>';
+  if (gr) t += '<button class="tile" onclick="go(\'prix\')"><b>Prix & offres</b><span>Mettre à jour un prix d’achat ou comparer l’offre d’un fournisseur à votre prix actuel.</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'depots\')"><b>Dépôts</b><span id="dp_sub">Calcul en cours…</span></button>';
   $('view').innerHTML = (x ? '' : '<div id="hm_imp"></div>') + t;
   if (!x) homeStock();
@@ -624,6 +626,60 @@ function ctrlDecide(id, action) {
   google.script.run.withSuccessHandler(function () { ctrlValider(); }).withFailureHandler(stkErr).decideRapportStock(stkP({id: id, action: action}));
 }
 
+// ---------- Prix & offres (gérants)
+var PX = {cat: [], hist: [], cur: null};
+function prixStart() {
+  ldRun('Chargement des prix…', ['Demande envoyée', 'Lecture des catalogues', 'Préparation de l’écran']);
+  google.script.run.withSuccessHandler(function (r) { PX.cat = r.cat; PX.hist = r.hist; PX.cur = null; ldDone(prixVue); }).withFailureHandler(stkErr).getPrixOffres(stkP());
+}
+function pxPct(x) { return (Math.round(x * 1000) / 10).toString().replace('.', ',') + ' %'; }
+function prixVue() {
+  var t = '<div class="line"><b>Article</b><input id="px_q" placeholder="Chercher un article (ex. Coca, Cubic, Monito)" autocomplete="off" oninput="pxFiltre()"><select id="px_s" size="6" onchange="pxChoix()" style="width:100%;margin-top:6px"></select></div><div id="px_f"></div>';
+  if (PX.hist.length) t += '<h2>Dernières modifications de prix</h2>' + PX.hist.map(function (h) { return '<div class="li2"><span>' + esc(h[2]) + '<small class="mu">' + esc(h[0]) + ' · ' + esc(h[1]) + (h[5] ? ' · ' + esc(h[5]) : '') + '</small></span><b>' + eur(h[3]) + ' → ' + eur(h[4]) + '</b></div>'; }).join('');
+  $('view').innerHTML = '<button class="bs2" onclick="go(\'home\')">← Retour au menu</button>' + t; pxFiltre();
+}
+function pxFiltre() {
+  var q = ($('px_q').value || '').toLowerCase().trim(), h = '', n = 0;
+  PX.cat.forEach(function (a, i) { if (n < 60 && a.on && (!q || (a.n + ' ' + a.f + ' ' + a.fo).toLowerCase().indexOf(q) >= 0)) { h += '<option value="' + i + '">' + esc(a.n) + ' · ' + esc(a.fo) + '</option>'; n++; } });
+  $('px_s').innerHTML = h || '<option disabled>Aucun article</option>';
+}
+function pxChoix() {
+  var a = PX.cat[Number($('px_s').value)]; if (!a) return; PX.cur = a;
+  $('px_f').innerHTML = '<div class="line"><b>' + esc(a.n) + '</b><p class="lg">' + esc(a.f) + ' · fournisseur actuel : ' + esc(a.fo || '—') + ' · conditionnement ' + a.col + ' ' + esc(a.u) + '</p>' +
+    '<div class="li2"><span>Prix d’achat actuel HT</span><b>' + eur(a.pa) + '</b></div><div class="li2"><span>Prix de vente TTC</span><b>' + eur(a.pv) + '</b></div><div class="li2"><span>Marge actuelle</span><b>' + pxMarge(a.pa, a.pv, a.t) + '</b></div></div>' +
+    '<div class="line"><b>Offre à comparer</b>' +
+    '<label class="fl" for="px_o">Prix d’achat HT proposé (à l’unité)</label><input id="px_o" inputmode="decimal" placeholder="ex. 0,85" oninput="pxCalc()">' +
+    '<label class="fl" for="px_fo">Fournisseur proposé</label><input id="px_fo" maxlength="40" placeholder="ex. Métro, Taklope…" oninput="pxCalc()">' +
+    '<label class="fl" for="px_v">Volume vendu par mois (unités)</label><input id="px_v" inputmode="numeric" placeholder="ex. 120" oninput="pxCalc()">' +
+    '<label class="fl" for="px_l">Frais de livraison par mois (€, facultatif)</label><input id="px_l" inputmode="decimal" placeholder="0" oninput="pxCalc()"><div id="px_r"></div></div>';
+}
+function pxMarge(pa, pv, t) { if (!(pv > 0)) return '—'; var ht = pv / (1 + t); return eur(ht - pa) + ' · ' + pxPct((ht - pa) / ht); }
+function pxNum(id) { var v = parseFloat(String($(id).value || '').replace(',', '.')); return isNaN(v) ? null : v; }
+function pxCalc() {
+  var a = PX.cur, o = pxNum('px_o'), v = pxNum('px_v'), l = pxNum('px_l') || 0, r = $('px_r');
+  if (!a || !(o > 0) || !(v > 0)) { r.innerHTML = '<p class="lg">Renseignez le prix proposé et votre volume mensuel pour voir le verdict.</p>'; return; }
+  var d = o - a.pa, pc = a.pa > 0 ? d / a.pa : 0, gain = Math.round(((a.pa - o) * v - l) * 12 * 100) / 100;
+  var ver, col; if (gain <= 0 || o >= a.pa) { ver = 'Pas intéressant'; col = '#f8d7da'; } else if (gain >= 120 && pc <= -0.02) { ver = 'Intéressant'; col = '#d4edda'; } else { ver = 'À peine différent'; col = '#fff3cd'; }
+  PX.res = {actuel: a.pa, offre: o, vol: v, gain: gain, verdict: ver};
+  r.innerHTML = '<div class="msg" style="background:' + col + ';margin-top:10px"><b>' + ver + '</b> · gain sur un an : ' + eur(gain) + '</div>' +
+    '<div class="li2"><span>Écart par unité</span><b>' + eur(d) + ' (' + pxPct(pc) + ')</b></div>' +
+    '<div class="li2"><span>Marge avec l’offre</span><b>' + pxMarge(o, a.pv, a.t) + '</b></div>' +
+    '<div class="li2"><span>Gain par mois</span><b>' + eur(gain / 12) + '</b></div>' +
+    '<p class="lg">Verdict : intéressant si le gain dépasse 120 € par an et que le prix baisse d’au moins 2 %. Les frais de livraison sont déduits.</p>' +
+    '<button onclick="pxMaj()">Adopter ce prix d’achat dans le catalogue</button><button class="bs2" onclick="pxNote()">Noter l’offre sans changer le prix</button><div id="px_m"></div>';
+}
+function pxNote() {
+  var a = PX.cur, R = PX.res; $('px_m').innerHTML = '<div class="msg">Enregistrement…</div>';
+  google.script.run.withSuccessHandler(function () { $('px_m').innerHTML = '<div class="msg" style="background:#d4edda">Offre notée dans l’onglet « Offres fournisseurs ».</div>'; }).withFailureHandler(function (e) { $('px_m').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .noterOffre(stkP({nom: a.n, fo: $('px_fo').value, actuel: R.actuel, offre: R.offre, vol: R.vol, gain: R.gain, verdict: R.verdict}));
+}
+function pxMaj() {
+  var a = PX.cur, R = PX.res; if (!confirm('Remplacer le prix d’achat de « ' + a.n + ' » par ' + eur(R.offre) + ' (au lieu de ' + eur(a.pa) + ') ?')) return;
+  $('px_m').innerHTML = '<div class="msg">Enregistrement…</div>';
+  google.script.run.withSuccessHandler(function () { PX.cat[PX.cat.indexOf(a)].pa = R.offre; var fo = $('px_fo').value.trim(); if (fo) a.fo = fo; $('px_m').innerHTML = '<div class="msg" style="background:#d4edda">Prix d’achat mis à jour dans le catalogue et noté dans l’historique.</div>'; })
+  .withFailureHandler(function (e) { $('px_m').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .majPrixAchat(stkP({s: a.s, r: a.r, nom: a.n, pa: R.offre, fo: $('px_fo').value.trim(), motif: 'Offre ' + ($('px_fo').value.trim() || 'fournisseur')}));
+}
 var DP = null, COUP = [500, 200, 100, 50, 20, 10, 5];
 var MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'], JOURS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 function dpEchange(c) { var cc = Math.round(c * 100) / 100, e = Math.floor(cc / 5 + 1e-9) * 5, b = {20: 0, 10: 0, 5: 0}, r = e; [20, 10, 5].forEach(function (d) { b[d] = Math.floor(r / d); r -= b[d] * d; }); return {e: e, reste: Math.round((cc - e) * 100) / 100, b: b}; }
