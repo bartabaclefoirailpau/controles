@@ -628,6 +628,7 @@ function ctrlDecide(id, action) {
 
 // ---------- Prix & offres (gérants)
 var PX = {cat: [], hist: [], cur: null};
+var PX_DELAIS = [['Comptant', 0], ['30 jours date de facture', 30], ['30 jours fin de mois', 45], ['45 jours fin de mois', 60], ['60 jours date de facture', 60], ['60 jours fin de mois', 75], ['90 jours date de facture', 90]];
 function prixStart() {
   ldRun('Chargement des prix…', ['Demande envoyée', 'Lecture des catalogues', 'Préparation de l’écran']);
   google.script.run.withSuccessHandler(function (r) { PX.cat = r.cat; PX.hist = r.hist; PX.cur = null; ldDone(prixVue); }).withFailureHandler(stkErr).getPrixOffres(stkP());
@@ -643,43 +644,56 @@ function pxFiltre() {
   PX.cat.forEach(function (a, i) { if (n < 60 && a.on && (!q || (a.n + ' ' + a.f + ' ' + a.fo).toLowerCase().indexOf(q) >= 0)) { h += '<option value="' + i + '">' + esc(a.n) + ' · ' + esc(a.fo) + '</option>'; n++; } });
   $('px_s').innerHTML = h || '<option disabled>Aucun article</option>';
 }
+function pxDelOpts(sel) { return PX_DELAIS.map(function (d, i) { return '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>' + d[0] + '</option>'; }).join(''); }
 function pxChoix() {
   var a = PX.cat[Number($('px_s').value)]; if (!a) return; PX.cur = a;
+  var taux = '6'; try { taux = localStorage.getItem('px_taux') || '6'; } catch (e) {}
   $('px_f').innerHTML = '<div class="line"><b>' + esc(a.n) + '</b><p class="lg">' + esc(a.f) + ' · fournisseur actuel : ' + esc(a.fo || '—') + ' · conditionnement ' + a.col + ' ' + esc(a.u) + '</p>' +
     '<div class="li2"><span>Prix d’achat actuel HT</span><b>' + eur(a.pa) + '</b></div><div class="li2"><span>Prix de vente TTC</span><b>' + eur(a.pv) + '</b></div><div class="li2"><span>Marge actuelle</span><b>' + pxMarge(a.pa, a.pv, a.t) + '</b></div></div>' +
+    '<div class="line"><b>Volume</b><label class="fl" for="px_v">Volume annuel approximatif (unités)<small>' + (a.v ? 'Dernier volume enregistré : ' + a.v + '. ' : 'Pas encore de volume enregistré : estimez-le. ') + 'C’est le chiffre à annoncer au fournisseur.</small></label><input id="px_v" inputmode="numeric" value="' + (a.v || '') + '" placeholder="ex. 1500" oninput="pxCalc()"><div id="px_vs"></div></div>' +
     '<div class="line"><b>Offre à comparer</b>' +
     '<label class="fl" for="px_o">Prix d’achat HT proposé (à l’unité)</label><input id="px_o" inputmode="decimal" placeholder="ex. 0,85" oninput="pxCalc()">' +
     '<label class="fl" for="px_fo">Fournisseur proposé</label><input id="px_fo" maxlength="40" placeholder="ex. Métro, Taklope…" oninput="pxCalc()">' +
-    '<label class="fl" for="px_v">Volume vendu par mois (unités)</label><input id="px_v" inputmode="numeric" placeholder="ex. 120" oninput="pxCalc()">' +
+    '<label class="fl" for="px_da">Délai de paiement actuel</label><select id="px_da" onchange="pxCalc()">' + pxDelOpts(2) + '</select>' +
+    '<label class="fl" for="px_do">Délai de paiement proposé</label><select id="px_do" onchange="pxCalc()">' + pxDelOpts(2) + '</select>' +
+    '<label class="fl" for="px_t">Coût de l’argent par an (%)<small>Ce que coûte votre trésorerie (découvert, emprunt ou rendement perdu). Retenu pour la prochaine fois.</small></label><input id="px_t" inputmode="decimal" value="' + esc(taux) + '" oninput="pxCalc()">' +
     '<label class="fl" for="px_l">Frais de livraison par mois (€, facultatif)</label><input id="px_l" inputmode="decimal" placeholder="0" oninput="pxCalc()"><div id="px_r"></div></div>';
+  pxCalc();
 }
 function pxMarge(pa, pv, t) { if (!(pv > 0)) return '—'; var ht = pv / (1 + t); return eur(ht - pa) + ' · ' + pxPct((ht - pa) / ht); }
 function pxNum(id) { var v = parseFloat(String($(id).value || '').replace(',', '.')); return isNaN(v) ? null : v; }
 function pxCalc() {
-  var a = PX.cur, o = pxNum('px_o'), v = pxNum('px_v'), l = pxNum('px_l') || 0, r = $('px_r');
-  if (!a || !(o > 0) || !(v > 0)) { r.innerHTML = '<p class="lg">Renseignez le prix proposé et votre volume mensuel pour voir le verdict.</p>'; return; }
-  var d = o - a.pa, pc = a.pa > 0 ? d / a.pa : 0, gain = Math.round(((a.pa - o) * v - l) * 12 * 100) / 100;
-  var ver, col; if (gain <= 0 || o >= a.pa) { ver = 'Pas intéressant'; col = '#f8d7da'; } else if (gain >= 120 && pc <= -0.02) { ver = 'Intéressant'; col = '#d4edda'; } else { ver = 'À peine différent'; col = '#fff3cd'; }
-  PX.res = {actuel: a.pa, offre: o, vol: v, gain: gain, verdict: ver};
+  var a = PX.cur, o = pxNum('px_o'), v = pxNum('px_v'), l = pxNum('px_l') || 0, tx = pxNum('px_t'), r = $('px_r'); if (!a) return;
+  if (tx === null || tx < 0) tx = 0; try { localStorage.setItem('px_taux', String(tx)); } catch (e) {}
+  $('px_vs').innerHTML = v > 0 ? '<p class="lg">À dire au fournisseur : « nous achetons environ ' + Math.round(v) + ' unités par an, soit environ ' + eur(v * a.pa) + ' HT. »</p>' : '';
+  if (!(o > 0) || !(v > 0)) { r.innerHTML = '<p class="lg">Renseignez le volume annuel et le prix proposé pour voir le verdict.</p>'; return; }
+  var da = PX_DELAIS[Number($('px_da').value)], dof = PX_DELAIS[Number($('px_do').value)], k = tx / 100;
+  var gPrix = (a.pa - o) * v, gDel = (v * o * dof[1] - v * a.pa * da[1]) / 365 * k, fr = l * 12, gain = Math.round((gPrix + gDel - fr) * 100) / 100;
+  var base = v * a.pa - v * a.pa * da[1] / 365 * k + 0, pc = base > 0 ? -gain / base : 0, d = o - a.pa;
+  var ver, col; if (gain <= 0) { ver = 'Pas intéressant'; col = '#f8d7da'; } else if (gain >= 120 && pc <= -0.02) { ver = 'Intéressant'; col = '#d4edda'; } else { ver = 'À peine différent'; col = '#fff3cd'; }
+  PX.res = {actuel: a.pa, offre: o, vol: v, gain: gain, verdict: ver, dAct: da[0], dOff: dof[0], taux: tx};
   r.innerHTML = '<div class="msg" style="background:' + col + ';margin-top:10px"><b>' + ver + '</b> · gain sur un an : ' + eur(gain) + '</div>' +
-    '<div class="li2"><span>Écart par unité</span><b>' + eur(d) + ' (' + pxPct(pc) + ')</b></div>' +
+    '<div class="li2"><span>Écart de prix par unité</span><b>' + eur(d) + ' (' + pxPct(a.pa > 0 ? d / a.pa : 0) + ')</b></div>' +
+    '<div class="li2"><span>Gain sur le prix (sur l’année)</span><b>' + eur(gPrix) + '</b></div>' +
+    '<div class="li2"><span>Gain ou perte sur le délai de paiement</span><b>' + eur(gDel) + '</b></div>' +
+    (fr ? '<div class="li2"><span>Frais de livraison (sur l’année)</span><b>−' + eur(fr) + '</b></div>' : '') +
     '<div class="li2"><span>Marge avec l’offre</span><b>' + pxMarge(o, a.pv, a.t) + '</b></div>' +
-    '<div class="li2"><span>Gain par mois</span><b>' + eur(gain / 12) + '</b></div>' +
-    '<p class="lg">Verdict : intéressant si le gain dépasse 120 € par an et que le prix baisse d’au moins 2 %. Les frais de livraison sont déduits.</p>' +
+    '<p class="lg">Délai de paiement : fin de mois = 15 jours de plus en moyenne. Le délai vaut « achats × coût de l’argent × jours ÷ 365 ». Intéressant : gain supérieur à 120 € par an et coût total en baisse d’au moins 2 %.</p>' +
     '<button onclick="pxMaj()">Adopter ce prix d’achat dans le catalogue</button><button class="bs2" onclick="pxNote()">Noter l’offre sans changer le prix</button><div id="px_m"></div>';
 }
 function pxNote() {
   var a = PX.cur, R = PX.res; $('px_m').innerHTML = '<div class="msg">Enregistrement…</div>';
-  google.script.run.withSuccessHandler(function () { $('px_m').innerHTML = '<div class="msg" style="background:#d4edda">Offre notée dans l’onglet « Offres fournisseurs ».</div>'; }).withFailureHandler(function (e) { $('px_m').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
-  .noterOffre(stkP({nom: a.n, fo: $('px_fo').value, actuel: R.actuel, offre: R.offre, vol: R.vol, gain: R.gain, verdict: R.verdict}));
+  google.script.run.withSuccessHandler(function () { a.v = R.vol; $('px_m').innerHTML = '<div class="msg" style="background:#d4edda">Offre notée dans l’onglet « Offres fournisseurs », volume annuel mémorisé.</div>'; }).withFailureHandler(function (e) { $('px_m').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
+  .noterOffre(stkP({s: a.s, r: a.r, nom: a.n, fo: $('px_fo').value, actuel: R.actuel, offre: R.offre, vol: R.vol, dAct: R.dAct, dOff: R.dOff, taux: R.taux, gain: R.gain, verdict: R.verdict}));
 }
 function pxMaj() {
   var a = PX.cur, R = PX.res; if (!confirm('Remplacer le prix d’achat de « ' + a.n + ' » par ' + eur(R.offre) + ' (au lieu de ' + eur(a.pa) + ') ?')) return;
   $('px_m').innerHTML = '<div class="msg">Enregistrement…</div>';
-  google.script.run.withSuccessHandler(function () { PX.cat[PX.cat.indexOf(a)].pa = R.offre; var fo = $('px_fo').value.trim(); if (fo) a.fo = fo; $('px_m').innerHTML = '<div class="msg" style="background:#d4edda">Prix d’achat mis à jour dans le catalogue et noté dans l’historique.</div>'; })
+  google.script.run.withSuccessHandler(function () { a.pa = R.offre; a.v = R.vol; var fo = $('px_fo').value.trim(); if (fo) a.fo = fo; $('px_m').innerHTML = '<div class="msg" style="background:#d4edda">Prix d’achat mis à jour dans le catalogue et noté dans l’historique.</div>'; })
   .withFailureHandler(function (e) { $('px_m').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
-  .majPrixAchat(stkP({s: a.s, r: a.r, nom: a.n, pa: R.offre, fo: $('px_fo').value.trim(), motif: 'Offre ' + ($('px_fo').value.trim() || 'fournisseur')}));
+  .majPrixAchat(stkP({s: a.s, r: a.r, nom: a.n, pa: R.offre, volAn: R.vol, fo: $('px_fo').value.trim(), motif: 'Offre ' + ($('px_fo').value.trim() || 'fournisseur')}));
 }
+
 var DP = null, COUP = [500, 200, 100, 50, 20, 10, 5];
 var MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'], JOURS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 function dpEchange(c) { var cc = Math.round(c * 100) / 100, e = Math.floor(cc / 5 + 1e-9) * 5, b = {20: 0, 10: 0, 5: 0}, r = e; [20, 10, 5].forEach(function (d) { b[d] = Math.floor(r / d); r -= b[d] * d; }); return {e: e, reste: Math.round((cc - e) * 100) / 100, b: b}; }
