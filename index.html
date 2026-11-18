@@ -635,13 +635,24 @@ function prixStart() {
 }
 function pxPct(x) { return (Math.round(x * 1000) / 10).toString().replace('.', ',') + ' %'; }
 function prixVue() {
-  var t = '<div class="line"><b>Article</b><input id="px_q" placeholder="Chercher un article (ex. Coca, Cubic, Monito)" autocomplete="off" oninput="pxFiltre()"><select id="px_s" size="6" onchange="pxChoix()" style="width:100%;margin-top:6px"></select></div><div id="px_f"></div>';
+  var t = '<div class="line"><b>Article à comparer</b><label class="fl" for="px_fa">1. Famille</label><select id="px_fa" onchange="pxFam()" style="width:100%"></select><label class="fl" for="px_sf">2. Sous-famille</label><select id="px_sf" onchange="pxFiltre()" style="width:100%"></select><label class="fl" for="px_q">3. Produit</label><input id="px_q" placeholder="Filtrer par nom (facultatif)" autocomplete="off" oninput="pxFiltre()"><select id="px_s" size="6" onchange="pxChoix()" style="width:100%;margin-top:6px"></select></div><div id="px_f"></div>';
   if (PX.hist.length) t += '<h2>Dernières modifications de prix</h2>' + PX.hist.map(function (h) { return '<div class="li2"><span>' + esc(h[2]) + '<small class="mu">' + esc(h[0]) + ' · ' + esc(h[1]) + (h[5] ? ' · ' + esc(h[5]) : '') + '</small></span><b>' + eur(h[3]) + ' → ' + eur(h[4]) + '</b></div>'; }).join('');
-  $('view').innerHTML = '<button class="bs2" onclick="go(\'home\')">← Retour au menu</button>' + t; pxFiltre();
+  $('view').innerHTML = '<button class="bs2" onclick="go(\'home\')">← Retour au menu</button>' + t; pxFam();
+}
+function pxFamOf(a) { return a.s === 'boissons' ? 'Boissons' : String(a.f).split(' · ')[0]; }
+function pxSubOf(a) { return a.s === 'boissons' ? String(a.f) : (String(a.f).split(' · ')[1] || String(a.f)); }
+function pxUniq(arr) { var m = {}; arr.forEach(function (x) { if (x) m[x] = 1; }); return Object.keys(m).sort(); }
+function pxFam() {
+  var fa = $('px_fa'), cur = fa.value;
+  if (!fa.options.length) fa.innerHTML = '<option value="">Choisir une famille…</option>' + pxUniq(PX.cat.filter(function (a) { return a.on; }).map(pxFamOf)).map(function (f) { return '<option>' + esc(f) + '</option>'; }).join('');
+  var f = fa.value, subs = pxUniq(PX.cat.filter(function (a) { return a.on && pxFamOf(a) === f; }).map(pxSubOf));
+  $('px_sf').innerHTML = f ? '<option value="">Toutes les sous-familles</option>' + subs.map(function (s) { return '<option>' + esc(s) + '</option>'; }).join('') : '<option value="">—</option>';
+  pxFiltre();
 }
 function pxFiltre() {
-  var q = ($('px_q').value || '').toLowerCase().trim(), h = '', n = 0;
-  PX.cat.forEach(function (a, i) { if (n < 60 && a.on && (!q || (a.n + ' ' + a.f + ' ' + a.fo).toLowerCase().indexOf(q) >= 0)) { h += '<option value="' + i + '">' + esc(a.n) + ' · ' + esc(a.fo) + '</option>'; n++; } });
+  var f = $('px_fa').value, sf = $('px_sf').value, q = ($('px_q').value || '').toLowerCase().trim(), h = '', n = 0;
+  if (!f && !q) { $('px_s').innerHTML = '<option disabled>Choisis d’abord une famille (ou tape un nom)</option>'; return; }
+  PX.cat.forEach(function (a, i) { if (n < 200 && a.on && (!f || pxFamOf(a) === f) && (!sf || pxSubOf(a) === sf) && (!q || (a.n + ' ' + a.f + ' ' + a.fo).toLowerCase().indexOf(q) >= 0)) { h += '<option value="' + i + '">' + esc(a.n) + ' · ' + esc(a.fo) + '</option>'; n++; } });
   $('px_s').innerHTML = h || '<option disabled>Aucun article</option>';
 }
 function pxDelOpts(sel) { return PX_DELAIS.map(function (d, i) { return '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>' + d[0] + '</option>'; }).join(''); }
