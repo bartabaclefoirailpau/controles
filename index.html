@@ -104,6 +104,7 @@ details{margin-top:8px}summary{font-size:14px;color:#8A6440;cursor:pointer}
 .cvg{color:#2e7d32}.cvo{color:#b7791f}.cvr{color:#c62828}.sx{position:sticky;top:0;z-index:5}.li2 input[type=checkbox]{width:auto;margin-right:6px}.br{height:6px;background:#eee;border-radius:3px;margin:3px 0 8px}.br i{display:block;height:6px;border-radius:3px}
 .li2{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #E3D3B8;padding:7px 0;font-size:14px}.li2 small{display:block;font-size:12px}
 button.bs2{background:#FCF8F1;color:#3d2b1c;border:1.5px solid #8A6440;margin-top:8px}button.bs2:disabled{background:#eee;color:#999}
+.spk{display:flex;align-items:flex-end;gap:4px;height:52px;margin-top:6px}.spk span{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}.spk em{font-style:normal;font-size:10px;color:#7a6a5c;margin-bottom:2px}.spk i{display:block;width:100%;background:#cdbba8;border-radius:2px 2px 0 0}.spk i.last{background:#c27400}
 </style></head><body>
 <div class="hd"><svg viewBox="50 180 300 215" width="70" height="50" role="img" aria-label="Pictogramme Le Foirail" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="color:#8A6440;display:block"><ellipse cx="200" cy="225" rx="78" ry="11"/><path d="M122 225 L200 305 L278 225"/><path d="M141 240 Q200 254 259 240"/><line x1="200" y1="305" x2="200" y2="345"/><ellipse cx="200" cy="350" rx="40" ry="7"/><line x1="244" y1="254" x2="290" y2="190" stroke-width="2.5"/><circle cx="272" cy="205" r="14"/><circle cx="276" cy="201" r="3.5"/><line x1="96.2" y1="258.0" x2="62.8" y2="244.6"/><line x1="88.3" y1="292.2" x2="52.4" y2="289.7"/><line x1="91.3" y1="327.1" x2="56.4" y2="335.8"/><line x1="105.0" y1="359.4" x2="74.5" y2="378.4"/><line x1="303.8" y1="258.0" x2="337.2" y2="244.6"/><line x1="311.7" y1="292.2" x2="347.6" y2="289.7"/><line x1="308.7" y1="327.1" x2="343.6" y2="335.8"/><line x1="295.0" y1="359.4" x2="325.5" y2="378.4"/><line x1="118" y1="382" x2="188" y2="382"/><line x1="212" y1="382" x2="282" y2="382"/><path d="M200 375 L207 382 L200 389 L193 382 Z" fill="currentColor"/></svg><div><h1>Contrôles Bar Tabac du Foirail</h1><div class="sub" id="sub">Choisissez le contrôle à effectuer</div></div></div>
 <div class="dt" id="dt"></div><div class="who" id="who"></div><button class="back" id="back">← Choisir un autre contrôle</button><div class="info" id="info"></div>
@@ -136,7 +137,7 @@ var $ = function (id) { return document.getElementById(id); };
 var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
 var eur = function (n) { return n.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'}); };
 var cls = function (n) { return n < 0 ? 'neg' : (n > 0 ? 'pos' : ''); };
- 
+
 var B, D, L = [], done = false, chk = function () { return false; };
 var LD = {t: null, p: 0, e: []};
 function ldHtml(titre, etapes) {
@@ -173,11 +174,11 @@ var INFO = {
   cloture: ['Contrôle de caisse', 'À faire à chaque changement d’équipe et à la clôture du soir. Suivez les étapes dans l’ordre : chaque étape compare les tickets entre eux. Si une ligne est rouge, relisez le ticket indiqué. Après la préparation, vous photographiez chaque document : l’application lit les chiffres toute seule. Une étape ne se débloque que si tous ses contrôles sont verts. Les rapports FDJ et Nickel cumulent la journée : l’application ajoute les clôtures déjà enregistrées aujourd’hui.'],
   surprise: ['Contrôle surprise', 'Réservé aux gérants. À faire à tout moment : sur place avec les tickets, ou avec les photos envoyées par un employé. Mêmes tickets que la clôture (ticket X, TPE, FDJ, Nickel), mais le tiroir est compté fond de caisse compris. Le rapport PDF est envoyé par e-mail.'],
   depots: ['Dépôts à la banque', 'Réservé aux gérants. Chaque clôture alimente cet écran : cochez ce qui part à la banque, l’application prépare les pochettes (8 000 € maximum chacune) et note le dépôt. Les pièces restent en caisse : elles sont échangées contre des billets de la caisse.'],
-  ctrl: ['Contrôle de stock', 'Choisissez les familles à contrôler (boissons, vape, CBD, articles fumeurs, confiserie) : vous pouvez en enchaîner plusieurs. Déclarez seulement les produits dont le stock réel ne correspond pas au stock théorique de Strator. À la fin, envoyez le rapport : les gérants le valident, puis Strator est mis à jour.'],
+  ctrl: ['Contrôle de stock', 'Choisissez les familles à contrôler (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) : vous pouvez en enchaîner plusieurs. Déclarez seulement les produits dont le stock réel ne correspond pas au stock théorique de Strator. À la fin, envoyez le rapport : les gérants le valident, puis Strator est mis à jour.'],
   tabac: ['Contrôle tabac · écarts de stock', 'À faire deux fois par semaine et avant chaque livraison. Déclarez seulement les références dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20).']
 };
 function check() { var b = $('save'); if (b) b.disabled = done || !chk(); }
- 
+
 function go(v) {
   if (!B.user) { loginView(); return; }
   var gr = (B.gerants || []).indexOf(B.user.nom) >= 0;
@@ -192,13 +193,13 @@ function go(v) {
   if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'ctrl') ctrlStart(); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else home();
   window.scrollTo(0, 0);
 }
- 
+
 function home() {
   var gr = (B.gerants || []).indexOf(B.user.nom) >= 0, x = B.user.nom === 'Extra';
   var t = '<button class="tile" onclick="go(\'cloture\')"><b>Contrôle de caisse</b><span>Changement d’équipe ou clôture du soir : ticket X, TPE, FDJ, cash back, Nickel puis comptage. Le calcul se fait tout seul.</span></button>';
   if (!x) t += '<button class="tile" onclick="go(\'stock\')"><b>Stock fin de mois</b><span>Fûts, café, sucres et déca : saisir les quantités du dernier jour du mois.</span></button>' +
     '<button class="tile" onclick="go(\'tabac\')"><b>Contrôle tabac</b><span>Déclarer les écarts entre le stock Strator et le rayon.</span></button>' +
-    '<button class="tile" onclick="go(\'ctrl\')"><b>Contrôle de stock</b><span id="ct_sub">Boissons, vape, CBD, articles fumeurs, confiserie : écarts entre Strator et le comptage, rapport et validation.</span></button>';
+    '<button class="tile" onclick="go(\'ctrl\')"><b>Contrôle de stock</b><span id="ct_sub">Boissons, vape, CBD, articles fumeurs, FDJ, confiserie : écarts entre Strator et le comptage, rapport et validation.</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'depots\')"><b>Dépôts</b><span id="dp_sub">Calcul en cours…</span></button>';
   $('view').innerHTML = (x ? '' : '<div id="hm_imp"></div>') + t;
   if (!x) homeStock();
@@ -208,7 +209,7 @@ function tick() { $('dt').textContent = new Date().toLocaleString('fr-FR', {time
 var idleT = null;
 function idleReset() { clearTimeout(idleT); if (B && B.user) idleT = setTimeout(function () { logout('Session verrouillée après 10 minutes sans activité.'); }, 600000); }
 function logout(msg) { B.user = null; clearTimeout(idleT); loginView(msg); }
- 
+
 function loginView(msg) {
   window.okSave = false; chk = function () { return false; }; L = [];
   $('who').style.display = 'none'; $('back').style.display = 'none'; $('info').style.display = 'none'; $('sub').textContent = 'Connexion';
@@ -226,7 +227,7 @@ function loginView(msg) {
     }).withFailureHandler(function (e) { $('lg_go').textContent = 'Se connecter'; $('lg_go').disabled = false; $('lg_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; }).connexion(nom, pin, pre);
   };
 }
- 
+
 function start(b) {
   B = b; tick(); setInterval(tick, 20000);
   $('back').onclick = function () { go('home'); };
@@ -326,8 +327,8 @@ function showRes() {
   var head = (r.fuzzy ? '<div style="cursor:default;color:#8a6d00">Aucun résultat exact : suggestions proches.</div>' : '') + (r.total > 60 ? '<div style="cursor:default;color:#666">' + r.total + ' résultats, 60 affichés : affinez avec les filtres.</div>' : '');
   $('res').innerHTML = head + r.list.map(function (c) { return '<div onclick="add(' + c[0] + ')">' + esc(c[1]) + '<small>' + esc(c[3]) + (c.cd ? ' · ' + esc(c.cd) : '') + ' · ' + eur(c[4]) + '</small></div>'; }).join('');
 }
- 
- 
+
+
 function tabacStart() {
   ldRun('Chargement du catalogue…', ['Demande envoyée', 'Réception du catalogue', 'Préparation de la recherche']);
   google.script.run.withSuccessHandler(function (r) {
@@ -355,7 +356,7 @@ function tabacInit(d) {
   chk = function () { return window.okSave && $('typ').value && $('cre').value && $('eff').value; };
   $('save').onclick = save; refresh(); render();
 }
- 
+
 function num(v) { v = String(v).replace(',', '.').trim(); if (v === '') return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
 function stockView() {
   var h = '<p class="lg">Employé : <b>' + esc(B.user.aff) + '</b></p><div class="row"><select id="smois">' + opts(B.mois, 'Mois contrôlé') + '</select></div>';
@@ -421,7 +422,7 @@ function calc() {
   $('recap').innerHTML = nb ? '<div class="tot st-' + st(tot, D.seuils.t1, D.seuils.t2)[0] + '">Impact final : ' + eur(tot) + ' · ' + st(tot, D.seuils.t1, D.seuils.t2)[1] + '</div>' + tb(G, 'Famille') + '<br>' + tb(S, 'Sous-famille') : '<p style="color:#666;font-size:13px">Le récapitulatif par famille et sous-famille apparaît dès que les quantités sont saisies.</p>';
   window.okSave = ok; check();
 }
- 
+
 function save() {
   var b = $('save'); b.disabled = true; b.textContent = 'Enregistrement…';
   google.script.run.withSuccessHandler(function (r) {
@@ -430,11 +431,12 @@ function save() {
   }).withFailureHandler(function (e) { b.textContent = 'Enregistrer la déclaration'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
   .enregistrer({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
 }
- 
+
+
 // ---------- Contrôle de stock : plusieurs familles enchaînées, rapport, validation des gérants
 var BS = [], BSF = '', BSQ = '', BSSRC = 'boissons';
 var STK = {emp: '', hub: null, sel: {}, done: [], queue: [], cur: null, cat: {}, meta: null};
-function bsNorm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+function bsNorm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 function stkP(x) { var o = x || {}; o.employe = B.user.nom; o.pin = B.user.pin; return o; }
 function stkErr(e) { $('view').innerHTML = '<div class="msg" style="background:#f8d7da">Erreur : ' + esc(e.message) + '</div><button onclick="go(\'home\')">Retour au menu</button>'; }
 function stkEur(x) { var v = Math.round(x * 100) / 100, a = Math.abs(v); return (v < 0 ? '−' : (v > 0 ? '+' : '')) + a.toLocaleString('fr-FR', {maximumFractionDigits: 2}) + ' €'; }
@@ -451,7 +453,7 @@ function homeStock() {
   google.script.run.withSuccessHandler(function (h) {
     var e = $('hm_imp'); if (!e) return;
     e.innerHTML = '<div class="ic ' + st(h.impact30, h.orange, h.rouge)[0] + '"><small>Impact des contrôles de stock · 30 derniers jours</small><b class="n">' + stkEur(h.impact30) + '</b>' + stkJauge(h.impact30, h.orange, h.rouge) + '</div>';
-    var s = $('ct_sub'); if (s && h.aValider) s.textContent = h.aValider + (h.aValider > 1 ? ' rapports à valider' : ' rapport à valider') + ' · Boissons, vape, CBD, articles fumeurs, confiserie.';
+    var s = $('ct_sub'); if (s && h.aValider) s.textContent = h.aValider + (h.aValider > 1 ? ' rapports à valider' : ' rapport à valider') + ' · Boissons, vape, CBD, articles fumeurs, FDJ, confiserie.';
   }).withFailureHandler(function () {}).getStockHub(stkP());
 }
 function ctrlStart() {
@@ -473,7 +475,9 @@ function ctrlHub() {
     else if (g.dernier.jours > 14) p = '<span class="sb late">En retard · ' + g.dernier.jours + ' j</span>';
     else p = '<span class="sb todo">À faire</span>';
     last = g.dernier ? 'Dernier contrôle : ' + esc(g.dernier.aff) + ' · ' + esc(g.dernier.emp) + ' · <b class="cv' + st(g.dernier.impact, h.seuils.t1, h.seuils.t2)[0] + '">' + stkEur(g.dernier.impact) + '</b>' : 'Aucun contrôle enregistré';
-    t += '<label class="fm' + (STK.sel[g.id] && !d ? ' sel' : '') + '"><input type="checkbox" ' + (d ? 'disabled' : (STK.sel[g.id] ? 'checked' : '')) + ' onchange="ctrlSel(\'' + g.id + '\',this.checked)"><div style="flex:1"><div style="display:flex;gap:8px;align-items:center"><b>' + esc(g.nom) + '</b>' + p + '</div><small class="mu">' + last + '</small></div></label>';
+    var hs = g.hist || [], sp = '';
+    if (hs.length > 1) { var mx = Math.max.apply(null, hs.map(function (v) { return Math.abs(v); })) || 1; sp = '<div class="spk">' + hs.map(function (v, i) { return '<span><em>' + stkEur(v) + '</em><i' + (i === hs.length - 1 ? ' class="last"' : '') + ' style="height:' + Math.max(4, Math.round(Math.abs(v) / mx * 34)) + 'px"></i></span>'; }).join('') + '</div>'; }
+    t += '<label class="fm' + (STK.sel[g.id] && !d ? ' sel' : '') + '"><input type="checkbox" ' + (d ? 'disabled' : (STK.sel[g.id] ? 'checked' : '')) + ' onchange="ctrlSel(\'' + g.id + '\',this.checked)"><div style="flex:1"><div style="display:flex;gap:8px;align-items:center"><b>' + esc(g.nom) + '</b>' + p + '</div><small class="mu">' + last + '</small>' + sp + '</div></label>';
     if (STK.sel[g.id] && !d) ok++;
   });
   t += '<button id="ct_go" ' + (ok ? '' : 'disabled') + ' onclick="ctrlGo()">' + (ok ? 'Commencer · ' + ok + (ok > 1 ? ' familles' : ' famille') : 'Cochez au moins une famille') + '</button>';
@@ -503,7 +507,7 @@ function boissonsInit() {
   h += '<h2>1. Ajouter une référence en écart</h2><div class="row"><select id="fam">' + opts(uniq(BS.map(function (c) { return c[2]; })), 'Toutes les sous-familles') + '</select></div>';
   h += '<input id="q" placeholder="Rechercher un produit (2 lettres minimum)" style="margin-top:6px"><div class="res" id="res"></div>';
   h += '<h2>2. Quantités <span id="cnt"></span></h2><div id="lines"></div>';
-  h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix de vente TTC (l’argent perdu ou gagné).</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer cette famille</button>';
+  h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix d’achat HT.</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer cette famille</button>';
   $('view').innerHTML = h;
   if (m.typ) { $('typ').value = m.typ; $('cre').value = m.cre; $('eff').value = m.eff; }
   $('fam').onchange = function () { BSF = this.value; bsRes(); };
@@ -517,7 +521,7 @@ function bsRes() {
   if (!BSF && q.length < 2) { $('res').innerHTML = '<div style="cursor:default;color:#666">Choisissez une sous-famille ou tapez le nom d’un produit.</div>'; return; }
   r = BS.filter(function (c) { return (!BSF || c[2] === BSF) && (q.length < 2 || q.split(/\s+/).every(function (w) { return bsNorm(c[1]).indexOf(w) >= 0; })) && !L.some(function (l) { return l.c[0] === c[0]; }); });
   if (!r.length) { $('res').innerHTML = '<div style="cursor:default">Aucun résultat.</div>'; return; }
-  $('res').innerHTML = (r.length > 60 ? '<div style="cursor:default;color:#666">' + r.length + ' résultats, 60 affichés : affinez la recherche.</div>' : '') + r.slice(0, 60).map(function (c) { return '<div onclick="bsAdd(' + c[0] + ')">' + esc(c[1]) + '<small>' + esc(c[2]) + ' · ' + esc(c[3]) + ' · ' + eur(c[4]) + (c[8] ? '' : ' (prix d’achat)') + '</small></div>'; }).join('');
+  $('res').innerHTML = (r.length > 60 ? '<div style="cursor:default;color:#666">' + r.length + ' résultats, 60 affichés : affinez la recherche.</div>' : '') + r.slice(0, 60).map(function (c) { return '<div onclick="bsAdd(' + c[0] + ')">' + esc(c[1]) + '<small>' + esc(c[2]) + ' · ' + esc(c[3]) + ' · ' + eur(c[4]) + '</small></div>'; }).join('');
 }
 function bsAdd(id) {
   if (done) return;
@@ -531,7 +535,7 @@ function bsUpd(i, k, v) { L[i][k] = v; bsCalc(); }
 function bsVal(l) { var t = parseFloat(String(l.theo).replace(',', '.')), r = parseFloat(String(l.reel).replace(',', '.')); if (isNaN(t) || isNaN(r) || t < 0 || r < 0) return null; var e = Math.round((r - t) * 100) / 100; return {t: t, r: r, e: e, i: Math.round(e * l.c[4] * 100) / 100}; }
 function bsRender() {
   $('lines').innerHTML = L.map(function (l, i) {
-    return '<div class="line"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(l.c[1]) + '</b><button class="x" onclick="bsDel(' + i + ')">Retirer</button></div><small>' + esc(l.c[2]) + ' · en ' + esc(l.c[3]) + ' · valeur ' + eur(l.c[4]) + (l.c[8] ? '' : ' (prix d’achat, prix de vente à compléter)') + '</small>' +
+    return '<div class="line"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(l.c[1]) + '</b><button class="x" onclick="bsDel(' + i + ')">Retirer</button></div><small>' + esc(l.c[2]) + ' · en ' + esc(l.c[3]) + ' · valeur ' + eur(l.c[4]) + '</small>' +
       '<div class="in"><label>Théorique (Strator)<input type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.theo) + '" oninput="bsUpd(' + i + ',\'theo\',this.value)"></label><label>Réel (comptage)<input type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.reel) + '" oninput="bsUpd(' + i + ',\'reel\',this.value)"></label><div style="flex:1;font-size:13px">Écart<br><span id="e' + i + '">–</span></div></div></div>';
   }).join('');
   bsCalc();
@@ -582,7 +586,7 @@ function ctrlBarres(fam) {
 }
 function ctrlRapport(r) {
   var q = {t1: 50, t2: 200}; try { q = B.seuilsTabac; } catch (e) {}
-  var t = stkIc('Rapport · ' + esc(r.aff) + ' · ' + esc(r.emp), r.impact, q.t1, q.t2, esc(r.statut) + ' · ' + r.nb + ' référence(s) · prix de vente TTC');
+  var t = stkIc('Rapport · ' + esc(r.aff) + ' · ' + esc(r.emp), r.impact, q.t1, q.t2, esc(r.statut) + ' · ' + r.nb + ' référence(s) · prix d’achat HT');
   t += '<div class="mg"><div class="mk"><small>Pertes</small><b class="cvr">' + stkEur(r.pertes) + '</b></div><div class="mk"><small>Gains</small><b class="cvg">' + stkEur(r.gains) + '</b></div>' + (r.prec !== null ? '<div class="mk"><small>Rapport précédent</small><b>' + stkEur(r.prec) + '</b></div>' : '') + '</div>';
   t += '<h2>Par famille</h2>' + ctrlBarres(r.fam);
   if (r.top.length) t += '<h2>Plus gros écarts</h2>' + r.top.map(function (x) { return '<div class="li2"><span>' + esc(x.nom) + '</span><b>' + stkEur(x.impact) + '</b></div>'; }).join('');
@@ -803,7 +807,7 @@ function dpValider() {
   }).withFailureHandler(function (e) { DP.conf = false; $('dp_msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; dpRefresh(); })
     .validerDepot({employe: B.user.nom, pin: B.user.pin, extraNom: '', ids: ids, bordereau: $('dp_bd').value, anomalie: $('dp_an') ? $('dp_an').value : ''});
 }
- 
+
 function dpPretes() {
   var P = DP.d.pretes || []; if (!P.length) return '';
   return '<div class="sec">Poche prête · à déposer en banque</div>' + P.map(function (x) {
@@ -824,7 +828,7 @@ function dpConf(n) {
 var CL = null;
 var DEN_B = [500, 200, 100, 50, 20, 10, 5];
 var CL_STEPS = ['Préparation', 'Carte bancaire', 'FDJ', 'Cash back', 'Nickel', 'Comptage', 'Bilan'];
- 
+
 function clotureStart() {
   ldRun('Ouverture du contrôle de caisse…', ['Demande envoyée', 'Lecture des clôtures du jour', 'Préparation du contrôle']);
   google.script.run.withSuccessHandler(function (r) { ldDone(function () { CL = {info: r, step: 0, c: [1, 2], v: {}, photos: [], doc: {}, man: {}, err: {}, fails: {}, reads: {}, ov: {}, ovpin: {}, pics: {}, picn: {}, busy: '', ovKey: '', rep: null, rd: {}, sm: false, src: ''}; CL.v.cl_mode = 'direct'; clStep(); }); })
@@ -870,15 +874,15 @@ function clPrep() {
   var it = clPrepItems(), row = function (x) { return '<label class="pck"><input type="checkbox" id="' + x[0] + '"' + (CL.v[x[0]] ? ' checked' : '') + ' onchange="CL.v[this.id]=this.checked?1:0;clCheck()"><span>' + x[1] + '</span></label>'; };
   return '<div class="line"><b>1. Sortez ces documents</b>' + it.docs.map(row).join('') + '</div><div class="line"><b>' + (CL.sm ? '2. Comptage du tiroir' : (CL.v.cl_mode === 'reprise' ? '2. Retrouvez le comptage de ce jour-là' : '2. Sortez la recette des tiroirs')) + '</b>' + it.cash.map(row).join('') + '</div>';
 }
- 
+
 function clSrcInner() {
   var s = CL.src;
   return '<div class="bgrid bg2" style="margin-top:8px"><div class="bigb' + (s === 'place' ? ' on' : '') + '" onclick="clSrc(\'place\')"><b>Sur place</b><span>je photographie les tickets</span></div><div class="bigb' + (s === 'photos' ? ' on' : '') + '" onclick="clSrc(\'photos\')"><b>Photos reçues</b><span>envoyées par un employé</span></div></div>' +
     (s === 'photos' ? '<label class="fl" for="sm_from">Photos envoyées par</label><select id="sm_from" onchange="CL.v.sm_from=this.value;clCheck()">' + opts(B.emp.filter(function (n) { return n !== B.user.nom; }), 'Choisir') + '</select><p class="lg">Choisissez les photos dans la galerie du téléphone. Le comptage du tiroir sera noté « déclaré par l’employé, non vérifié sur place ».</p>' : '');
 }
 function clSrc(s) { CL.src = s; clModeDraw(); if ($('sm_from') && CL.v.sm_from) $('sm_from').value = CL.v.sm_from; }
- 
- 
+
+
 function clS0() {
   function sel(id, label, list) { return '<label class="fl" for="' + id + '">' + label + '</label><select id="' + id + '" onchange="CL.v[this.id]=this.value;clCheck()">' + opts(list, 'Choisir') + '</select>'; }
   var cais = '<div class="fl">Caisses concernées</div><div class="row"><label class="cbx"><input type="checkbox" id="cl_c1" onchange="clCaisses()"> Caisse 1</label><label class="cbx"><input type="checkbox" id="cl_c2" onchange="clCaisses()"> Caisse 2</label></div>';
@@ -888,7 +892,7 @@ function clS0() {
     '<div id="prep">' + clPrep() + '</div><p class="lg">Ensuite, l’application vous demandera de photographier chaque document, un par un, et lira les chiffres toute seule.</p><p class="lg" id="prepmsg" style="color:#7f1020"></p>';
 }
 function fr(d) { return d ? d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) : ''; }
- 
+
 function clModeHtml() {
   if (B.user.nom === 'Extra') return '';
   var m = CL.v.cl_mode, I = CL.info, possible = I.hier >= I.debut, g = (B.gerants || []).indexOf(B.user.nom) >= 0;
@@ -907,7 +911,7 @@ function clModeDraw() { var w = $('modewrap'); if (w) w.innerHTML = clModeHtml()
 function clCumul(date) {
   google.script.run.withSuccessHandler(function (r) { CL.info.cumul = r.cumul; clCheck(); }).withFailureHandler(function () {}).getCloture(date || '');
 }
- 
+
 function clMode(m) {
   if (m === CL.v.cl_mode) return;
   if (m === 'reprise' && CL.info.hier < CL.info.debut) return;
@@ -995,7 +999,7 @@ function packImage(file, cb) {
   r.readAsDataURL(file);
 }
 function clRedraw() { var y = window.pageYOffset || 0; clStep(); window.scrollTo(0, y); }
- 
+
 function clPhoto(inp, id) {
   var f = inp.files && inp.files[0]; if (!f) return;
   CL.busy = id; CL.err[id] = ''; pgStart(id); clRedraw();
@@ -1270,7 +1274,7 @@ function clSave() {
 var APP_VERSION = '1.5';
 var APP_DATE = '17 novembre 2026';
 var APP_NOTES = [
-  {v: '1.5', d: '17 novembre 2026', t: ['Contrôle de stock : un seul bloc, vous cochez les familles (boissons, vape, CBD, articles fumeurs, confiserie) et vous les enchaînez.', 'L’impact en euros est visible partout : accueil, pendant la saisie, fin de famille et rapport.', 'Chaque contrôle donne un rapport envoyé aux gérants par e-mail ; ils l’approuvent, puis la mise à jour de Strator est suivie dans l’application.', 'Chaque famille affiche la date et l’auteur du dernier contrôle.']},
+  {v: '1.5', d: '17 novembre 2026', t: ['Contrôle de stock : un seul bloc, vous cochez les familles (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) et vous les enchaînez.', 'L’impact en euros est visible partout : accueil, pendant la saisie, fin de famille et rapport.', 'Chaque contrôle donne un rapport envoyé aux gérants par e-mail ; ils l’approuvent, puis la mise à jour de Strator est suivie dans l’application.', 'Chaque famille affiche la date et l’auteur du dernier contrôle.']},
   {v: '1.4', d: '17 novembre 2026', t: ['Nouveau : Contrôle boissons. Comme au tabac, on déclare les écarts entre le stock théorique de Strator et le comptage réel, par référence.', 'Catalogue de 75 boissons (Pyrénées Boissons) avec la valeur d’achat pour chiffrer chaque écart.', 'Nouveau : Contrôle vape, CBD et confiserie, sur le même principe (350 produits : e-liquides, puffs, résistances, CBD, confiseries, papier, articles fumeurs).']},
   {v: '1.3', d: '16 novembre 2026', t: ['Clôture de caisse : les rapports FDJ et Nickel qui cumulent la journée ne bloquent plus à tort (ticket X seul, ou ticket X + clôtures déjà faites).', 'Dépôts : seules les clôtures du soir créent un dépôt. Le changement d’équipe n’a plus de dépôt à enregistrer.', 'Numéro de version et liste des nouveautés visibles dans l’application.']},
   {v: '1.2', d: 'novembre 2026', t: ['Application installable sur l’écran d’accueil, avec le logo Le Foirail.', 'Ouverture du lien possible depuis n’importe quel compte Google.']},
@@ -1292,4 +1296,3 @@ var APP_NOTES = [
   try { if (localStorage.getItem('foirail_version_vue') !== APP_VERSION) { localStorage.setItem('foirail_version_vue', APP_VERSION); setTimeout(function () { nouveautes(true); }, 600); } } catch (e) {}
 })();
 </script></body></html>
- 
