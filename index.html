@@ -201,6 +201,7 @@ function home() {
   if (!x) t += '<button class="tile" onclick="go(\'stock\')"><b>Stock fin de mois</b><span>Fûts, café, sucres et déca : saisir les quantités du dernier jour du mois.</span></button>' +
     '<button class="tile" onclick="go(\'tabac\')"><b>Contrôle tabac</b><span>Déclarer les écarts entre le stock Strator et le rayon.</span></button>' +
     '<button class="tile" onclick="go(\'ctrl\')"><b>Contrôle de stock</b><span id="ct_sub">Boissons, vape, CBD, articles fumeurs, FDJ, confiserie : écarts entre Strator et le comptage, rapport et validation.</span></button>';
+  if (gr) t += '<button class="tile" onclick="window.open(\'https://sites.google.com/view/simulateurfoirail\', \'_blank\', \'noopener\')"><b>Simulateur prix & marges</b><span>Simuler une hausse de prix ou une baisse d’achat, et voir quoi renégocier. Réservé à Nasim et Wuissem (connexion Google).</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'prix\')"><b>Prix & offres</b><span>Mettre à jour un prix d’achat ou comparer l’offre d’un fournisseur à votre prix actuel.</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'depots\')"><b>Dépôts</b><span id="dp_sub">Calcul en cours…</span></button>';
   $('view').innerHTML = (x ? '' : '<div id="hm_imp"></div>') + t;
