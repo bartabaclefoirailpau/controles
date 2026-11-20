@@ -347,7 +347,7 @@ function tabacInit(d) {
   h += '<div class="row"><select id="mar"></select></div><div id="chips"></div>';
   h += '<label style="font-size:13px"><input type="checkbox" id="mine" style="width:auto"> Seulement les références que nous tenons en stock</label>';
   h += '<input id="q" placeholder="Rechercher un produit (2 lettres minimum)" style="margin-top:6px"><div class="res" id="res"></div>';
-  h += '<h2>2. Quantités <span id="cnt"></span></h2><div id="lines"></div>';
+  h += '<h2>2. Quantités <span id="cnt"></span></h2><p class="lg">Inutile de tout contrôler : une ligne laissée vide est ignorée à l’enregistrement.</p><div id="lines"></div>';
   h += '<h2>3. Impact de l\'écart</h2><p class="lg">' + legende() + '</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer la déclaration</button>';
   $('view').innerHTML = h;
   if (d.cat.some(function (c) { return c[7]; })) { $('mine').checked = true; S.mine = true; }
@@ -422,7 +422,7 @@ function calc() {
   var G = {}, S = {}, tot = 0, ok = L.length > 0, nb = 0;
   L.forEach(function (l, i) {
     var v = val(l), el = $('e' + i);
-    if (!v) { ok = false; if (el) el.textContent = '–'; return; }
+    if (!v) { if (el) el.textContent = 'Non contrôlé · ignoré'; return; }
 
     if (el) el.innerHTML = '<span class="' + cls(v.e) + '">' + (v.e > 0 ? '+' : '') + v.e + ' · ' + eur(v.i) + '</span>' + pill(v.i, D.seuils.l1, D.seuils.l2);
     nb++; tot += v.i;
@@ -431,7 +431,7 @@ function calc() {
   $('cnt').textContent = '(' + L.length + ' / ' + (D ? D.max : 20) + ')';
   var tb = function (T, t) { return '<table><tr><th>' + t + '</th><th>Réf.</th><th>Écart</th><th>Impact</th></tr>' + Object.keys(T).sort().map(function (k) { return '<tr><td>' + esc(k) + '</td><td>' + T[k].n + '</td><td class="' + cls(T[k].e) + '">' + T[k].e + '</td><td class="' + cls(T[k].i) + '">' + eur(T[k].i) + '</td></tr>'; }).join('') + '</table>'; };
   $('recap').innerHTML = nb ? '<div class="tot st-' + st(tot, D.seuils.t1, D.seuils.t2)[0] + '">Impact final : ' + eur(tot) + ' · ' + st(tot, D.seuils.t1, D.seuils.t2)[1] + '</div>' + tb(G, 'Famille') + '<br>' + tb(S, 'Sous-famille') : '<p style="color:#666;font-size:13px">Le récapitulatif par famille et sous-famille apparaît dès que les quantités sont saisies.</p>';
-  window.okSave = ok; check();
+  window.okSave = nb > 0; check();
 }
 
 function save() {
@@ -440,7 +440,7 @@ function save() {
     done = true; drClear(); DRM = ''; b.style.display = 'none';
     $('msg').innerHTML = '<div class="msg" style="background:#d4edda">Déclaration enregistrée : ' + r.nb + ' référence(s), impact ' + eur(r.impact) + '.</div><button onclick="go(\'home\')">Retour au menu</button>';
   }).withFailureHandler(function (e) { b.textContent = 'Enregistrer la déclaration'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
-  .enregistrer({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
+  .enregistrer({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.filter(function (l) { return val(l); }).map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
 }
 
 
@@ -570,7 +570,7 @@ function boissonsInit() {
   h += '<div class="row"><select id="typ">' + opts(B.types, 'Type de contrôle') + '</select></div><div class="row"><select id="cre">' + opts(B.creneaux, 'Créneau horaire') + '</select><select id="eff">' + opts(B.effectifs, 'Seul ou à deux ?') + '</select></div>';
   h += '<h2>1. Ajouter une référence en écart</h2><div class="row"><select id="fam">' + opts(uniq(BS.map(function (c) { return c[2]; })), 'Toutes les sous-familles') + '</select></div>';
   h += '<input id="q" placeholder="Rechercher un produit (2 lettres minimum)" style="margin-top:6px"><div class="res" id="res"></div>';
-  h += '<h2>2. Quantités <span id="cnt"></span></h2><div id="lines"></div>';
+  h += '<h2>2. Quantités <span id="cnt"></span></h2><p class="lg">Inutile de tout contrôler : une ligne laissée vide est ignorée à l’enregistrement.</p><div id="lines"></div>';
   h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix d’achat HT.</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer cette famille</button>';
   $('view').innerHTML = h;
   if (m.typ) $('typ').value = m.typ; if (m.cre) $('cre').value = m.cre; if (m.eff) $('eff').value = m.eff;
@@ -608,7 +608,7 @@ function bsCalc() {
   var G = {}, tot = 0, ok = L.length > 0, nb = 0, q = D.seuils;
   L.forEach(function (l, i) {
     var v = bsVal(l), el = $('e' + i);
-    if (!v) { ok = false; if (el) el.textContent = '–'; return; }
+    if (!v) { if (el) el.textContent = 'Non contrôlé · ignoré'; return; }
 
     if (el) el.innerHTML = '<span class="' + cls(v.e) + '">' + (v.e > 0 ? '+' : '') + v.e + ' · ' + eur(v.i) + '</span>' + pill(v.i, q.l1, q.l2);
     nb++; tot += v.i;
@@ -618,7 +618,7 @@ function bsCalc() {
   if ($('lv')) $('lv').innerHTML = stkIc((STK.cur ? esc(STK.cur.nom) : '') + ' · impact en direct', tot, q.t1, q.t2, nb + (nb > 1 ? ' références chiffrées' : ' référence chiffrée') + ' · orange à partir de ' + q.t1 + ' €');
   $('cnt').textContent = '(' + L.length + ' / ' + D.max + ')';
   $('recap').innerHTML = nb ? '<div class="tot st-' + st(tot, q.t1, q.t2)[0] + '">Impact final : ' + eur(tot) + ' · ' + st(tot, q.t1, q.t2)[1] + '</div><table><tr><th>Sous-famille</th><th>Réf.</th><th>Écart</th><th>Impact</th></tr>' + Object.keys(G).sort().map(function (k) { return '<tr><td>' + esc(k) + '</td><td>' + G[k].n + '</td><td class="' + cls(G[k].e) + '">' + Math.round(G[k].e * 100) / 100 + '</td><td class="' + cls(G[k].i) + '">' + eur(G[k].i) + '</td></tr>'; }).join('') + '</table>' : '<p style="color:#666;font-size:13px">Le récapitulatif apparaît dès que les quantités sont saisies.</p>';
-  window.okSave = ok; check();
+  window.okSave = nb > 0; check();
 }
 function bsSave() {
   var b = $('save'), g = STK.cur; b.disabled = true; b.textContent = 'Enregistrement…';
@@ -627,7 +627,7 @@ function bsSave() {
     STK.done.push({groupe: g.id, nom: g.nom, session: r.session, nb: r.nb, impact: r.impact}); STK.sel[g.id] = false;
     ctrlApres(r);
   }).withFailureHandler(function (e) { b.textContent = 'Enregistrer cette famille'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
-  .enregistrerBoissons({catalogue: BSSRC, employe: B.user.nom, pin: B.user.pin, type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
+  .enregistrerBoissons({catalogue: BSSRC, employe: B.user.nom, pin: B.user.pin, type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.filter(function (l) { return bsVal(l); }).map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
 }
 function ctrlTotal() { return Math.round(STK.done.reduce(function (s, d) { return s + d.impact; }, 0) * 100) / 100; }
 function ctrlApres(r) {
