@@ -1445,9 +1445,10 @@ function clSave() {
 }
 
 // ---------- Suivi des versions (à modifier à chaque mise à jour : numéro, date et nouveautés)
-var APP_VERSION = '1.5';
-var APP_DATE = '17 novembre 2026';
+var APP_VERSION = '1.6';
+var APP_DATE = '20 novembre 2026';
 var APP_NOTES = [
+  {v: '1.6', d: '20 novembre 2026', t: ['Accueil gérant : bannière « contrôle à vérifier » et compteur dans l’onglet, avec notification quand l’appli est ouverte.', 'Validation : seules les références avec écart sont à valider, les jeux à 0/0 ne sont plus listés, et un contrôle sans écart se valide en un clic.', 'Un rapport PDF pour chaque contrôle (tabac, caisse, surprise, stock), classé dans Drive et tracé dans le Sheet.', 'Puffs regroupés par modèle (une ligne par modèle, tous goûts confondus) avec le bon prix de vente.', 'Contrôle en cours : reprise automatique après une veille, nouvel article en haut de la liste, champs vides ignorés, écart 0 accepté.', 'Contrôle surprise : toutes les caisses ne sont plus obligatoires.']},
   {v: '1.5', d: '17 novembre 2026', t: ['Contrôle de stock : un seul bloc, vous cochez les familles (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) et vous les enchaînez.', 'L’impact en euros est visible partout : accueil, pendant la saisie, fin de famille et rapport.', 'Chaque contrôle donne un rapport envoyé aux gérants par e-mail ; ils l’approuvent, puis la mise à jour de Strator est suivie dans l’application.', 'Chaque famille affiche la date et l’auteur du dernier contrôle.']},
   {v: '1.4', d: '17 novembre 2026', t: ['Nouveau : Contrôle boissons. Comme au tabac, on déclare les écarts entre le stock théorique de Strator et le comptage réel, par référence.', 'Catalogue de 75 boissons (Pyrénées Boissons) avec la valeur d’achat pour chiffrer chaque écart.', 'Nouveau : Contrôle vape, CBD et confiserie, sur le même principe (350 produits : e-liquides, puffs, résistances, CBD, confiseries, papier, articles fumeurs).']},
   {v: '1.3', d: '16 novembre 2026', t: ['Clôture de caisse : les rapports FDJ et Nickel qui cumulent la journée ne bloquent plus à tort (ticket X seul, ou ticket X + clôtures déjà faites).', 'Dépôts : seules les clôtures du soir créent un dépôt. Le changement d’équipe n’a plus de dépôt à enregistrer.', 'Numéro de version et liste des nouveautés visibles dans l’application.']},
