@@ -508,9 +508,26 @@ function stkJauge(imp, o, r) {
 function homeStock() {
   google.script.run.withSuccessHandler(function (h) {
     var e = $('hm_imp'); if (!e) return;
-    e.innerHTML = '<div class="ic ' + st(h.impact30, h.orange, h.rouge)[0] + '"><small>Impact des contrôles de stock · 30 derniers jours</small><b class="n">' + stkEur(h.impact30) + '</b>' + stkJauge(h.impact30, h.orange, h.rouge) + '</div>';
+    avBanner(h.aValider);
+    e.innerHTML = '<div id="av_b">' + avHtml(h.aValider) + '</div><div class="ic ' + st(h.impact30, h.orange, h.rouge)[0] + '"><small>Impact des contrôles de stock · 30 derniers jours</small><b class="n">' + stkEur(h.impact30) + '</b>' + stkJauge(h.impact30, h.orange, h.rouge) + '</div>';
     var s = $('ct_sub'); if (s && h.aValider) s.textContent = h.aValider + (h.aValider > 1 ? ' rapports à valider' : ' rapport à valider') + ' · Boissons, vape, CBD, articles fumeurs, FDJ, confiserie.';
   }).withFailureHandler(function () {}).getStockHub(stkP());
+}
+
+// ---------- Gérants : contrôle(s) à vérifier + notification
+var AV = {n: null, t: null};
+function avHtml(n) {
+  if (!n) return '';
+  var notif = (window.Notification && Notification.permission === 'default') ? '<p class="lg" style="margin:6px 0 0"><a href="#" onclick="avNotif();return false">Activer les notifications sur cet appareil</a></p>' : '';
+  return '<div class="line" style="border:2px solid #c62828;background:#FCF0EE"><b style="color:#c62828">' + n + (n > 1 ? ' contrôles à vérifier' : ' contrôle à vérifier') + '</b><p class="lg" style="margin:4px 0 8px">Ouvrez le rapport, contrôlez les références en écart puis validez.</p><button onclick="ctrlValider()">Vérifier maintenant</button>' + notif + '</div>';
+}
+function avNotif() { try { Notification.requestPermission().then(function () { var e = $('av_b'); if (e) e.innerHTML = avHtml(AV.n); }); } catch (e) {} }
+function avBanner(n) {
+  var e = $('av_b'); if (e) e.innerHTML = avHtml(n);
+  try { document.title = (n ? '(' + n + ') ' : '') + 'Contrôles Le Foirail'; } catch (x) {}
+  if (AV.n !== null && n > AV.n) { try { if (window.Notification && Notification.permission === 'granted') new Notification('Contrôle à vérifier', {body: n + (n > 1 ? ' contrôles attendent' : ' contrôle attend') + ' votre validation.'}); } catch (x) {} }
+  AV.n = n;
+  if (!AV.t) AV.t = setInterval(function () { if (!B || !B.user || !$('hm_imp')) return; google.script.run.withSuccessHandler(function (h) { avBanner(h.aValider); }).withFailureHandler(function () {}).getStockHub(stkP()); }, 120000);
 }
 function ctrlStart() {
   var dr = DRRES; DRRES = null;
@@ -664,7 +681,14 @@ function ctrlValider() {
   ldRun('Chargement des rapports…', ['Demande envoyée', 'Lecture des rapports', 'Préparation de l’écran']);
   google.script.run.withSuccessHandler(function (r) { STK.rap = r; ldDone(ctrlValiderVue); }).withFailureHandler(stkErr).getRapportsStock(stkP());
 }
-function ctrlLignes(f) { return f.lignes.map(function (l) { return '<div class="li2"><span>' + esc(l[0]) + '<small class="mu">Strator ' + l[1] + ' → compté ' + l[2] + '</small></span><b class="' + (l[4] < 0 ? 'cvr' : 'cvg') + '">' + stkEur(l[4]) + '</b></div>'; }).join(''); }
+function ctrlPb(f) { return f.lignes.filter(function (l) { return Number(l[3]) !== 0; }); }
+function ctrlRes(f) { var L = f.lignes, pb = ctrlPb(f).length, nul = L.filter(function (l) { return Number(l[1]) === 0 && Number(l[2]) === 0; }).length; return '<p class="lg" style="margin:2px 0 6px">' + L.length + ' saisie(s) : <b>' + pb + ' en écart</b>, ' + (L.length - pb - nul) + ' conforme(s)' + (nul ? ', ' + nul + ' sans stock (masquées)' : '') + '.</p>'; }
+function ctrlLignes(f) { var pb = ctrlPb(f); if (!pb.length) return '<p class="lg" style="color:#2e7d32"><b>Aucun écart sur cette famille.</b></p>'; return pb.map(function (l) { return '<div class="li2"><span>' + esc(l[0]) + '<small class="mu">Strator ' + l[1] + ' → compté ' + l[2] + '</small></span><b class="' + (l[4] < 0 ? 'cvr' : 'cvg') + '">' + stkEur(l[4]) + '</b></div>'; }).join(''); }
+function ctrlAucunEcart(r) { return r.fam.every(function (f) { return !ctrlPb(f).length; }); }
+function ctrlDecideAucun(id) {
+  $('view').innerHTML = '<div class="msg">Enregistrement…</div>';
+  google.script.run.withSuccessHandler(function () { google.script.run.withSuccessHandler(function () { ctrlValider(); }).withFailureHandler(stkErr).decideRapportStock(stkP({id: id, action: 'saisi'})); }).withFailureHandler(stkErr).decideRapportStock(stkP({id: id, action: 'approuver'}));
+}
 function ctrlValiderVue() {
   var R = STK.rap, q = B.seuilsTabac, t = '<button class="bs2" onclick="ctrlStart()">← Retour au contrôle de stock</button>';
   t += stkIc('Impact du mois · toutes familles', R.impactMois, q.t2, q.t2 * 3, '');
@@ -672,16 +696,16 @@ function ctrlValiderVue() {
   var att = R.rapports.filter(function (r) { return r.etat === 'À valider'; }), str = R.rapports.filter(function (r) { return r.etat === 'À saisir dans Strator'; }), aut = R.rapports.filter(function (r) { return r.etat !== 'À valider' && r.etat !== 'À saisir dans Strator'; });
   t += '<h2>À valider (' + att.length + ')</h2>' + (att.length ? '' : '<p class="lg">Rien à valider.</p>');
   att.forEach(function (r) {
-    t += '<div class="line">' + stkIc(esc(r.emp) + ' · ' + esc(r.aff) + ' · ' + esc(r.fams), r.impact, q.t1, q.t2, esc(r.statut)) + r.fam.map(function (f) { return '<b>' + esc(f.nom) + ' · ' + stkEur(f.impact) + '</b>' + ctrlLignes(f); }).join('') +
-      '<button onclick="ctrlDecide(\'' + r.id + '\',\'approuver\')">Approuver : mettre Strator à jour</button><button class="bs2" onclick="ctrlDecide(\'' + r.id + '\',\'recompter\')">Demander un recomptage</button></div>';
+    t += '<div class="line">' + stkIc(esc(r.emp) + ' · ' + esc(r.aff) + ' · ' + esc(r.fams), r.impact, q.t1, q.t2, esc(r.statut)) + r.fam.map(function (f) { return '<b>' + esc(f.nom) + ' · ' + stkEur(f.impact) + '</b>' + ctrlRes(f) + ctrlLignes(f); }).join('') + (r.pdf ? '<p class="lg"><a href="' + esc(r.pdf) + '" target="_blank" rel="noopener">Rapport PDF (Drive)</a></p>' : '') +
+      (ctrlAucunEcart(r) ? '<button onclick="ctrlDecideAucun(\'' + r.id + '\')">Valider : aucun écart, rien à saisir dans Strator</button>' : '<button onclick="ctrlDecide(\'' + r.id + '\',\'approuver\')">Approuver : mettre Strator à jour</button>') + '<button class="bs2" onclick="ctrlDecide(\'' + r.id + '\',\'recompter\')">Demander un recomptage</button></div>';
   });
   t += '<h2>À saisir dans Strator (' + str.length + ')</h2>' + (str.length ? '' : '<p class="lg">Rien en attente.</p>');
   str.forEach(function (r) {
-    t += '<div class="line"><b>' + esc(r.emp) + ' · ' + esc(r.aff) + ' · approuvé par ' + esc(r.par) + '</b><p class="lg">Mettre ces quantités dans Strator (stock = quantité comptée) :</p>' +
-      r.fam.map(function (f) { return '<b>' + esc(f.nom) + '</b>' + f.lignes.map(function (l) { return '<label class="li2"><span><input type="checkbox"> ' + esc(l[0]) + '</span><b>→ ' + l[2] + '</b></label>'; }).join(''); }).join('') +
+    t += '<div class="line"><b>' + esc(r.emp) + ' · ' + esc(r.aff) + ' · approuvé par ' + esc(r.par) + '</b><p class="lg">Mettre ces quantités dans Strator (stock = quantité comptée), uniquement pour les références en écart :</p>' +
+      r.fam.map(function (f) { return '<b>' + esc(f.nom) + '</b>' + ctrlPb(f).map(function (l) { return '<label class="li2"><span><input type="checkbox"> ' + esc(l[0]) + '</span><b>→ ' + l[2] + '</b></label>'; }).join(''); }).join('') +
       '<button onclick="ctrlDecide(\'' + r.id + '\',\'saisi\')">Tout est saisi dans Strator</button></div>';
   });
-  if (aut.length) t += '<h2>Historique</h2>' + aut.slice(0, 15).map(function (r) { return '<div class="li2"><span>' + esc(r.aff) + ' · ' + esc(r.emp) + ' · ' + esc(r.fams) + '<small class="mu">' + esc(r.etat) + (r.par ? ' · ' + esc(r.par) : '') + '</small></span><b>' + stkEur(r.impact) + '</b></div>'; }).join('');
+  if (aut.length) t += '<h2>Historique</h2>' + aut.slice(0, 15).map(function (r) { return '<div class="li2"><span>' + esc(r.aff) + ' · ' + esc(r.emp) + ' · ' + esc(r.fams) + '<small class="mu">' + esc(r.etat) + (r.par ? ' · ' + esc(r.par) : '') + (r.pdf ? ' · <a href="' + esc(r.pdf) + '" target="_blank" rel="noopener">PDF</a>' : '') + '</small></span><b>' + stkEur(r.impact) + '</b></div>'; }).join('');
   $('view').innerHTML = t; window.scrollTo(0, 0);
 }
 function ctrlDecide(id, action) {
