@@ -178,13 +178,15 @@ var INFO = {
   ctrl: ['Contrôle de stock', 'Choisissez les familles à contrôler (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) : vous pouvez en enchaîner plusieurs. Déclarez seulement les produits dont le stock réel ne correspond pas au stock théorique de Strator. À la fin, envoyez le rapport : les gérants le valident, puis Strator est mis à jour.'],
   tabac: ['Contrôle tabac · écarts de stock', 'À faire deux fois par semaine et avant chaque livraison. Déclarez seulement les références dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20).']
 };
-function check() { var b = $('save'); if (b) b.disabled = done || !chk(); }
+function check() { drSave(); var b = $('save'); if (b) b.disabled = done || !chk(); }
 
 function go(v) {
   if (!B.user) { loginView(); return; }
   var gr = (B.gerants || []).indexOf(B.user.nom) >= 0;
   if (B.user.nom === 'Extra' && v !== 'cloture') v = 'home';
   if ((v === 'depots' || v === 'prix') && !gr) v = 'home';
+  if ((v === 'ctrl' || v === 'tabac') && !DRRES && drGet()) { drPrompt(v); return; }
+  DRM = '';
   L = []; done = false; window.okSave = false; chk = function () { return false; };
   S = {fam: '', sou: '', mar: '', mine: false, cond: '', fmt: '', gam: '', q: ''};
   var i = INFO[v];
@@ -204,7 +206,7 @@ function home() {
   if (gr) t += '<button class="tile" onclick="window.open(\'https://sites.google.com/view/simulateurfoirail\', \'_blank\', \'noopener\')"><b>Simulateur prix & marges</b><span>Simuler une hausse de prix ou une baisse d’achat, et voir quoi renégocier. Réservé à Nasim et Wuissem (connexion Google).</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'prix\')"><b>Prix & offres</b><span>Mettre à jour un prix d’achat ou comparer l’offre d’un fournisseur à votre prix actuel.</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'depots\')"><b>Dépôts</b><span id="dp_sub">Calcul en cours…</span></button>';
-  $('view').innerHTML = (x ? '' : '<div id="hm_imp"></div>') + t;
+  DRRES = null; $('view').innerHTML = drBanner() + (x ? '' : '<div id="hm_imp"></div>') + t;
   if (!x) homeStock();
   if (gr) depotsResume();
 }
@@ -357,6 +359,12 @@ function tabacInit(d) {
   $('chips').onclick = function (e) { var t = e.target && e.target.closest ? e.target.closest('[data-k]') : e.target; if (t && t.getAttribute && t.getAttribute('data-k')) { var k = t.getAttribute('data-k'), v = t.getAttribute('data-v'); S[k] = S[k] === v ? '' : v; refresh(); } };
   $('typ').onchange = $('cre').onchange = $('eff').onchange = check;
   chk = function () { return window.okSave && $('typ').value && $('cre').value && $('eff').value; };
+  DRM = 'tabac';
+  if (DRRES && DRRES.kind === 'tabac') {
+    var dr = DRRES; DRRES = null;
+    L = (dr.L || []).map(function (x) { var c = find(x.id); return c ? {c: c, theo: x.theo, reel: x.reel} : null; }).filter(Boolean);
+    if (dr.typ) $('typ').value = dr.typ; if (dr.cre) $('cre').value = dr.cre; if (dr.eff) $('eff').value = dr.eff;
+  }
   $('save').onclick = save; refresh(); render();
 }
 
@@ -395,7 +403,7 @@ function add(id) {
   if (done) return;
   if (L.length >= D.max) { $('msg').innerHTML = '<div class="msg">Limite de ' + D.max + ' références atteinte : enregistrez, puis faites une nouvelle déclaration.</div>'; return; }
   if (L.some(function (l) { return l.c[0] === id; })) return;
-  L.push({c: find(id), theo: '', reel: ''}); render();
+  L.unshift({c: find(id), theo: '', reel: ''}); render();
 }
 function del(i) { L.splice(i, 1); render(); }
 function upd(i, k, v) { L[i][k] = v; calc(); }
@@ -415,7 +423,7 @@ function calc() {
   L.forEach(function (l, i) {
     var v = val(l), el = $('e' + i);
     if (!v) { ok = false; if (el) el.textContent = '–'; return; }
-    if (v.e === 0) ok = false;
+
     if (el) el.innerHTML = '<span class="' + cls(v.e) + '">' + (v.e > 0 ? '+' : '') + v.e + ' · ' + eur(v.i) + '</span>' + pill(v.i, D.seuils.l1, D.seuils.l2);
     nb++; tot += v.i;
     [[G, l.c[2]], [S, l.c[3]]].forEach(function (p) { var o = p[0][p[1]] = p[0][p[1]] || {n: 0, e: 0, i: 0}; o.n++; o.e += v.e; o.i += v.i; });
@@ -429,7 +437,7 @@ function calc() {
 function save() {
   var b = $('save'); b.disabled = true; b.textContent = 'Enregistrement…';
   google.script.run.withSuccessHandler(function (r) {
-    done = true; b.style.display = 'none';
+    done = true; drClear(); DRM = ''; b.style.display = 'none';
     $('msg').innerHTML = '<div class="msg" style="background:#d4edda">Déclaration enregistrée : ' + r.nb + ' référence(s), impact ' + eur(r.impact) + '.</div><button onclick="go(\'home\')">Retour au menu</button>';
   }).withFailureHandler(function (e) { b.textContent = 'Enregistrer la déclaration'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
   .enregistrer({employe: B.user.nom, pin: B.user.pin, extraNom: B.user.extra || '', type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
@@ -439,6 +447,51 @@ function save() {
 // ---------- Contrôle de stock : plusieurs familles enchaînées, rapport, validation des gérants
 var BS = [], BSF = '', BSQ = '', BSSRC = 'boissons';
 var STK = {emp: '', hub: null, sel: {}, done: [], queue: [], cur: null, cat: {}, meta: null};
+
+// ---------- Brouillon : les saisies d'un contrôle en cours sont gardées sur l'appareil (24 h)
+var DRK = 'foirail_brouillon_v1', DRM = '', DRF = false, DRRES = null, DRL = null;
+function drGet() { try { var d = JSON.parse(localStorage.getItem(DRK) || 'null'); if (d && B && B.user && d.emp === B.user.nom && Date.now() - d.ts < 86400000) return d; } catch (e) {} return null; }
+function drClear() { try { localStorage.removeItem(DRK); } catch (e) {} }
+function drPut(d) { try { d.ts = Date.now(); d.emp = B.user.nom; localStorage.setItem(DRK, JSON.stringify(d)); } catch (e) {} }
+function drSave(force) {
+  if (!DRM || !B || !B.user || (done && !force)) return;
+  try {
+    var d = {kind: DRM, typ: '', cre: '', eff: '', L: L.map(function (l) { return {id: l.c[0], theo: l.theo, reel: l.reel}; })};
+    if ($('typ')) { d.typ = $('typ').value; d.cre = $('cre').value; d.eff = $('eff').value; }
+    if (DRM === 'ctrl') { d.done = STK.done; d.sel = STK.sel; d.meta = STK.meta; d.cur = DRF && STK.cur ? STK.cur.id : ''; d.curNom = DRF && STK.cur ? STK.cur.nom : ''; d.queue = STK.queue.map(function (g) { return g.id; }); }
+    if (!d.L.length && !(d.done && d.done.length)) { drClear(); return; }
+    drPut(d);
+  } catch (e) {}
+}
+function drDesc(d) {
+  var n = (d.L || []).length, nd = (d.done || []).length, dt = new Date(d.ts), t = dt.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+  var x = d.kind === 'tabac' ? 'Contrôle tabac · ' + n + ' référence(s) saisie(s)' : 'Contrôle de stock' + (d.cur ? ' · ' + esc(d.curNom) + ' · ' + n + ' référence(s) en cours' : '') + (nd ? ' · ' + nd + ' famille(s) déjà enregistrée(s)' : '');
+  return x + ' · dernière saisie à ' + t;
+}
+function drBanner() {
+  var d = drGet(); if (!d) return '';
+  return '<div class="line" style="border-color:#8A6440"><b>Contrôle en cours</b><p class="lg">' + drDesc(d) + '</p><button onclick="drGo()">Continuer</button><button class="bs2" onclick="drZero(\'home\')">Repartir de zéro</button></div>';
+}
+function drPrompt(v) {
+  var d = drGet();
+  $('sub').textContent = 'Contrôle en cours'; $('info').style.display = 'none'; $('back').style.display = 'block';
+  $('view').innerHTML = '<div class="line"><b>Vous avez un contrôle en cours</b><p class="lg">' + drDesc(d) + '</p><p class="lg">Vos saisies ont été gardées sur cet appareil : rien n’est perdu.</p></div>' +
+    '<button onclick="drGo()">Continuer le contrôle</button><button class="bs2" onclick="go(\'home\')">Mettre en veille</button><button class="bs2" onclick="drZero(\'' + v + '\')">Repartir de zéro</button>';
+  window.scrollTo(0, 0);
+}
+function drGo() { var d = drGet(); if (!d) { go('home'); return; } DRRES = d; go(d.kind); }
+function drZero(v) {
+  var d = drGet();
+  if (!confirm('Effacer les saisies du contrôle en cours ?' + (d && d.done && d.done.length ? ' Les familles déjà enregistrées restent dans le rapport.' : ''))) return;
+  if (d && d.kind === 'ctrl' && d.done && d.done.length) { d.L = []; d.cur = ''; d.queue = []; d.typ = d.cre = d.eff = ''; drPut(d); if (v === 'home') { go('home'); return; } DRRES = d; go('ctrl'); return; }
+  drClear(); go(v);
+}
+function drRestoreStk(d, h) {
+  STK.done = d.done || []; STK.sel = d.sel || {}; STK.meta = d.meta || null;
+  var byId = function (id) { return h.groupes.filter(function (g) { return g.id === id; })[0]; };
+  STK.queue = (d.cur ? [d.cur].concat(d.queue || []) : []).map(byId).filter(Boolean);
+  DRL = d;
+}
 function bsNorm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 function stkP(x) { var o = x || {}; o.employe = B.user.nom; o.pin = B.user.pin; return o; }
 function stkErr(e) { $('view').innerHTML = '<div class="msg" style="background:#f8d7da">Erreur : ' + esc(e.message) + '</div><button onclick="go(\'home\')">Retour au menu</button>'; }
@@ -460,12 +513,14 @@ function homeStock() {
   }).withFailureHandler(function () {}).getStockHub(stkP());
 }
 function ctrlStart() {
+  var dr = DRRES; DRRES = null;
   if (STK.emp !== B.user.nom) STK = {emp: B.user.nom, hub: null, sel: {}, done: [], queue: [], cur: null, cat: {}, meta: null};
   ldRun('Chargement du contrôle de stock…', ['Demande envoyée', 'Lecture des derniers contrôles', 'Préparation de l’écran']);
-  google.script.run.withSuccessHandler(function (h) { STK.hub = h; ldDone(ctrlHub); }).withFailureHandler(stkErr).getStockHub(stkP());
+  google.script.run.withSuccessHandler(function (h) { STK.hub = h; if (dr && dr.kind === 'ctrl') drRestoreStk(dr, h); ldDone(dr && dr.kind === 'ctrl' && dr.cur && STK.queue.length ? ctrlNext : ctrlHub); }).withFailureHandler(stkErr).getStockHub(stkP());
 }
 function ctrlHub() {
   var h = STK.hub, gr = (B.gerants || []).indexOf(B.user.nom) >= 0, ok = 0;
+  DRM = 'ctrl'; DRF = false;
   L = []; done = false; window.okSave = false; chk = function () { return false; };
   var t = stkIc('Impact · 30 derniers jours', h.impact30, h.orange, h.rouge, '', '') .replace('</div>', stkJauge(h.impact30, h.orange, h.rouge) + '</div>');
   if (gr) t += '<button class="tile" onclick="ctrlValider()"><b>À valider' + (h.aValider ? ' (' + h.aValider + ')' : '') + '</b><span>Rapports envoyés par l’équipe, tableau de bord et suivi Strator.</span></button>';
@@ -485,7 +540,7 @@ function ctrlHub() {
   });
   t += '<button id="ct_go" ' + (ok ? '' : 'disabled') + ' onclick="ctrlGo()">' + (ok ? 'Commencer · ' + ok + (ok > 1 ? ' familles' : ' famille') : 'Cochez au moins une famille') + '</button>';
   if (STK.done.length) t += '<button class="bs2" onclick="ctrlTerminer()">Terminer et envoyer le rapport · ' + STK.done.length + (STK.done.length > 1 ? ' familles' : ' famille') + '</button>';
-  $('view').innerHTML = t;
+  $('view').innerHTML = t; drSave(true);
 }
 function ctrlSel(id, v) { STK.sel[id] = v; ctrlHub(); }
 function ctrlGo() {
@@ -497,6 +552,11 @@ function ctrlNext() {
   STK.cur = g; BSSRC = g.src;
   var go2 = function () {
     BS = STK.cat[g.src].filter(function (c) { return c[6] && c[7] === g.id; }); BSF = ''; BSQ = ''; L = []; done = false;
+    if (DRL && DRL.cur === g.id) {
+      L = (DRL.L || []).map(function (x) { var c = BS.filter(function (y) { return y[0] === x.id; })[0]; return c ? {c: c, theo: x.theo, reel: x.reel} : null; }).filter(Boolean);
+      STK.meta = {typ: DRL.typ, cre: DRL.cre, eff: DRL.eff};
+    }
+    DRL = null;
     D = {max: B.max, seuils: B.seuilsTabac}; boissonsInit();
   };
   if (STK.cat[g.src]) { go2(); return; }
@@ -504,6 +564,7 @@ function ctrlNext() {
   google.script.run.withSuccessHandler(function (r) { STK.cat[g.src] = r.cat || []; ldDone(go2); }).withFailureHandler(stkErr).getCatalogueBoissons(g.src);
 }
 function boissonsInit() {
+  DRM = 'ctrl'; DRF = true;
   var g = STK.cur, m = STK.meta || {}, pos = STK.done.length + 1, tot = STK.done.length + STK.queue.length + 1;
   var h = '<div class="sx" id="lv"></div><p class="lg">Employé : <b>' + esc(B.user.aff) + '</b> · Famille <b>' + esc(g.nom) + '</b> (' + pos + ' sur ' + tot + ')</p>';
   h += '<div class="row"><select id="typ">' + opts(B.types, 'Type de contrôle') + '</select></div><div class="row"><select id="cre">' + opts(B.creneaux, 'Créneau horaire') + '</select><select id="eff">' + opts(B.effectifs, 'Seul ou à deux ?') + '</select></div>';
@@ -512,7 +573,7 @@ function boissonsInit() {
   h += '<h2>2. Quantités <span id="cnt"></span></h2><div id="lines"></div>';
   h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix d’achat HT.</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer cette famille</button>';
   $('view').innerHTML = h;
-  if (m.typ) { $('typ').value = m.typ; $('cre').value = m.cre; $('eff').value = m.eff; }
+  if (m.typ) $('typ').value = m.typ; if (m.cre) $('cre').value = m.cre; if (m.eff) $('eff').value = m.eff;
   $('fam').onchange = function () { BSF = this.value; bsRes(); };
   $('q').oninput = function () { BSQ = this.value; bsRes(); };
   $('typ').onchange = $('cre').onchange = $('eff').onchange = check;
@@ -531,7 +592,7 @@ function bsAdd(id) {
   if (L.length >= D.max) { $('msg').innerHTML = '<div class="msg">Limite de ' + D.max + ' références atteinte : enregistrez cette famille, puis recommencez.</div>'; return; }
   var c = BS.filter(function (x) { return x[0] === id; })[0];
   if (!c || L.some(function (l) { return l.c[0] === id; })) return;
-  L.push({c: c, theo: '', reel: ''}); bsRender(); bsRes();
+  L.unshift({c: c, theo: '', reel: ''}); bsRender(); bsRes();
 }
 function bsDel(i) { L.splice(i, 1); bsRender(); bsRes(); }
 function bsUpd(i, k, v) { L[i][k] = v; bsCalc(); }
@@ -548,7 +609,7 @@ function bsCalc() {
   L.forEach(function (l, i) {
     var v = bsVal(l), el = $('e' + i);
     if (!v) { ok = false; if (el) el.textContent = '–'; return; }
-    if (v.e === 0) ok = false;
+
     if (el) el.innerHTML = '<span class="' + cls(v.e) + '">' + (v.e > 0 ? '+' : '') + v.e + ' · ' + eur(v.i) + '</span>' + pill(v.i, q.l1, q.l2);
     nb++; tot += v.i;
     var o = G[l.c[2]] = G[l.c[2]] || {n: 0, e: 0, i: 0}; o.n++; o.e += v.e; o.i += v.i;
@@ -570,6 +631,7 @@ function bsSave() {
 }
 function ctrlTotal() { return Math.round(STK.done.reduce(function (s, d) { return s + d.impact; }, 0) * 100) / 100; }
 function ctrlApres(r) {
+  DRF = false; drSave(true);
   var q = STK.hub.seuils, nx = STK.queue[0], t = '<div class="msg" style="background:#d4edda">' + esc(STK.cur.nom) + ' enregistré : ' + r.nb + ' référence(s).</div>';
   t += stkIc(esc(STK.cur.nom) + ' · cette famille', r.impact, q.t1, q.t2, '');
   t += stkIc('Session en cours · ' + STK.done.length + (STK.done.length > 1 ? ' familles' : ' famille'), ctrlTotal(), q.t1, q.t2, 'Rien n’est envoyé aux gérants avant « Terminer ».');
@@ -580,7 +642,7 @@ function ctrlApres(r) {
 function ctrlTerminer() {
   if (!STK.done.length) return;
   $('view').innerHTML = '<div class="msg">Envoi du rapport aux gérants…</div>';
-  google.script.run.withSuccessHandler(function (r) { STK.done = []; STK.sel = {}; STK.queue = []; STK.hub = null; ctrlRapport(r); }).withFailureHandler(function (e) { stkErr(e); })
+  google.script.run.withSuccessHandler(function (r) { STK.done = []; STK.sel = {}; STK.queue = []; STK.hub = null; drClear(); DRM = ''; ctrlRapport(r); }).withFailureHandler(function (e) { stkErr(e); })
     .cloreRapportStock(stkP({items: STK.done.map(function (d) { return {groupe: d.groupe, session: d.session}; })}));
 }
 function ctrlBarres(fam) {
