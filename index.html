@@ -100,6 +100,7 @@ details{margin-top:8px}summary{font-size:14px;color:#8A6440;cursor:pointer}
 .ic small{display:block;color:#7a6a5c;font-size:13px}.ic .n{display:block;font-size:30px;font-weight:800;letter-spacing:-.5px;line-height:1.15}.ic.g .n{color:#2e7d32}.ic.o .n{color:#b7791f}.ic.r .n{color:#c62828}
 .gj{height:7px;border-radius:4px;position:relative;margin:12px 0 4px}.gj i{position:absolute;top:-4px;width:4px;height:15px;background:#3d2b1c;border-radius:2px}.gl{display:flex;justify-content:space-between;font-size:11px;color:#7a6a5c}.mu{color:#7a6a5c}
 .fm{display:flex;gap:10px;align-items:flex-start;border:1px solid #D9C7AA;border-radius:10px;padding:11px;margin-bottom:8px;background:#FCF8F1;cursor:pointer}.fm.sel{border-color:#3d2b1c;box-shadow:0 0 0 1px #3d2b1c}.fm input{width:22px;height:22px;margin-top:1px;flex:none}.fm small{display:block;margin-top:3px;font-size:13px}
+.bub{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border-radius:20px;padding:8px 14px;min-width:88px;color:#fff;text-align:center;line-height:1.15}.bub b{font-size:20px;font-weight:700}.bub small{font-size:11px;opacity:.92}
 .sb{font-size:11px;font-weight:700;border-radius:9px;padding:2px 8px;white-space:nowrap;margin-left:auto}.sb.fait{background:#e1f2e5;color:#1e6b36}.sb.cours{background:#fbefd5;color:#8a5a00}.sb.todo{background:#eee;color:#666}.sb.late{background:#fbe3df;color:#a52f20}
 .cvg{color:#2e7d32}.cvo{color:#b7791f}.cvr{color:#c62828}.sx{position:sticky;top:0;z-index:5}.li2 input[type=checkbox]{width:auto;margin-right:6px}.br{height:6px;background:#eee;border-radius:3px;margin:3px 0 8px}.br i{display:block;height:6px;border-radius:3px}
 .li2{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #E3D3B8;padding:7px 0;font-size:14px}.li2 small{display:block;font-size:12px}
@@ -175,6 +176,7 @@ var INFO = {
   surprise: ['Contrôle surprise', 'Réservé aux gérants. À faire à tout moment : sur place avec les tickets, ou avec les photos envoyées par un employé. Mêmes tickets que la clôture (ticket X, TPE, FDJ, Nickel), mais le tiroir est compté fond de caisse compris. Le rapport PDF est envoyé par e-mail.'],
   prix: ['Prix & offres', 'Réservé aux gérants. Choisissez un article, saisissez le prix proposé par un fournisseur et votre volume : l’outil compare à votre prix actuel et dit si l’offre vaut le coup.'],
   depots: ['Dépôts à la banque', 'Réservé aux gérants. Chaque clôture alimente cet écran : cochez ce qui part à la banque, l’application prépare les pochettes (8 000 € maximum chacune) et note le dépôt. Les pièces restent en caisse : elles sont échangées contre des billets de la caisse.'],
+  rep: ['Reporting', 'Réservé aux gérants. Impacts des contrôles, caisse, contrôles en retard et conseils, sur la semaine en cours, la semaine dernière ou le mois. Un récap est aussi envoyé par e-mail chaque lundi à midi.'],
   hist: ['Mes contrôles', 'Les contrôles faits et validés, par date et par type, avec leur rapport PDF. Un contrôle fait sans l’application peut être déclaré ici.'],
   ctrl: ['Contrôle de stock', 'Choisissez les familles à contrôler (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) : vous pouvez en enchaîner plusieurs. Déclarez seulement les produits dont le stock réel ne correspond pas au stock théorique de Strator. À la fin, envoyez le rapport : les gérants le valident, puis Strator est mis à jour.'],
   tabac: ['Contrôle tabac · écarts de stock', 'À faire deux fois par semaine et avant chaque livraison. Déclarez seulement les références dont le stock réel ne correspond pas au stock théorique de Strator (maximum 20).']
@@ -185,7 +187,7 @@ function go(v) {
   if (!B.user) { loginView(); return; }
   var gr = (B.gerants || []).indexOf(B.user.nom) >= 0;
   if (B.user.nom === 'Extra' && v !== 'cloture') v = 'home';
-  if ((v === 'depots' || v === 'prix') && !gr) v = 'home';
+  if ((v === 'depots' || v === 'prix' || v === 'rep') && !gr) v = 'home';
   if ((v === 'ctrl' || v === 'tabac') && !DRRES && drGet()) { drPrompt(v); return; }
   DRM = '';
   L = []; done = false; window.okSave = false; chk = function () { return false; };
@@ -194,7 +196,7 @@ function go(v) {
   $('sub').textContent = i ? i[0] : 'Choisissez le contrôle à effectuer';
   $('info').style.display = i ? 'block' : 'none'; $('info').textContent = i ? i[1] : '';
   $('back').style.display = i ? 'block' : 'none';
-  if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'ctrl') ctrlStart(); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else if (v === 'prix') prixStart(); else if (v === 'hist') histStart(); else home();
+  if (v === 'stock') stockView(); else if (v === 'tabac') tabacStart(); else if (v === 'ctrl') ctrlStart(); else if (v === 'cloture') clotureStart(); else if (v === 'depots') depotsStart(); else if (v === 'prix') prixStart(); else if (v === 'hist') histStart(); else if (v === 'rep') repStart(); else home();
   window.scrollTo(0, 0);
 }
 
@@ -204,6 +206,7 @@ function home() {
   if (!x) t += '<button class="tile" onclick="go(\'stock\')"><b>Stock fin de mois</b><span>Fûts, café, sucres et déca : saisir les quantités du dernier jour du mois.</span></button>' +
     '<button class="tile" onclick="go(\'ctrl\')"><b>Contrôle de stock</b><span id="ct_sub">Tabac, boissons, vape, CBD, articles fumeurs, FDJ, confiserie : écarts entre Strator et le comptage, rapport et validation.</span></button>' +
     '<button class="tile" onclick="go(\'hist\')"><b>Mes contrôles</b><span>Retrouver les contrôles faits et validés, par date et par type, avec leur rapport.</span></button>';
+  if (gr) t += '<button class="tile" onclick="go(\'rep\')"><b>Reporting</b><span>Tous les chiffres et contrôles de la semaine ou du mois, retards, conseils : sans ouvrir le PC.</span></button>';
   if (gr) t += '<button class="tile" onclick="window.open(\'https://sites.google.com/view/simulateurfoirail\', \'_blank\', \'noopener\')"><b>Simulateur prix & marges</b><span>Simuler une hausse de prix ou une baisse d’achat, et voir quoi renégocier. Réservé à Nasim et Wuissem (connexion Google).</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'prix\')"><b>Prix & offres</b><span>Mettre à jour un prix d’achat ou comparer l’offre d’un fournisseur à votre prix actuel.</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'depots\')"><b>Dépôts</b><span id="dp_sub">Calcul en cours…</span></button>';
@@ -516,18 +519,28 @@ function homeStock() {
 }
 
 // ---------- Gérants : contrôle(s) à vérifier + notification
-var AV = {n: null, t: null};
+var AV = {n: null, t: null, fam: null, imp: 0, dn: null};
+function avCol(v) { var q = B.seuilsTabac || {t1: 50, t2: 200}, a = Math.abs(v); return v < 0 && a >= q.t2 ? '#c62828' : (v < 0 && a >= q.t1 ? '#e08a00' : '#2e7d32'); }
+function avData() {
+  google.script.run.withSuccessHandler(function (r) {
+    var m = {}, imp = 0; (r.rapports || []).filter(function (x) { return x.etat === 'À valider'; }).forEach(function (x) { imp += x.impact; (x.fam || []).forEach(function (f) { m[f.nom] = (m[f.nom] || 0) + Number(f.impact); }); });
+    AV.imp = imp; AV.fam = Object.keys(m).map(function (k) { return [k, m[k]]; }).sort(function (a, b) { return a[1] - b[1]; });
+    var e = $('av_b'); if (e) e.innerHTML = avHtml(AV.n);
+  }).withFailureHandler(function () {}).getRapportsStock(stkP());
+}
 function avHtml(n) {
   if (!n) return '';
   var notif = (window.Notification && Notification.permission === 'default') ? '<p class="lg" style="margin:6px 0 0"><a href="#" onclick="avNotif();return false">Activer les notifications sur cet appareil</a></p>' : '';
-  return '<div class="line" style="border:2px solid #c62828;background:#FCF0EE"><b style="color:#c62828">' + n + (n > 1 ? ' contrôles à vérifier' : ' contrôle à vérifier') + '</b><p class="lg" style="margin:4px 0 8px">Ouvrez le rapport, contrôlez les références en écart puis validez.</p><button onclick="ctrlValider()">Vérifier maintenant</button>' + notif + '</div>';
+  var bu = '<span class="bub" style="background:#c62828"><b>' + n + '</b><small>' + (n > 1 ? 'à vérifier' : 'à vérifier') + '</small></span>';
+  if (AV.fam) { bu += '<span class="bub" style="background:' + avCol(AV.imp) + '"><b>' + stkEur(AV.imp) + '</b><small>impact total</small></span>' + AV.fam.map(function (f) { return '<span class="bub" style="background:' + avCol(f[1]) + '"><b>' + stkEur(f[1]) + '</b><small>' + esc(f[0]) + '</small></span>'; }).join(''); }
+  return '<div class="line" style="border:2px solid #c62828;background:#FCF0EE"><b style="color:#c62828">' + n + (n > 1 ? ' contrôles à vérifier' : ' contrôle à vérifier') + '</b><div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;cursor:pointer" onclick="ctrlValider()">' + bu + '</div><p class="lg" style="margin:4px 0 8px">Ouvrez le rapport, contrôlez les références en écart puis validez.</p><button onclick="ctrlValider()">Vérifier maintenant</button>' + notif + '</div>';
 }
 function avNotif() { try { Notification.requestPermission().then(function () { var e = $('av_b'); if (e) e.innerHTML = avHtml(AV.n); }); } catch (e) {} }
 function avBanner(n) {
   var e = $('av_b'); if (e) e.innerHTML = avHtml(n);
   try { document.title = (n ? '(' + n + ') ' : '') + 'Contrôles Le Foirail'; } catch (x) {}
   if (AV.n !== null && n > AV.n) { try { if (window.Notification && Notification.permission === 'granted') new Notification('Contrôle à vérifier', {body: n + (n > 1 ? ' contrôles attendent' : ' contrôle attend') + ' votre validation.'}); } catch (x) {} }
-  AV.n = n;
+  AV.n = n; if (n && AV.dn !== n) { AV.dn = n; avData(); } if (!n) { AV.fam = null; AV.dn = null; }
   if (!AV.t) AV.t = setInterval(function () { if (!B || !B.user || !$('hm_imp')) return; google.script.run.withSuccessHandler(function (h) { avBanner(h.aValider); }).withFailureHandler(function () {}).getStockHub(stkP()); }, 120000);
 }
 function ctrlStart() {
@@ -1608,6 +1621,33 @@ function plRender() {
   } else h += '<p class="lg">Touchez un jour pour voir ce qui est prévu et ce qui a été fait. Un contrôle en retard reste affiché à sa date prévue ; la suite du planning repart de la date où il est réellement fait.</p>';
   $('view').innerHTML = h;
 }
+
+// ---------- Reporting gérants (semaine, semaine dernière, mois) + conseils
+var REP = null;
+function repStart() {
+  ldRun('Calcul du reporting…', ['Demande envoyée', 'Lecture des contrôles et de la caisse', 'Calcul des chiffres']);
+  google.script.run.withSuccessHandler(function (r) { ldDone(function () { REP = {r: r, per: 'prec'}; repView(); }); })
+    .withFailureHandler(stkErr).getReporting(stkP({extraNom: ''}));
+}
+function repPer(p) { REP.per = p; repView(); }
+function repBub(v, lib, col) { return '<span class="bub" style="background:' + col + '"><b>' + v + '</b><small>' + esc(lib) + '</small></span>'; }
+function repView() {
+  var R = REP.r, S = R[REP.per], q = B.seuilsTabac || {t1: 50, t2: 200}, lbl = {sem: 'Cette semaine', prec: 'Semaine dernière', mois: 'Ce mois'};
+  var net = Math.round((S.caisse.manques + S.caisse.exces) * 100) / 100;
+  var h = '<div class="bn" style="background:#8A6440"><span>Reporting · ' + lbl[REP.per] + '</span></div><div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap">' + ['sem', 'prec', 'mois'].map(function (k) { return '<button class="nvb" style="width:auto;padding:6px 12px;font-size:14px;' + (REP.per === k ? '' : 'opacity:.55') + '" onclick="repPer(\'' + k + '\')">' + lbl[k] + '</button>'; }).join('') + '</div>' +
+    '<p class="lg">Du ' + esc(S.debut.split('-').reverse().join('/')) + ' au ' + esc(S.fin.split('-').reverse().join('/')) + '</p>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px">' + repBub(stkEur(S.stock.impact), 'impact stock', avCol(S.stock.impact)) + repBub(stkEur(net), 'caisse (net)', Math.abs(net) >= 20 ? '#c62828' : (Math.abs(net) >= 5 ? '#e08a00' : '#2e7d32')) + repBub(S.caisse.rouges, 'clôtures rouges', S.caisse.rouges ? '#c62828' : '#2e7d32') + repBub(R.aValider, 'à valider', R.aValider ? '#c62828' : '#2e7d32') + '</div>';
+  var fam = Object.keys(S.stock.fam).map(function (k) { return {nom: k, impact: S.stock.fam[k].impact}; }).sort(function (a, b) { return a.impact - b.impact; });
+  h += '<h2>Contrôles de stock par famille</h2>' + (fam.length ? ctrlBarres(fam) : '<p class="lg">Aucun contrôle de stock sur la période.</p>');
+  h += '<h2>Contrôles faits</h2><div class="li2"><span>Stock (familles)</span><b>' + S.stock.nb + '</b></div><div class="li2"><span>Tabac<small class="mu">' + S.tabac.ref + ' réf. en écart</small></span><b>' + S.tabac.nb + ' · ' + stkEur(S.tabac.impact) + '</b></div><div class="li2"><span>Boissons</span><b>' + S.boissons.nb + ' · ' + stkEur(S.boissons.impact) + '</b></div><div class="li2"><span>Contrôles surprise<small class="mu">' + S.surprise.alertes + ' en alerte</small></span><b>' + S.surprise.nb + '</b></div><div class="li2"><span>Faits hors appli · corrections</span><b>' + S.hors + ' · ' + S.corr + '</b></div>';
+  var tri = function (o) { return Object.keys(o).sort(function (a, b) { return o[b].abs - o[a].abs; }); };
+  h += '<h2>Caisse</h2><div class="li2"><span>Clôtures · caisses<small class="mu">' + S.caisse.oranges + ' orange · ' + S.caisse.rouges + ' rouge</small></span><b>' + S.caisse.nb + '</b></div><div class="li2"><span>Manques</span><b class="cvr">' + stkEur(S.caisse.manques) + '</b></div><div class="li2"><span>Excédents</span><b class="cvg">' + stkEur(S.caisse.exces) + '</b></div>';
+  [['Par jour', S.caisse.jours], ['Par créneau', S.caisse.creneaux], ['Par clôture de', S.caisse.emp]].forEach(function (x) { var ks = tri(x[1]).filter(function (k) { return x[1][k].abs > 0; }); if (ks.length) h += '<p class="lg" style="margin:8px 0 2px"><b>' + x[0] + ' (écarts cumulés)</b></p>' + ks.map(function (k) { return '<div class="li2"><span>' + esc(k) + '<small class="mu">' + x[1][k].n + ' caisse(s)</small></span><b>' + eur(Math.round(x[1][k].abs * 100) / 100) + '</b></div>'; }).join(''); });
+  h += '<h2>Planning : où en est-on ?</h2>' + R.retards.map(function (r) { var c = plCoul(r.retard), chip = r.retard > 0 ? '<span class="sb" style="background:' + c[0] + ';color:' + c[1] + '">En retard de ' + r.retard + ' j</span>' : '<span class="sb fait">À jour</span>'; return '<div class="li2"><span>' + esc(r.nom) + '<small class="mu">Dernier : ' + (r.dernier ? esc(r.dernier.split('-').reverse().join('/')) : 'jamais') + ' · prochain prévu : ' + esc(plAff(plJ0(r.prevu))) + '</small></span>' + chip + '</div>'; }).join('');
+  var C = R.conseils, ul = function (a) { return '<ul style="margin:4px 0 8px;padding-left:18px">' + a.map(function (x) { return '<li style="margin:3px 0">' + esc(x) + '</li>'; }).join('') + '</ul>'; };
+  h += '<h2>Conseils (d’après la semaine dernière)</h2><div class="line"><b>Pour l’équipe</b>' + ul(C.equipe) + '</div><div class="line" style="border-color:#c62828"><b style="color:#c62828">Points de vigilance gérants</b>' + (C.gerants.length ? ul(C.gerants) : '<p class="lg">Rien de particulier.</p>') + '</div><div class="line"><b>Le planning colle-t-il à la réalité ?</b>' + ul(C.planning) + '</div>';
+  $('view').innerHTML = h + '<button class="bs2" onclick="go(\'home\')">← Retour au menu</button>'; window.scrollTo(0, 0);
+}
 function hiDeclarer() {
   var n = $('ho_n').value.trim(), b = $('ho_go'), m = $('ho_msg');
   if (n.length < 5) { m.innerHTML = '<div class="msg">Indiquez le motif et le résultat du contrôle.</div>'; return; }
@@ -1621,7 +1661,7 @@ function hiDeclarer() {
 var APP_VERSION = '1.7';
 var APP_DATE = '21 novembre 2026';
 var APP_NOTES = [
-  {v: '1.7', d: '21 novembre 2026', t: ['Un contrôle en retard affiche « En retard de 2 j » avec une couleur de plus en plus vive.', 'Gérants : planning des contrôles en calendrier (prévu, fait, en retard).', 'Le contrôle tabac est maintenant dans le bloc « Contrôle de stock », avec sa date de dernier et de prochain contrôle.', 'Nouveau : « Mes contrôles ». Chaque contrôle fait et validé est retrouvable par date, avec un code couleur par type et le rapport PDF en un clic.', 'Les gérants voient tous les contrôles (ou seulement les leurs) et la date du dernier contrôle de chaque type.', 'Un contrôle fait sans l’application peut être déclaré (qui, quand, pourquoi) : il apparaît dans l’historique et les gérants reçoivent un rapport.', 'En cas d’erreur, on peut déclarer une correction sur n’importe quel contrôle : elle est tracée à côté et les gérants sont prévenus.', 'Choix des familles : date du dernier contrôle et date théorique du prochain (lundi et vendredi FDJ, mercredi soft, mardi CBD/confiserie/fumeurs et jeudi vape tous les 15 jours), recalculée selon ce qui a été fait.']},
+  {v: '1.7', d: '21 novembre 2026', t: ['Gérants : la bannière « à vérifier » affiche des bulles avec le montant total et par famille.', 'Gérants : nouvelle tuile Reporting (semaine, semaine dernière, mois) avec impacts, caisse, retards et conseils. Un récap est envoyé par e-mail chaque lundi à midi.', 'Un contrôle en retard affiche « En retard de 2 j » avec une couleur de plus en plus vive.', 'Gérants : planning des contrôles en calendrier (prévu, fait, en retard).', 'Le contrôle tabac est maintenant dans le bloc « Contrôle de stock », avec sa date de dernier et de prochain contrôle.', 'Nouveau : « Mes contrôles ». Chaque contrôle fait et validé est retrouvable par date, avec un code couleur par type et le rapport PDF en un clic.', 'Les gérants voient tous les contrôles (ou seulement les leurs) et la date du dernier contrôle de chaque type.', 'Un contrôle fait sans l’application peut être déclaré (qui, quand, pourquoi) : il apparaît dans l’historique et les gérants reçoivent un rapport.', 'En cas d’erreur, on peut déclarer une correction sur n’importe quel contrôle : elle est tracée à côté et les gérants sont prévenus.', 'Choix des familles : date du dernier contrôle et date théorique du prochain (lundi et vendredi FDJ, mercredi soft, mardi CBD/confiserie/fumeurs et jeudi vape tous les 15 jours), recalculée selon ce qui a été fait.']},
   {v: '1.6', d: '20 novembre 2026', t: ['Accueil gérant : bannière « contrôle à vérifier » et compteur dans l’onglet, avec notification quand l’appli est ouverte.', 'Validation : seules les références avec écart sont à valider, les jeux à 0/0 ne sont plus listés, et un contrôle sans écart se valide en un clic.', 'Un rapport PDF pour chaque contrôle (tabac, caisse, surprise, stock), classé dans Drive et tracé dans le Sheet.', 'Puffs regroupés par modèle (une ligne par modèle, tous goûts confondus) avec le bon prix de vente.', 'Contrôle en cours : reprise automatique après une veille, nouvel article en haut de la liste, champs vides ignorés, écart 0 accepté.', 'Contrôle surprise : toutes les caisses ne sont plus obligatoires.']},
   {v: '1.5', d: '17 novembre 2026', t: ['Contrôle de stock : un seul bloc, vous cochez les familles (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) et vous les enchaînez.', 'L’impact en euros est visible partout : accueil, pendant la saisie, fin de famille et rapport.', 'Chaque contrôle donne un rapport envoyé aux gérants par e-mail ; ils l’approuvent, puis la mise à jour de Strator est suivie dans l’application.', 'Chaque famille affiche la date et l’auteur du dernier contrôle.']},
   {v: '1.4', d: '17 novembre 2026', t: ['Nouveau : Contrôle boissons. Comme au tabac, on déclare les écarts entre le stock théorique de Strator et le comptage réel, par référence.', 'Catalogue de 75 boissons (Pyrénées Boissons) avec la valeur d’achat pour chiffrer chaque écart.', 'Nouveau : Contrôle vape, CBD et confiserie, sur le même principe (350 produits : e-liquides, puffs, résistances, CBD, confiseries, papier, articles fumeurs).']},
