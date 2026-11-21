@@ -202,8 +202,7 @@ function home() {
   var gr = (B.gerants || []).indexOf(B.user.nom) >= 0, x = B.user.nom === 'Extra';
   var t = '<button class="tile" onclick="go(\'cloture\')"><b>Contrôle de caisse</b><span>Changement d’équipe ou clôture du soir : ticket X, TPE, FDJ, cash back, Nickel puis comptage. Le calcul se fait tout seul.</span></button>';
   if (!x) t += '<button class="tile" onclick="go(\'stock\')"><b>Stock fin de mois</b><span>Fûts, café, sucres et déca : saisir les quantités du dernier jour du mois.</span></button>' +
-    '<button class="tile" onclick="go(\'tabac\')"><b>Contrôle tabac</b><span>Déclarer les écarts entre le stock Strator et le rayon.</span></button>' +
-    '<button class="tile" onclick="go(\'ctrl\')"><b>Contrôle de stock</b><span id="ct_sub">Boissons, vape, CBD, articles fumeurs, FDJ, confiserie : écarts entre Strator et le comptage, rapport et validation.</span></button>' +
+    '<button class="tile" onclick="go(\'ctrl\')"><b>Contrôle de stock</b><span id="ct_sub">Tabac, boissons, vape, CBD, articles fumeurs, FDJ, confiserie : écarts entre Strator et le comptage, rapport et validation.</span></button>' +
     '<button class="tile" onclick="go(\'hist\')"><b>Mes contrôles</b><span>Retrouver les contrôles faits et validés, par date et par type, avec leur rapport.</span></button>';
   if (gr) t += '<button class="tile" onclick="window.open(\'https://sites.google.com/view/simulateurfoirail\', \'_blank\', \'noopener\')"><b>Simulateur prix & marges</b><span>Simuler une hausse de prix ou une baisse d’achat, et voir quoi renégocier. Réservé à Nasim et Wuissem (connexion Google).</span></button>';
   if (gr) t += '<button class="tile" onclick="go(\'prix\')"><b>Prix & offres</b><span>Mettre à jour un prix d’achat ou comparer l’offre d’un fournisseur à votre prix actuel.</span></button>';
@@ -535,7 +534,7 @@ function ctrlStart() {
   var dr = DRRES; DRRES = null;
   if (STK.emp !== B.user.nom) STK = {emp: B.user.nom, hub: null, sel: {}, done: [], queue: [], cur: null, cat: {}, meta: null};
   ldRun('Chargement du contrôle de stock…', ['Demande envoyée', 'Lecture des derniers contrôles', 'Préparation de l’écran']);
-  google.script.run.withSuccessHandler(function (h) { STK.hub = h; if (dr && dr.kind === 'ctrl') drRestoreStk(dr, h); ldDone(dr && dr.kind === 'ctrl' && dr.cur && STK.queue.length ? ctrlNext : ctrlHub); }).withFailureHandler(stkErr).getStockHub(stkP());
+  google.script.run.withSuccessHandler(function (h) { STK.hub = h; google.script.run.withSuccessHandler(function (r) { STK.last = r.last || {}; if (DRM === 'ctrl' && $('ct_go')) ctrlHub(); }).withFailureHandler(function () { STK.last = {}; if (DRM === 'ctrl' && $('ct_go')) ctrlHub(); }).getHistoriqueControles(stkP({extraNom: ''})); if (dr && dr.kind === 'ctrl') drRestoreStk(dr, h); ldDone(dr && dr.kind === 'ctrl' && dr.cur && STK.queue.length ? ctrlNext : ctrlHub); }).withFailureHandler(stkErr).getStockHub(stkP());
 }
 function ctrlHub() {
   var h = STK.hub, gr = (B.gerants || []).indexOf(B.user.nom) >= 0, ok = 0;
@@ -544,12 +543,15 @@ function ctrlHub() {
   var t = stkIc('Impact · 30 derniers jours', h.impact30, h.orange, h.rouge, '', '') .replace('</div>', stkJauge(h.impact30, h.orange, h.rouge) + '</div>');
   if (gr) t += '<button class="tile" onclick="ctrlValider()"><b>À valider' + (h.aValider ? ' (' + h.aValider + ')' : '') + '</b><span>Rapports envoyés par l’équipe, tableau de bord et suivi Strator.</span></button>';
   t += '<h2>Quelles familles contrôlez-vous ?</h2><p class="lg">Cochez une ou plusieurs familles : vous les enchaînez l’une après l’autre.</p>';
+  var tl = STK.last && STK.last['Contrôle tabac'], tp, now0 = new Date(), iso0 = plIso(new Date(now0.getFullYear(), now0.getMonth(), now0.getDate()));
+  if (!STK.last) tp = '<span class="sb todo">…</span>'; else if (tl && tl.d === iso0) tp = '<span class="sb fait">Fait aujourd’hui</span>'; else if (!tl) tp = '<span class="sb todo">Jamais contrôlé</span>'; else tp = plChip('tabac', tl.d);
+  t += '<div class="fm" style="cursor:pointer" onclick="go(\'tabac\')"><div style="flex:1"><div style="display:flex;gap:8px;align-items:center"><b>Tabac</b>' + tp + '</div><small class="mu">' + (STK.last ? (tl ? 'Dernier contrôle : ' + esc(plJourAff(tl.d)) + ' · ' + esc(tl.par) + (tl.st ? ' · ' + esc(tl.st) : '') : 'Aucun contrôle enregistré') + '<br>' + plLigne('tabac', tl ? tl.d : '') : 'Lecture du dernier contrôle…') + '<br>Ouvre la saisie des écarts par référence (séparée des autres familles).</small></div><span style="font-size:22px;color:#8A6440;align-self:center">›</span></div>';
   h.groupes.forEach(function (g) {
     var d = STK.done.filter(function (x) { return x.groupe === g.id; })[0], p, last;
     if (d) p = '<span class="sb cours">À envoyer · ' + stkEur(d.impact) + '</span>';
     else if (g.faitAuj) p = '<span class="sb fait">Fait aujourd’hui</span>';
     else if (!g.dernier) p = '<span class="sb todo">Jamais contrôlé</span>';
-    else { var nx = plNext(g.id, g.dernier.jour); if (nx && nx.retard) p = '<span class="sb late">En retard · prévu ' + esc(plAff(nx.d)) + '</span>'; else if (nx && !nx.auj) p = '<span class="sb fait">À jour</span>'; else p = '<span class="sb todo">À faire</span>'; }
+    else p = plChip(g.id, g.dernier.jour);
     last = (g.dernier ? 'Dernier contrôle : ' + esc(plJourAff(g.dernier.jour)) + ' · ' + esc(g.dernier.emp) + ' · <b class="cv' + st(g.dernier.impact, h.seuils.t1, h.seuils.t2)[0] + '">' + stkEur(g.dernier.impact) + '</b>' : 'Aucun contrôle enregistré') + '<br>' + plLigne(g.id, g.dernier ? g.dernier.jour : '');
     var hs = g.hist || [], sp = '';
     if (hs.length > 1) { var mx = Math.max.apply(null, hs.map(function (v) { return Math.abs(v); })) || 1; sp = '<div class="spk">' + hs.map(function (v, i) { return '<span><em>' + stkEur(v) + '</em><i' + (i === hs.length - 1 ? ' class="last"' : '') + ' style="height:' + Math.max(4, Math.round(Math.abs(v) / mx * 34)) + 'px"></i></span>'; }).join('') + '</div>'; }
@@ -1461,9 +1463,16 @@ function plNext(id, lastIso) {
   for (var i = 0; i < 20 && pl.j.indexOf(d.getDay()) < 0; i++) d.setDate(d.getDate() + 1);
   return {d: d, retard: d < auj, auj: d.getTime() === auj.getTime(), lib: pl.lib};
 }
+function plRet(n) { var now = new Date(), auj = new Date(now.getFullYear(), now.getMonth(), now.getDate()); return Math.max(0, Math.round((auj - n.d) / 86400000)); }
+function plCoul(j) { return j <= 1 ? ['#fff0c2', '#8a5a00'] : (j <= 3 ? ['#ffd6a0', '#9a4a00'] : (j <= 6 ? ['#ffb3a3', '#a52f20'] : ['#d32f2f', '#ffffff'])); }
+function plChip(id, lastIso) {
+  var nx = plNext(id, lastIso); if (!nx) return '<span class="sb fait">À jour</span>';
+  if (nx.retard) { var j = plRet(nx), c = plCoul(j); return '<span class="sb" style="background:' + c[0] + ';color:' + c[1] + '">En retard de ' + j + ' j</span>'; }
+  return nx.auj ? '<span class="sb todo">À faire</span>' : '<span class="sb fait">À jour</span>';
+}
 function plLigne(id, lastIso) {
   var n = plNext(id, lastIso); if (!n) return '';
-  return 'Prochain contrôle prévu : <b>' + (n.auj ? 'aujourd’hui' : plAff(n.d)) + '</b>' + (n.retard ? ' <b style="color:#c62828">(en retard)</b>' : '') + ' · rythme : ' + n.lib;
+  return 'Prochain contrôle prévu : <b>' + (n.auj ? 'aujourd’hui' : plAff(n.d)) + '</b>' + (n.retard ? ' <b style="color:' + plCoul(plRet(n))[1] + ';background:' + plCoul(plRet(n))[0] + ';padding:1px 6px;border-radius:8px">en retard de ' + plRet(n) + ' j</b>' : '') + ' · rythme : ' + n.lib;
 }
 function plJourAff(iso) { var d = plJ0(iso), now = new Date(), auj = new Date(now.getFullYear(), now.getMonth(), now.getDate()), j = Math.round((auj - d) / 86400000); return plAff(d) + (j === 0 ? ' (aujourd’hui)' : (j === 1 ? ' (hier)' : '')); }
 
@@ -1481,6 +1490,7 @@ function histStart() {
 function histView() {
   var h = '<div class="bn" style="background:#8A6440"><span>Mes contrôles</span></div>';
   if (HI.r.gerant) h += '<div style="display:flex;gap:8px;margin:8px 0"><button class="nvb" style="width:auto;padding:6px 12px;font-size:14px;' + (HI.tous ? '' : 'opacity:.55') + '" onclick="hiTous(true)">Tous les employés</button><button class="nvb" style="width:auto;padding:6px 12px;font-size:14px;' + (HI.tous ? 'opacity:.55' : '') + '" onclick="hiTous(false)">Les miens</button></div>';
+  if (HI.r.gerant) h += '<button class="nvb" style="margin:4px 0 10px" onclick="plView()">📅 Planning des contrôles (calendrier)</button>';
   h += '<div id="hi_last"></div><div id="hi_cal"></div><div id="hi_day"></div><details><summary>Voir tous les contrôles du mois</summary><div id="hi_list"></div></details>' +
     '<details style="margin-top:14px"><summary>Un contrôle a été fait sans l’application ? Le déclarer</summary>' +
     '<p class="lg">Pour garder une trace : indiquez qui l’a fait, quand, et pourquoi il n’a pas été saisi. Les gérants reçoivent un e-mail avec un rapport.</p>' +
@@ -1539,6 +1549,65 @@ function hiCal() {
   $('hi_day').innerHTML = HI.jour && by[HI.jour] ? by[HI.jour].map(hiCarte).join('') : '<p class="lg">Aucun contrôle ce mois-ci.</p>';
   $('hi_list').innerHTML = mj.map(hiCarte).join('');
 }
+
+// ---------- Planning des contrôles en calendrier (gérants) : prévu, fait, en retard
+var PL = null, PC = {fdj: '#c2185b', boissons: '#0277bd', cbd: '#2e7d32', confiserie: '#ef6c00', fumeurs: '#6d4c41', vape: '#7b3fa0', tabac: '#8A6440'}, PN = {fdj: 'FDJ / jeux', boissons: 'Soft (boissons)', cbd: 'CBD', confiserie: 'Confiserie', fumeurs: 'Fumeurs (briquet, filtres, tubes)', vape: 'E-liquide + puff', tabac: 'Tabac'};
+function plNextFrom(id, d0) {
+  var pl = PLAN[id], d = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate() + (pl.every === 7 ? 1 : pl.every));
+  for (var i = 0; i < 20 && pl.j.indexOf(d.getDay()) < 0; i++) d.setDate(d.getDate() + 1);
+  return d;
+}
+function plEvents(last, fin) {
+  var ev = {}, now = new Date(), auj = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  Object.keys(PLAN).forEach(function (id) {
+    var n = plNext(id, last[id] || ''), d = n.d, late = n.retard, k = 0;
+    while (d <= fin && k++ < 80) {
+      var iso = plIso(d); (ev[iso] = ev[iso] || []).push({id: id, late: late, j: late ? plRet({d: d}) : 0});
+      d = plNextFrom(id, late ? auj : d); late = false;
+    }
+  });
+  return ev;
+}
+function plView() {
+  ldRun('Chargement du planning…', ['Demande envoyée', 'Lecture des derniers contrôles']);
+  google.script.run.withSuccessHandler(function (h) {
+    ldDone(function () {
+      var last = {}; (h.groupes || []).forEach(function (g) { if (g.dernier) last[g.id] = g.dernier.jour; });
+      var tl = HI.r.last && HI.r.last['Contrôle tabac'], ti = HI.r.items.filter(function (x) { return x.t === 'Contrôle tabac' || (x.t === 'Hors appli' && /^Contrôle tabac/.test(x.res)); })[0];
+      if (tl) last.tabac = tl.d; else if (ti) last.tabac = ti.d;
+      PL = {last: last, mois: dpMoisNow(), jour: ''}; plRender();
+    });
+  }).withFailureHandler(function (e) { $('view').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div><button onclick="histView()">Retour</button>'; }).getStockHub(stkP());
+}
+function plNav(s) {
+  var y = Number(PL.mois.slice(0, 4)), m = Number(PL.mois.slice(5, 7)) + s; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; }
+  var k = y + '-' + (m < 10 ? '0' : '') + m, mx = new Date(); mx.setMonth(mx.getMonth() + 3); if (k > mx.getFullYear() + '-' + (mx.getMonth() < 9 ? '0' : '') + (mx.getMonth() + 1)) return;
+  PL.mois = k; PL.jour = ''; plRender();
+}
+function plJour(iso) { PL.jour = PL.jour === iso ? '' : iso; plRender(); }
+function plRender() {
+  var m = PL.mois, y = Number(m.slice(0, 4)), mo = Number(m.slice(5, 7)), nbj = new Date(y, mo, 0).getDate(), off = (new Date(y, mo - 1, 1).getDay() + 6) % 7, ev = plEvents(PL.last, new Date(y, mo, 0)), fait = {};
+  HI.r.items.forEach(function (x) { if (x.d.slice(0, 7) === m && x.t !== 'Correction') (fait[x.d] = fait[x.d] || []).push(x); });
+  var today = plIso(new Date());
+  var h = '<div class="bn" style="background:#8A6440"><span>Planning des contrôles</span></div><button class="nvb" style="width:auto;padding:6px 12px;font-size:14px;margin:8px 0" onclick="histView()">‹ Mes contrôles</button>' +
+    '<div class="calh"><button class="nvb calb" onclick="plNav(-1)" aria-label="Mois précédent">‹</button><b>' + esc(dpMoisLib(m)) + '</b><button class="nvb calb" onclick="plNav(1)" aria-label="Mois suivant">›</button></div><div class="cal">' + ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(function (x) { return '<span class="cdw">' + x + '</span>'; }).join('');
+  for (var i = 0; i < off; i++) h += '<span class="cd e"></span>';
+  for (var d = 1; d <= nbj; d++) {
+    var iso = m + '-' + (d < 10 ? '0' : '') + d, pe = ev[iso] || [], fe = fait[iso] || [], dots = '';
+    pe.forEach(function (e) { dots += '<i style="display:inline-block;width:9px;height:9px;box-sizing:border-box;border-radius:50%;border:2px solid ' + (e.late ? '#d32f2f' : PC[e.id]) + ';background:' + (e.late ? '#d32f2f' : '#fff') + '"></i>'; });
+    var ty = []; fe.forEach(function (x) { if (ty.indexOf(x.t) < 0) ty.push(x.t); });
+    ty.forEach(function (t) { dots += '<i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + hiCol(t) + '"></i>'; });
+    h += '<div class="cd' + (PL.jour === iso ? ' sel' : '') + '" style="cursor:pointer' + (iso === today ? ';background:#FFF4D6' : '') + '" onclick="plJour(\'' + iso + '\')"><b>' + d + '</b><span style="display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:42px;margin-top:2px">' + dots + '</span></div>';
+  }
+  h += '</div><div class="leg">' + Object.keys(PLAN).map(function (id) { return '<span><i style="display:inline-block;width:10px;height:10px;box-sizing:border-box;border-radius:50%;border:2px solid ' + PC[id] + '"></i>' + esc(PN[id]) + '</span>'; }).join('') + '<span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#d32f2f"></i>En retard</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#555"></i>Fait (couleur du type)</span></div>';
+  if (PL.jour) {
+    var pe2 = ev[PL.jour] || [], fe2 = fait[PL.jour] || [];
+    h += '<div class="sec">' + esc(plAff(plJ0(PL.jour))) + '</div>';
+    h += pe2.length ? pe2.map(function (e) { var c = e.late ? plCoul(e.j) : null; return '<div class="dj" style="border-left:6px solid ' + PC[e.id] + '"><div class="dj1"><b>' + esc(PN[e.id]) + '</b> ' + (e.late ? '<span class="sb" style="background:' + c[0] + ';color:' + c[1] + '">En retard de ' + e.j + ' j</span>' : (PL.jour < today ? '' : '<span class="sb todo">Prévu</span>')) + '</div><div class="dj3">Rythme : ' + esc(PLAN[e.id].lib) + '</div></div>'; }).join('') : '<p class="lg">Rien de prévu ce jour-là.</p>';
+    if (fe2.length) h += '<div class="sec">Fait ce jour-là</div>' + fe2.map(hiCarte).join('');
+  } else h += '<p class="lg">Touchez un jour pour voir ce qui est prévu et ce qui a été fait. Un contrôle en retard reste affiché à sa date prévue ; la suite du planning repart de la date où il est réellement fait.</p>';
+  $('view').innerHTML = h;
+}
 function hiDeclarer() {
   var n = $('ho_n').value.trim(), b = $('ho_go'), m = $('ho_msg');
   if (n.length < 5) { m.innerHTML = '<div class="msg">Indiquez le motif et le résultat du contrôle.</div>'; return; }
@@ -1552,7 +1621,7 @@ function hiDeclarer() {
 var APP_VERSION = '1.7';
 var APP_DATE = '21 novembre 2026';
 var APP_NOTES = [
-  {v: '1.7', d: '20 novembre 2026', t: ['Nouveau : « Mes contrôles ». Chaque contrôle fait et validé est retrouvable par date, avec un code couleur par type et le rapport PDF en un clic.', 'Les gérants voient tous les contrôles (ou seulement les leurs) et la date du dernier contrôle de chaque type.', 'Un contrôle fait sans l’application peut être déclaré (qui, quand, pourquoi) : il apparaît dans l’historique et les gérants reçoivent un rapport.', 'En cas d’erreur, on peut déclarer une correction sur n’importe quel contrôle : elle est tracée à côté et les gérants sont prévenus.', 'Choix des familles : date du dernier contrôle et date théorique du prochain (lundi et vendredi FDJ, mercredi soft, mardi CBD/confiserie/fumeurs et jeudi vape tous les 15 jours), recalculée selon ce qui a été fait.']},
+  {v: '1.7', d: '21 novembre 2026', t: ['Un contrôle en retard affiche « En retard de 2 j » avec une couleur de plus en plus vive.', 'Gérants : planning des contrôles en calendrier (prévu, fait, en retard).', 'Le contrôle tabac est maintenant dans le bloc « Contrôle de stock », avec sa date de dernier et de prochain contrôle.', 'Nouveau : « Mes contrôles ». Chaque contrôle fait et validé est retrouvable par date, avec un code couleur par type et le rapport PDF en un clic.', 'Les gérants voient tous les contrôles (ou seulement les leurs) et la date du dernier contrôle de chaque type.', 'Un contrôle fait sans l’application peut être déclaré (qui, quand, pourquoi) : il apparaît dans l’historique et les gérants reçoivent un rapport.', 'En cas d’erreur, on peut déclarer une correction sur n’importe quel contrôle : elle est tracée à côté et les gérants sont prévenus.', 'Choix des familles : date du dernier contrôle et date théorique du prochain (lundi et vendredi FDJ, mercredi soft, mardi CBD/confiserie/fumeurs et jeudi vape tous les 15 jours), recalculée selon ce qui a été fait.']},
   {v: '1.6', d: '20 novembre 2026', t: ['Accueil gérant : bannière « contrôle à vérifier » et compteur dans l’onglet, avec notification quand l’appli est ouverte.', 'Validation : seules les références avec écart sont à valider, les jeux à 0/0 ne sont plus listés, et un contrôle sans écart se valide en un clic.', 'Un rapport PDF pour chaque contrôle (tabac, caisse, surprise, stock), classé dans Drive et tracé dans le Sheet.', 'Puffs regroupés par modèle (une ligne par modèle, tous goûts confondus) avec le bon prix de vente.', 'Contrôle en cours : reprise automatique après une veille, nouvel article en haut de la liste, champs vides ignorés, écart 0 accepté.', 'Contrôle surprise : toutes les caisses ne sont plus obligatoires.']},
   {v: '1.5', d: '17 novembre 2026', t: ['Contrôle de stock : un seul bloc, vous cochez les familles (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) et vous les enchaînez.', 'L’impact en euros est visible partout : accueil, pendant la saisie, fin de famille et rapport.', 'Chaque contrôle donne un rapport envoyé aux gérants par e-mail ; ils l’approuvent, puis la mise à jour de Strator est suivie dans l’application.', 'Chaque famille affiche la date et l’auteur du dernier contrôle.']},
   {v: '1.4', d: '17 novembre 2026', t: ['Nouveau : Contrôle boissons. Comme au tabac, on déclare les écarts entre le stock théorique de Strator et le comptage réel, par référence.', 'Catalogue de 75 boissons (Pyrénées Boissons) avec la valeur d’achat pour chiffrer chaque écart.', 'Nouveau : Contrôle vape, CBD et confiserie, sur le même principe (350 produits : e-liquides, puffs, résistances, CBD, confiseries, papier, articles fumeurs).']},
