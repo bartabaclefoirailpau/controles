@@ -740,7 +740,7 @@ function pxPct(x) { return (Math.round(x * 1000) / 10).toString().replace('.', '
 function prixVue() {
   var t = '<div class="line"><b>Article à comparer</b><label class="fl" for="px_fa">1. Famille</label><select id="px_fa" onchange="pxFam()" style="width:100%"></select><label class="fl" for="px_sf">2. Sous-famille</label><select id="px_sf" onchange="pxFiltre()" style="width:100%"></select><label class="fl" for="px_q">3. Produit</label><input id="px_q" placeholder="Filtrer par nom (facultatif)" autocomplete="off" oninput="pxFiltre()"><select id="px_s" size="6" onchange="pxChoix()" style="width:100%;margin-top:6px"></select></div><div id="px_f"></div>';
   if (PX.hist.length) t += '<h2>Dernières modifications de prix</h2>' + PX.hist.map(function (h) { return '<div class="li2"><span>' + esc(h[2]) + '<small class="mu">' + esc(h[0]) + ' · ' + esc(h[1]) + (h[5] ? ' · ' + esc(h[5]) : '') + '</small></span><b>' + eur(h[3]) + ' → ' + eur(h[4]) + '</b></div>'; }).join('');
-  $('view').innerHTML = '<button class="bs2" onclick="go(\'home\')">← Retour au menu</button>' + t; pxFam();
+  $('view').innerHTML = t; pxFam();
 }
 function pxFamOf(a) { return a.s === 'boissons' ? 'Boissons' : String(a.f).split(' · ')[0]; }
 function pxSubOf(a) { return a.s === 'boissons' ? String(a.f) : (String(a.f).split(' · ')[1] || String(a.f)); }
@@ -1648,7 +1648,7 @@ function repView() {
   h += '<h2>Planning : où en est-on ?</h2>' + R.retards.map(function (r) { var c = plCoul(r.retard), pv = plJ0(r.prevu), auj0 = new Date(), auj1 = new Date(auj0.getFullYear(), auj0.getMonth(), auj0.getDate()), chip = r.retard > 0 ? '<span class="sb" style="background:' + c[0] + ';color:' + c[1] + '">En retard de ' + r.retard + ' j</span>' : (!r.dernier ? (pv.getTime() <= auj1.getTime() ? '<span class="sb todo">À faire</span>' : '<span class="sb todo">À faire · ' + esc(plAff(pv)) + '</span>') : (r.valide ? '<span class="sb fait">À jour</span>' : '<span class="sb cours">Fait · à valider dans Strator</span>')); return '<div class="li2"><span>' + esc(r.nom) + '<small class="mu">Dernier : ' + (r.dernier ? esc(r.dernier.split('-').reverse().join('/')) + (r.valide ? ' · validé' : ' · pas encore validé') : 'jamais fait') + ' · prochain prévu : ' + esc(plAff(plJ0(r.prevu))) + '</small></span>' + chip + '</div>'; }).join('');
   var C = R.conseils, ul = function (a) { return '<ul style="margin:4px 0 8px;padding-left:18px">' + a.map(function (x) { return '<li style="margin:3px 0">' + esc(x) + '</li>'; }).join('') + '</ul>'; };
   h += '<h2>Conseils (d’après la semaine dernière)</h2><div class="line"><b>Pour l’équipe</b>' + ul(C.equipe) + '</div><div class="line" style="border-color:#c62828"><b style="color:#c62828">Points de vigilance gérants</b>' + (C.gerants.length ? ul(C.gerants) : '<p class="lg">Rien de particulier.</p>') + '</div><div class="line"><b>Le planning colle-t-il à la réalité ?</b>' + ul(C.planning) + '</div>';
-  $('view').innerHTML = h + '<button class="bs2" onclick="go(\'home\')">← Retour au menu</button>'; window.scrollTo(0, 0);
+  $('view').innerHTML = h; window.scrollTo(0, 0);
 }
 function hiDeclarer() {
   var n = $('ho_n').value.trim(), b = $('ho_go'), m = $('ho_msg');
