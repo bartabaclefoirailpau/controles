@@ -580,6 +580,11 @@ function ctrlGo() {
   STK.queue = STK.hub.groupes.filter(function (g) { return STK.sel[g.id] && !STK.done.some(function (d) { return d.groupe === g.id; }); });
   if (STK.queue.length) { STK.total = STK.queue.length; ctrlNext(); }
 }
+var OFF = {actifs: [], gerant: false};
+function offIn(l, i) { return (STK.cur && STK.cur.id === 'fdj' && OFF.actifs.indexOf(l.c[1]) >= 0) ? '<label>Jeux offerts<input type="number" inputmode="numeric" min="0" step="1" value="' + esc(l.of || '') + '" oninput="bsUpd(' + i + ',\'of\',this.value)"></label>' : ''; }
+function offPanelHtml() { return (STK.cur && STK.cur.id === 'fdj' && OFF.gerant) ? '<details style="margin:8px 0"><summary><b>Jeux offerts FDJ (promo) · gérants</b></summary><div id="offp"></div></details>' : ''; }
+function offPanel() { var el = $('offp'); if (!el) return; el.innerHTML = '<p class="lg">Cochez les jeux pour lesquels la FDJ offre un ticket à l’achat : un champ « Jeux offerts » apparaît dans le comptage et ces tickets ne comptent pas comme écart.</p><button class="bs2" onclick="offSet(null,true)">Tout activer</button> <button class="bs2" onclick="offSet(null,false)">Tout désactiver</button>' + BS.map(function (c, i) { return '<label style="display:block;margin:4px 0"><input type="checkbox" ' + (OFF.actifs.indexOf(c[1]) >= 0 ? 'checked ' : '') + 'onchange="offSet(' + i + ',this.checked)"> ' + esc(c[1]) + '</label>'; }).join(''); }
+function offSet(i, a) { var noms = i === null ? BS.map(function (c) { return c[1]; }) : [BS[i][1]]; google.script.run.withSuccessHandler(function (o) { OFF = o; offPanel(); bsRender(); }).withFailureHandler(function (e) { $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; }).setOffreFdj(stkP({noms: noms, actif: a})); }
 function ctrlNext() {
   var g = STK.queue.shift(); if (!g) { ctrlHub(); return; }
   STK.cur = g; BSSRC = g.src;
@@ -592,16 +597,17 @@ function ctrlNext() {
     DRL = null;
     D = {max: B.max, seuils: B.seuilsTabac}; boissonsInit();
   };
-  if (STK.cat[g.src]) { go2(); return; }
+  var go2w = function () { if (g.id !== 'fdj') { go2(); return; } google.script.run.withSuccessHandler(function (o) { OFF = o; go2(); }).withFailureHandler(function () { OFF = {actifs: [], gerant: false}; go2(); }).getOffresFdj(stkP()); };
+  if (STK.cat[g.src]) { go2w(); return; }
   ldRun('Chargement du catalogue…', ['Demande envoyée', 'Réception du catalogue', 'Préparation de la recherche']);
-  google.script.run.withSuccessHandler(function (r) { STK.cat[g.src] = r.cat || []; ldDone(go2); }).withFailureHandler(stkErr).getCatalogueBoissons(g.src);
+  google.script.run.withSuccessHandler(function (r) { STK.cat[g.src] = r.cat || []; ldDone(go2w); }).withFailureHandler(stkErr).getCatalogueBoissons(g.src);
 }
 function boissonsInit() {
   DRM = 'ctrl'; DRF = true;
   var g = STK.cur, m = STK.meta || {}, pos = STK.done.length + 1, tot = STK.done.length + STK.queue.length + 1;
   var h = '<div class="sx" id="lv"></div><p class="lg">Employé : <b>' + esc(B.user.aff) + '</b> · Famille <b>' + esc(g.nom) + '</b> (' + pos + ' sur ' + tot + ')</p>';
   h += '<div class="row"><select id="typ">' + opts(B.types, 'Type de contrôle') + '</select></div><div class="row"><select id="cre">' + opts(B.creneaux, 'Créneau horaire') + '</select><select id="eff">' + opts(B.effectifs, 'Seul ou à deux ?') + '</select></div>';
-  h += '<h2>1. Ajouter une référence en écart</h2><div class="row"><select id="fam">' + opts(uniq(BS.map(function (c) { return c[2]; })), 'Toutes les sous-familles') + '</select></div>';
+  h += offPanelHtml(); h += '<h2>1. Ajouter une référence en écart</h2><div class="row"><select id="fam">' + opts(uniq(BS.map(function (c) { return c[2]; })), 'Toutes les sous-familles') + '</select></div>';
   h += '<input id="q" placeholder="Rechercher un produit (2 lettres minimum)" style="margin-top:6px"><div class="res" id="res"></div>';
   h += '<h2>2. Quantités <span id="cnt"></span></h2><p class="lg">Inutile de tout contrôler : une ligne laissée vide est ignorée à l’enregistrement.</p><div id="lines"></div>';
   h += '<h2>3. Impact de l’écart</h2><p class="lg">' + legende() + ' Valeur au prix d’achat HT.</p><div id="recap"></div><div id="msg"></div><button id="save" disabled>Enregistrer cette famille</button>';
@@ -611,7 +617,7 @@ function boissonsInit() {
   $('q').oninput = function () { BSQ = this.value; bsRes(); };
   $('typ').onchange = $('cre').onchange = $('eff').onchange = check;
   chk = function () { return window.okSave && $('typ').value && $('cre').value && $('eff').value; };
-  $('save').onclick = bsSave; bsRes(); bsRender();
+  $('save').onclick = bsSave; bsRes(); bsRender(); offPanel();
 }
 function bsRes() {
   var q = bsNorm(BSQ).trim(), r;
@@ -629,11 +635,11 @@ function bsAdd(id) {
 }
 function bsDel(i) { L.splice(i, 1); bsRender(); bsRes(); }
 function bsUpd(i, k, v) { L[i][k] = v; bsCalc(); }
-function bsVal(l) { var t = parseFloat(String(l.theo).replace(',', '.')), r = parseFloat(String(l.reel).replace(',', '.')); if (isNaN(t) || isNaN(r) || t < 0 || r < 0) return null; var e = Math.round((r - t) * 100) / 100; return {t: t, r: r, e: e, i: Math.round(e * l.c[4] * 100) / 100}; }
+function bsVal(l) { var t = parseFloat(String(l.theo).replace(',', '.')), r = parseFloat(String(l.reel).replace(',', '.')); if (isNaN(t) || isNaN(r) || t < 0 || r < 0) return null; var of = (STK.cur && STK.cur.id === 'fdj' && OFF.actifs.indexOf(l.c[1]) >= 0) ? (parseFloat(String(l.of).replace(',', '.')) || 0) : 0; if (of < 0) return null; var e = Math.round((r + of - t) * 100) / 100; return {t: t, r: r, e: e, of: of, i: Math.round(e * l.c[4] * 100) / 100}; }
 function bsRender() {
   $('lines').innerHTML = L.map(function (l, i) {
     return '<div class="line"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(l.c[1]) + '</b><button class="x" onclick="bsDel(' + i + ')">Retirer</button></div><small>' + esc(l.c[2]) + ' · en ' + esc(l.c[3]) + ' · valeur ' + eur(l.c[4]) + '</small>' +
-      '<div class="in"><label>Théorique (Strator)<input type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.theo) + '" oninput="bsUpd(' + i + ',\'theo\',this.value)"></label><label>Réel (comptage)<input type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.reel) + '" oninput="bsUpd(' + i + ',\'reel\',this.value)"></label><div style="flex:1;font-size:13px">Écart<br><span id="e' + i + '">–</span></div></div></div>';
+      '<div class="in"><label>Théorique (Strator)<input type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.theo) + '" oninput="bsUpd(' + i + ',\'theo\',this.value)"></label><label>Réel (comptage)<input type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.reel) + '" oninput="bsUpd(' + i + ',\'reel\',this.value)"></label>' + offIn(l, i) + '<div style="flex:1;font-size:13px">Écart<br><span id="e' + i + '">–</span></div></div></div>';
   }).join('');
   bsCalc();
 }
@@ -660,7 +666,7 @@ function bsSave() {
     STK.done.push({groupe: g.id, nom: g.nom, session: r.session, nb: r.nb, impact: r.impact}); STK.sel[g.id] = false;
     ctrlApres(r);
   }).withFailureHandler(function (e) { b.textContent = 'Enregistrer cette famille'; check(); $('msg').innerHTML = '<div class="msg" style="background:#f8d7da">' + esc(e.message) + '</div>'; })
-  .enregistrerBoissons({catalogue: BSSRC, employe: B.user.nom, pin: B.user.pin, type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.filter(function (l) { return bsVal(l); }).map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.')}; })});
+  .enregistrerBoissons({catalogue: BSSRC, employe: B.user.nom, pin: B.user.pin, type: $('typ').value, creneau: $('cre').value, effectif: $('eff').value, lignes: L.filter(function (l) { return bsVal(l); }).map(function (l) { return {id: l.c[0], theo: String(l.theo).replace(',', '.'), reel: String(l.reel).replace(',', '.'), offerts: String(bsVal(l).of || 0)}; })});
 }
 function ctrlTotal() { return Math.round(STK.done.reduce(function (s, d) { return s + d.impact; }, 0) * 100) / 100; }
 function ctrlApres(r) {
@@ -1660,9 +1666,10 @@ function hiDeclarer() {
 }
 
 // ---------- Suivi des versions (à modifier à chaque mise à jour : numéro, date et nouveautés)
-var APP_VERSION = '1.7';
+var APP_VERSION = '1.8';
 var APP_DATE = '21 novembre 2026';
 var APP_NOTES = [
+  {v: '1.8', d: '23 novembre 2026', t: ['Contrôle boissons : les boissons vendues au même prix en caisse (à emporter 2,20 €, Coca-Cola PET, PET à 3 €, énergisantes, Schweppes, Pago) se comptent en une seule ligne.', 'FDJ : option « jeux offerts » activable par les gérants jeu par jeu ; les tickets offerts ne comptent plus comme un écart.', 'Contrôle de jeux : le contrôle de Marc du 20/11 est remplacé par celui de Wendy.']},
   {v: '1.7', d: '21 novembre 2026', t: ['Retour au menu principal disponible dans tous les modules. Reporting, planning : « À jour » seulement si le contrôle est fait ET validé dans Strator ; sinon « À valider » ou « À faire » avec la date prévue.', 'Rapports de contrôle : même mise en page que les rapports de clôture. Contrôles de la période de test (avant le 17/11, sauf le 10/11) : grisés dans les calendriers, gardés en archive, ignorés pour les dates.', 'Gérants : la bannière « à vérifier » affiche des bulles avec le montant total et par famille.', 'Gérants : nouvelle tuile Reporting (semaine, semaine dernière, mois) avec impacts, caisse, retards et conseils. Un récap est envoyé par e-mail chaque lundi à midi.', 'Un contrôle en retard affiche « En retard de 2 j » avec une couleur de plus en plus vive.', 'Gérants : planning des contrôles en calendrier (prévu, fait, en retard).', 'Le contrôle tabac est maintenant dans le bloc « Contrôle de stock », avec sa date de dernier et de prochain contrôle.', 'Nouveau : « Mes contrôles ». Chaque contrôle fait et validé est retrouvable par date, avec un code couleur par type et le rapport PDF en un clic.', 'Les gérants voient tous les contrôles (ou seulement les leurs) et la date du dernier contrôle de chaque type.', 'Un contrôle fait sans l’application peut être déclaré (qui, quand, pourquoi) : il apparaît dans l’historique et les gérants reçoivent un rapport.', 'En cas d’erreur, on peut déclarer une correction sur n’importe quel contrôle : elle est tracée à côté et les gérants sont prévenus.', 'Choix des familles : date du dernier contrôle et date théorique du prochain (lundi et vendredi FDJ, mercredi soft, mardi CBD/confiserie/fumeurs et jeudi vape tous les 15 jours), recalculée selon ce qui a été fait.']},
   {v: '1.6', d: '20 novembre 2026', t: ['Accueil gérant : bannière « contrôle à vérifier » et compteur dans l’onglet, avec notification quand l’appli est ouverte.', 'Validation : seules les références avec écart sont à valider, les jeux à 0/0 ne sont plus listés, et un contrôle sans écart se valide en un clic.', 'Un rapport PDF pour chaque contrôle (tabac, caisse, surprise, stock), classé dans Drive et tracé dans le Sheet.', 'Puffs regroupés par modèle (une ligne par modèle, tous goûts confondus) avec le bon prix de vente.', 'Contrôle en cours : reprise automatique après une veille, nouvel article en haut de la liste, champs vides ignorés, écart 0 accepté.', 'Contrôle surprise : toutes les caisses ne sont plus obligatoires.']},
   {v: '1.5', d: '17 novembre 2026', t: ['Contrôle de stock : un seul bloc, vous cochez les familles (boissons, vape, CBD, articles fumeurs, FDJ, confiserie) et vous les enchaînez.', 'L’impact en euros est visible partout : accueil, pendant la saisie, fin de famille et rapport.', 'Chaque contrôle donne un rapport envoyé aux gérants par e-mail ; ils l’approuvent, puis la mise à jour de Strator est suivie dans l’application.', 'Chaque famille affiche la date et l’auteur du dernier contrôle.']},
