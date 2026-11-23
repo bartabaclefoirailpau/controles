@@ -716,6 +716,7 @@ function ctrlDecideAucun(id) {
   google.script.run.withSuccessHandler(function () { google.script.run.withSuccessHandler(function () { ctrlValider(); }).withFailureHandler(stkErr).decideRapportStock(stkP({id: id, action: 'saisi'})); }).withFailureHandler(stkErr).decideRapportStock(stkP({id: id, action: 'approuver'}));
 }
 function ctrlValiderVue() {
+  $('back').style.display = 'none'; $('back2').style.display = 'block'; window.scrollTo(0, 0);
   var R = STK.rap, q = B.seuilsTabac, t = '<button class="bs2" onclick="ctrlStart()">← Retour au contrôle de stock</button>';
   t += stkIc('Impact du mois · toutes familles', R.impactMois, q.t2, q.t2 * 3, '');
   if (R.parFamille.length) t += '<h2>Où part l’argent ?</h2>' + ctrlBarres(R.parFamille.map(function (x) { return {nom: x[0], impact: x[1]}; }));
